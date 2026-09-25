@@ -1,0 +1,84 @@
+{
+  "secureCheckout": "دفع آمن",
+  "stepIndicatorLabel": "مراحل الدفع",
+  "steps": {
+    "shipping": "الشحن",
+    "delivery": "التوصيل",
+    "payment": "الدفع",
+    "review": "المراجعة"
+  },
+  "backToCart": "العودة إلى السلة",
+  "continue": "متابعة",
+  "back": "رجوع",
+  "shippingForm": {
+    "title": "عنوان الشحن",
+    "fullName": "الاسم الكامل",
+    "line1": "العنوان — السطر الأول",
+    "line2": "العنوان — السطر الثاني (اختياري)",
+    "city": "المدينة",
+    "region": "المحافظة / المنطقة",
+    "postalCode": "الرمز البريدي",
+    "country": "الدولة",
+    "phone": "رقم الهاتف",
+    "errors": {
+      "required": "هذا الحقل مطلوب",
+      "postalCode": "أدخل رمزًا بريديًا صالحًا",
+      "phone": "أدخل رقم هاتف صالحًا"
+    }
+  },
+  "deliveryForm": {
+    "title": "طريقة التوصيل",
+    "shippingTo": "الشحن إلى"
+  },
+  "paymentForm": {
+    "title": "الدفع",
+    "disclaimer": "هذه عملية دفع تجريبية. معالجة الدفع مسؤولية الخادم الخلفي ولا تتم أي معاملة حقيقية — لا تُدخل بيانات بطاقة حقيقية.",
+    "cardNumber": "رقم البطاقة",
+    "expiry": "تاريخ الانتهاء (شهر/سنة)",
+    "cvc": "رمز التحقق CVC",
+    "nameOnCard": "الاسم على البطاقة",
+    "billingSameAsShipping": "عنوان الفوترة مطابق لعنوان الشحن",
+    "errors": {
+      "cardNumber": "أدخل رقم بطاقة مكونًا من 16 رقمًا",
+      "expiry": "أدخل تاريخ انتهاء صالحًا (شهر/سنة)",
+      "cvc": "أدخل رمز CVC صالحًا من 3 أرقام",
+      "nameOnCard": "هذا الحقل مطلوب"
+    }
+  },
+  "review": {
+    "title": "راجع طلبك",
+    "items": "العناصر",
+    "shippingAddress": "عنوان الشحن",
+    "deliveryMethod": "طريقة التوصيل",
+    "payment": "الدفع",
+    "edit": "تعديل",
+    "placeOrder": "إتمام الطلب",
+    "placingOrder": "جارٍ إتمام الطلب…"
+  },
+  "summary": {
+    "title": "ملخص الطلب",
+    "subtotal": "المجموع الفرعي",
+    "discount": "الخصم",
+    "shipping": "الشحن",
+    "free": "مجاني",
+    "calculatedAtCheckout": "يُحسب عند الدفع",
+    "tax": "الضريبة",
+    "total": "الإجمالي",
+    "couponLabel": "رمز القسيمة",
+    "couponPlaceholder": "أدخل الرمز",
+    "applyCoupon": "تطبيق",
+    "couponApplied": "تم التطبيق: {{code}} (-{{percent}}٪)",
+    "couponInvalid": "هذا الرمز غير صالح",
+    "removeCoupon": "إزالة",
+    "freeShippingProgress": "أنت على بُعد {{amount}} من الشحن المجاني",
+    "freeShippingUnlocked": "لقد حصلت على شحن مجاني"
+  },
+  "success": {
+    "title": "تم تأكيد الطلب",
+    "subtitle": "شكرًا — الباقي علينا.",
+    "orderNumber": "رقم الطلب",
+    "estimatedDelivery": "التوصيل المتوقع",
+    "continueShopping": "متابعة التسوق",
+    "viewOrder": "عرض الطلب"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "hero": {
+    "eyebrow": "Discovery, made intelligent",
+    "title": "Find exactly what you didn't know you needed",
+    "subtitle": "Personalized recommendations, real comparisons, and an AI assistant that actually understands what you're shopping for.",
+    "cta": "Start exploring"
+  },
+  "sections": {
+    "assistant": "Ask NOVA",
+    "trending": "Trending now",
+    "personalized": "Picked for you",
+    "categories": "Browse categories",
+    "deals": "Flash deals",
+    "editorial": "Curated collection",
+    "newArrivals": "New arrivals",
+    "premiumPicks": "Premium picks",
+    "recentlyViewed": "Recently viewed"
+  },
+  "newsletter": {
+    "title": "Get the best finds first",
+    "subtitle": "One email a week. No noise.",
+    "placeholder": "you@email.com",
+    "cta": "Subscribe"
+  }
+}

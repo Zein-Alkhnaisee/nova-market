@@ -1,0 +1,78 @@
+{
+  "title": "الحساب",
+  "greeting": "مرحبًا، {{name}}",
+  "nav": {
+    "overview": "نظرة عامة",
+    "orders": "الطلبات",
+    "wishlist": "المفضلة",
+    "collections": "المجموعات",
+    "addresses": "العناوين",
+    "paymentMethods": "طرق الدفع",
+    "profile": "الملف الشخصي",
+    "settings": "الإعدادات"
+  },
+  "overview": {
+    "recentOrders": "الطلبات الأخيرة",
+    "noOrders": "لم تقم بأي طلبات بعد.",
+    "viewAllOrders": "عرض كل الطلبات",
+    "savedItems": "العناصر المحفوظة",
+    "savedAddresses": "العناوين المحفوظة",
+    "startShopping": "ابدأ التسوق"
+  },
+  "profile": {
+    "title": "الملف الشخصي",
+    "fullName": "الاسم الكامل",
+    "email": "البريد الإلكتروني",
+    "save": "حفظ التغييرات",
+    "saved": "تم تحديث الملف الشخصي",
+    "errors": {
+      "fullNameRequired": "أدخل اسمك",
+      "emailInvalid": "أدخل بريدًا إلكترونيًا صالحًا"
+    }
+  },
+  "addresses": {
+    "title": "العناوين",
+    "empty": "لم تحفظ أي عناوين بعد.",
+    "addNew": "إضافة عنوان",
+    "labelField": "التسمية (مثل: المنزل، العمل)",
+    "setDefault": "تعيين كافتراضي",
+    "default": "افتراضي",
+    "edit": "تعديل",
+    "remove": "إزالة",
+    "cancel": "إلغاء",
+    "save": "حفظ العنوان"
+  },
+  "paymentMethods": {
+    "title": "طرق الدفع",
+    "empty": "لم تحفظ أي طرق دفع بعد.",
+    "addNew": "إضافة طريقة دفع",
+    "expires": "تنتهي في {{expiry}}",
+    "setDefault": "تعيين كافتراضي",
+    "default": "افتراضي",
+    "remove": "إزالة",
+    "cancel": "إلغاء",
+    "save": "حفظ البطاقة",
+    "disclaimer": "نسخة تجريبية فقط — لا يتم تخزين بيانات البطاقة إطلاقًا. يُحتفظ فقط بنوع البطاقة وآخر 4 أرقام."
+  },
+  "settings": {
+    "title": "الإعدادات",
+    "appearance": "المظهر",
+    "theme": "السمة",
+    "language": "اللغة",
+    "notifications": "إشعارات البريد الإلكتروني",
+    "orderUpdates": "تحديثات الطلبات",
+    "promotions": "العروض والتخفيضات",
+    "dangerZone": "منطقة الخطر",
+    "signOut": "تسجيل الخروج من هذا الجهاز",
+    "signOutDescription": "ستحتاج إلى تسجيل الدخول مرة أخرى لعرض حسابك.",
+    "experimentalFeatures": "الميزات التجريبية",
+    "experimentalFeaturesHint": "فعّل أو عطّل ميزات معينة في هذا المتصفح. إيقاف الميزة يخفيها تمامًا، لا يعطّلها فقط.",
+    "featureFlags": {
+      "aiAssistant": "مساعد التسوق الذكي",
+      "productComparison": "مقارنة المنتجات",
+      "smartRecommendations": "التوصيات الذكية وأسبابها",
+      "productConfigurator": "مُهيئ المنتج",
+      "commandPalette": "لوحة الأوامر (Ctrl/Cmd+K)"
+    }
+  }
+}

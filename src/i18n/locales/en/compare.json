@@ -1,0 +1,16 @@
+{
+  "title": "Compare products",
+  "empty": "You haven't added anything to compare yet",
+  "emptyDescription": "Add up to 4 products from the shop to compare them side by side.",
+  "remove": "Remove from compare",
+  "clearAll": "Clear all",
+  "attributes": {
+    "price": "Price",
+    "rating": "Rating",
+    "reviews": "Reviews",
+    "brand": "Brand",
+    "category": "Category",
+    "availability": "Availability"
+  },
+  "limitReached": "You can compare up to 4 products at a time"
+}

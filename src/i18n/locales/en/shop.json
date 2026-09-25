@@ -1,0 +1,22 @@
+{
+  "filters": "Filters",
+  "sort": {
+    "label": "Sort by",
+    "relevance": "Relevance",
+    "price-asc": "Price: low to high",
+    "price-desc": "Price: high to low",
+    "rating": "Top rated",
+    "newest": "Newest"
+  },
+  "price": "Price",
+  "priceMin": "Min",
+  "priceMax": "Max",
+  "rating": "Minimum rating",
+  "anyRating": "Any rating",
+  "inStockOnly": "In stock only",
+  "clearFilters": "Clear filters",
+  "applyFilters": "Apply",
+  "allCategories": "All categories",
+  "resultsCount_one": "{{count}} product",
+  "resultsCount_other": "{{count}} products"
+}

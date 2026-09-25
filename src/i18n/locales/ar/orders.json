@@ -1,0 +1,38 @@
+{
+  "title": "الطلبات",
+  "empty": "لم تقم بأي طلبات بعد.",
+  "emptyDescription": "عندما تقوم بطلب، سيظهر هنا حتى تتمكن من تتبعه.",
+  "startShopping": "ابدأ التسوق",
+  "orderNumber": "طلب",
+  "placedOn": "تم الطلب في {{date}}",
+  "itemsCount_one": "عنصر واحد",
+  "itemsCount_other": "{{count}} عناصر",
+  "total": "الإجمالي",
+  "viewDetails": "عرض التفاصيل",
+  "backToOrders": "كل الطلبات",
+  "status": {
+    "pending": "قيد الانتظار",
+    "confirmed": "مؤكد",
+    "processing": "قيد التجهيز",
+    "shipped": "تم الشحن",
+    "out_for_delivery": "خارج للتوصيل",
+    "delivered": "تم التوصيل",
+    "cancelled": "ملغى",
+    "refunded": "مسترد"
+  },
+  "detail": {
+    "items": "العناصر",
+    "timeline": "المسار الزمني",
+    "shippingAddress": "عنوان الشحن",
+    "deliveryMethod": "طريقة التوصيل",
+    "payment": "الدفع",
+    "summary": "ملخص الطلب",
+    "estimatedDelivery": "التوصيل المتوقع",
+    "actions": "الإجراءات",
+    "buyAgain": "اشترِ مرة أخرى",
+    "cancelOrder": "إلغاء الطلب",
+    "cancelConfirm": "هل تريد إلغاء هذا الطلب؟ لا يمكن التراجع عن ذلك.",
+    "cancelled": "تم إلغاء هذا الطلب.",
+    "notFound": "لم نتمكن من العثور على هذا الطلب."
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "appName": "نوفا ماركت",
+  "actions": {
+    "viewAll": "عرض الكل",
+    "seeMore": "المزيد",
+    "addToCart": "أضف إلى السلة",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "continue": "متابعة",
+    "retry": "أعد المحاولة",
+    "close": "إغلاق",
+    "search": "بحث"
+  },
+  "theme": {
+    "light": "فاتح",
+    "dark": "داكن",
+    "system": "النظام"
+  },
+  "language": {
+    "english": "English",
+    "arabic": "العربية"
+  },
+  "empty": {
+    "title": "لا يوجد شيء هنا بعد",
+    "description": "لم نتمكن من العثور على أي شيء لعرضه."
+  },
+  "commandPalette": {
+    "title": "إجراءات سريعة",
+    "placeholder": "اكتب أمرًا…",
+    "noResults": "لا توجد إجراءات مطابقة",
+    "searchProducts": "بحث عن منتجات",
+    "openCart": "فتح السلة",
+    "openWishlist": "فتح المفضلة",
+    "switchToLight": "التبديل إلى الوضع الفاتح",
+    "switchToDark": "التبديل إلى الوضع الداكن",
+    "switchToArabic": "التبديل إلى العربية",
+    "switchToEnglish": "التبديل إلى الإنجليزية",
+    "openAssistant": "فتح المساعد"
+  }
+}

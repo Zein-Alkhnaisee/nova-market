@@ -1,0 +1,30 @@
+{
+  "title": "NOVA Assistant",
+  "subtitle": "Ask for recommendations, comparisons, or help finding the right thing.",
+  "floatingButtonLabel": "Open assistant",
+  "openFullPage": "Open full page",
+  "close": "Close",
+  "clearConversation": "Clear conversation",
+  "inputPlaceholder": "Ask NOVA anything…",
+  "send": "Send",
+  "thinking": "Thinking…",
+  "errorMessage": "Something went wrong. Please try again.",
+  "retry": "Try again",
+  "suggestedPrompts": {
+    "title": "Try asking",
+    "prompt1": "Find me a laptop under $1000",
+    "prompt2": "Compare these headphones",
+    "prompt3": "What should I buy for a home office?",
+    "prompt4": "Find a gift for a gamer"
+  },
+  "actions": {
+    "view_product": "View",
+    "add_to_cart": "Add to cart",
+    "add_to_compare": "Compare",
+    "add_to_wishlist": "Add to wishlist",
+    "view_comparison": "View full comparison",
+    "search": "Search the shop"
+  },
+  "addedToCart": "Added to cart",
+  "addedToCompare": "Added to compare"
+}

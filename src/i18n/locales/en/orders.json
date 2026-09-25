@@ -1,0 +1,38 @@
+{
+  "title": "Orders",
+  "empty": "You haven't placed any orders yet.",
+  "emptyDescription": "When you place an order, it'll show up here so you can track it.",
+  "startShopping": "Start shopping",
+  "orderNumber": "Order",
+  "placedOn": "Placed {{date}}",
+  "itemsCount_one": "{{count}} item",
+  "itemsCount_other": "{{count}} items",
+  "total": "Total",
+  "viewDetails": "View details",
+  "backToOrders": "All orders",
+  "status": {
+    "pending": "Pending",
+    "confirmed": "Confirmed",
+    "processing": "Processing",
+    "shipped": "Shipped",
+    "out_for_delivery": "Out for delivery",
+    "delivered": "Delivered",
+    "cancelled": "Cancelled",
+    "refunded": "Refunded"
+  },
+  "detail": {
+    "items": "Items",
+    "timeline": "Timeline",
+    "shippingAddress": "Shipping address",
+    "deliveryMethod": "Delivery method",
+    "payment": "Payment",
+    "summary": "Order summary",
+    "estimatedDelivery": "Estimated delivery",
+    "actions": "Actions",
+    "buyAgain": "Buy again",
+    "cancelOrder": "Cancel order",
+    "cancelConfirm": "Cancel this order? This can't be undone.",
+    "cancelled": "This order was cancelled.",
+    "notFound": "We couldn't find that order."
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "title": "سلتك",
+  "empty": "سلتك فارغة",
+  "emptyDescription": "ستظهر هنا العناصر التي تضيفها.",
+  "subtotal": "المجموع الفرعي",
+  "checkout": "المتابعة إلى الدفع",
+  "remove": "إزالة",
+  "quantity": "الكمية",
+  "smartSuggestions": {
+    "title": "أكمل طلبك"
+  }
+}

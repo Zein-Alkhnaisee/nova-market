@@ -1,0 +1,22 @@
+{
+  "filters": "الفلاتر",
+  "sort": {
+    "label": "ترتيب حسب",
+    "relevance": "الأكثر صلة",
+    "price-asc": "السعر: من الأقل إلى الأعلى",
+    "price-desc": "السعر: من الأعلى إلى الأقل",
+    "rating": "الأعلى تقييمًا",
+    "newest": "الأحدث"
+  },
+  "price": "السعر",
+  "priceMin": "الحد الأدنى",
+  "priceMax": "الحد الأقصى",
+  "rating": "أقل تقييم",
+  "anyRating": "أي تقييم",
+  "inStockOnly": "المتوفر فقط",
+  "clearFilters": "مسح الفلاتر",
+  "applyFilters": "تطبيق",
+  "allCategories": "كل الفئات",
+  "resultsCount_one": "منتج واحد",
+  "resultsCount_other": "{{count}} منتج"
+}

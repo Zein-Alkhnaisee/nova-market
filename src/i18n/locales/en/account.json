@@ -1,0 +1,78 @@
+{
+  "title": "Account",
+  "greeting": "Hi, {{name}}",
+  "nav": {
+    "overview": "Overview",
+    "orders": "Orders",
+    "wishlist": "Wishlist",
+    "collections": "Collections",
+    "addresses": "Addresses",
+    "paymentMethods": "Payment methods",
+    "profile": "Profile",
+    "settings": "Settings"
+  },
+  "overview": {
+    "recentOrders": "Recent orders",
+    "noOrders": "You haven't placed any orders yet.",
+    "viewAllOrders": "View all orders",
+    "savedItems": "Saved items",
+    "savedAddresses": "Saved addresses",
+    "startShopping": "Start shopping"
+  },
+  "profile": {
+    "title": "Profile",
+    "fullName": "Full name",
+    "email": "Email",
+    "save": "Save changes",
+    "saved": "Profile updated",
+    "errors": {
+      "fullNameRequired": "Enter your name",
+      "emailInvalid": "Enter a valid email"
+    }
+  },
+  "addresses": {
+    "title": "Addresses",
+    "empty": "You haven't saved any addresses yet.",
+    "addNew": "Add an address",
+    "labelField": "Label (e.g. Home, Work)",
+    "setDefault": "Set as default",
+    "default": "Default",
+    "edit": "Edit",
+    "remove": "Remove",
+    "cancel": "Cancel",
+    "save": "Save address"
+  },
+  "paymentMethods": {
+    "title": "Payment methods",
+    "empty": "You haven't saved any payment methods yet.",
+    "addNew": "Add a payment method",
+    "expires": "Expires {{expiry}}",
+    "setDefault": "Set as default",
+    "default": "Default",
+    "remove": "Remove",
+    "cancel": "Cancel",
+    "save": "Save card",
+    "disclaimer": "Demo only — card details are never stored. Only the brand and last 4 digits are kept."
+  },
+  "settings": {
+    "title": "Settings",
+    "appearance": "Appearance",
+    "theme": "Theme",
+    "language": "Language",
+    "notifications": "Email notifications",
+    "orderUpdates": "Order updates",
+    "promotions": "Promotions and offers",
+    "dangerZone": "Danger zone",
+    "signOut": "Sign out of this device",
+    "signOutDescription": "You'll need to log in again to see your account.",
+    "experimentalFeatures": "Experimental features",
+    "experimentalFeaturesHint": "Turn individual features on or off in this browser. Off means the feature is hidden, not just disabled.",
+    "featureFlags": {
+      "aiAssistant": "AI shopping assistant",
+      "productComparison": "Product comparison",
+      "smartRecommendations": "Smart recommendations & reasons",
+      "productConfigurator": "Product configurator",
+      "commandPalette": "Command palette (Ctrl/Cmd+K)"
+    }
+  }
+}

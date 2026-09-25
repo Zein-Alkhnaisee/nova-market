@@ -1,0 +1,30 @@
+{
+  "title": "مساعد نوفا",
+  "subtitle": "اطلب توصيات أو مقارنات أو مساعدة في إيجاد ما تبحث عنه.",
+  "floatingButtonLabel": "فتح المساعد",
+  "openFullPage": "فتح الصفحة الكاملة",
+  "close": "إغلاق",
+  "clearConversation": "مسح المحادثة",
+  "inputPlaceholder": "اسأل نوفا أي شيء…",
+  "send": "إرسال",
+  "thinking": "جارٍ التفكير…",
+  "errorMessage": "حدث خطأ ما. حاول مرة أخرى.",
+  "retry": "أعد المحاولة",
+  "suggestedPrompts": {
+    "title": "جرّب أن تسأل",
+    "prompt1": "ابحث لي عن لابتوب بأقل من 1000 دولار",
+    "prompt2": "قارن بين هذه السماعات",
+    "prompt3": "ماذا أشتري لمكتب منزلي؟",
+    "prompt4": "ابحث عن هدية لمحب الألعاب"
+  },
+  "actions": {
+    "view_product": "عرض",
+    "add_to_cart": "أضف إلى السلة",
+    "add_to_compare": "قارن",
+    "add_to_wishlist": "أضف إلى المفضلة",
+    "view_comparison": "عرض المقارنة الكاملة",
+    "search": "ابحث في المتجر"
+  },
+  "addedToCart": "أُضيف إلى السلة",
+  "addedToCompare": "أُضيف للمقارنة"
+}

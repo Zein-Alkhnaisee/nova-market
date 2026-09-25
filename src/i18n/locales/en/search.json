@@ -1,0 +1,19 @@
+{
+  "placeholder": "Search products, brands, categories…",
+  "recent": "Recent searches",
+  "trending": "Trending searches",
+  "clearRecent": "Clear",
+  "removeRecent": "Remove search",
+  "categories": "Categories",
+  "products": "Products",
+  "viewAllResults": "View all results for \"{{query}}\"",
+  "noSuggestions": "No matches yet — keep typing.",
+  "resultsTitle": "Results for \"{{query}}\"",
+  "resultsCount_one": "{{count}} result",
+  "resultsCount_other": "{{count}} results",
+  "noResultsTitle": "No results for \"{{query}}\"",
+  "noResultsDescription": "Try a different term or clear your filters.",
+  "clearSearch": "Clear search",
+  "startTitle": "Search NOVA Market",
+  "startDescription": "Find products, brands and categories instantly."
+}

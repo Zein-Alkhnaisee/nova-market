@@ -1,0 +1,47 @@
+{
+  "price": "السعر",
+  "previousPrice": "كان",
+  "rating": "التقييم",
+  "reviews": "التقييمات",
+  "specifications": "المواصفات",
+  "addToCart": "أضف إلى السلة",
+  "addToWishlist": "أضف إلى المفضلة",
+  "addToCompare": "أضف للمقارنة",
+  "quickView": "عرض سريع",
+  "outOfStock": "غير متوفر",
+  "inStock": "متوفر",
+  "quantity": "الكمية",
+  "quantityDecrease": "إنقاص الكمية",
+  "quantityIncrease": "زيادة الكمية",
+  "youMayAlsoLike": "قد يعجبك أيضًا",
+  "viewFullDetails": "عرض التفاصيل الكاملة",
+  "gallery": {
+    "thumbnails": "صور المنتج",
+    "imageOf": "صورة {{index}} من {{total}}"
+  },
+  "reviewsSection": {
+    "title": "التقييمات",
+    "basedOn": "بناءً على {{count}} تقييم",
+    "writeReview": "اكتب تقييمًا",
+    "yourRating": "تقييمك",
+    "nameLabel": "الاسم (اختياري)",
+    "namePlaceholder": "مثال: سارة",
+    "titleLabel": "عنوان التقييم",
+    "bodyLabel": "تقييمك",
+    "submit": "إرسال التقييم",
+    "submitting": "جارٍ الإرسال…",
+    "cancel": "إلغاء",
+    "ratingRequired": "يرجى اختيار تقييم.",
+    "fieldsRequired": "يرجى إضافة عنوان وتقييم.",
+    "anonymous": "مجهول",
+    "verified": "عملية شراء موثقة",
+    "helpfulCount_one": "شخص واحد وجد هذا مفيدًا",
+    "helpfulCount_other": "{{count}} شخص وجدوا هذا مفيدًا",
+    "empty": "لا توجد تقييمات بعد — كن أول من يشارك رأيه."
+  },
+  "configurator": {
+    "title": "صمّم مواصفاتك",
+    "subtitle": "اختر الخيارات التي تهمك — يتحدث السعر أثناء الاختيار.",
+    "included": "مضمّن"
+  }
+}

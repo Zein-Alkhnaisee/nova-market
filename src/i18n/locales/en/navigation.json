@@ -1,0 +1,17 @@
+{
+  "categories": "Categories",
+  "search": "Search",
+  "assistant": "Assistant",
+  "wishlist": "Wishlist",
+  "cart": "Cart",
+  "account": "Account",
+  "menu": "Menu",
+  "links": {
+    "shop": "Shop",
+    "deals": "Deals",
+    "newArrivals": "New arrivals",
+    "trending": "Trending",
+    "collections": "Collections",
+    "compare": "Compare"
+  }
+}

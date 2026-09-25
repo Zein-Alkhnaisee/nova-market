@@ -1,0 +1,40 @@
+{
+  "appName": "NOVA Market",
+  "actions": {
+    "viewAll": "View all",
+    "seeMore": "See more",
+    "addToCart": "Add to cart",
+    "save": "Save",
+    "cancel": "Cancel",
+    "continue": "Continue",
+    "retry": "Try again",
+    "close": "Close",
+    "search": "Search"
+  },
+  "theme": {
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "language": {
+    "english": "English",
+    "arabic": "العربية"
+  },
+  "empty": {
+    "title": "Nothing here yet",
+    "description": "We couldn't find anything to show."
+  },
+  "commandPalette": {
+    "title": "Quick actions",
+    "placeholder": "Type a command…",
+    "noResults": "No matching actions",
+    "searchProducts": "Search products",
+    "openCart": "Open cart",
+    "openWishlist": "Open wishlist",
+    "switchToLight": "Switch to light theme",
+    "switchToDark": "Switch to dark theme",
+    "switchToArabic": "Switch to Arabic",
+    "switchToEnglish": "Switch to English",
+    "openAssistant": "Open assistant"
+  }
+}

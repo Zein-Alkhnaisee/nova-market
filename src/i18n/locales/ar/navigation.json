@@ -1,0 +1,17 @@
+{
+  "categories": "الفئات",
+  "search": "بحث",
+  "assistant": "المساعد",
+  "wishlist": "المفضلة",
+  "cart": "السلة",
+  "account": "الحساب",
+  "menu": "القائمة",
+  "links": {
+    "shop": "المتجر",
+    "deals": "العروض",
+    "newArrivals": "وصل حديثًا",
+    "trending": "الأكثر رواجًا",
+    "collections": "المجموعات",
+    "compare": "قارن"
+  }
+}

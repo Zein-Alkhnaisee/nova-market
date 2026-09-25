@@ -1,0 +1,84 @@
+{
+  "secureCheckout": "Secure checkout",
+  "stepIndicatorLabel": "Checkout progress",
+  "steps": {
+    "shipping": "Shipping",
+    "delivery": "Delivery",
+    "payment": "Payment",
+    "review": "Review"
+  },
+  "backToCart": "Back to cart",
+  "continue": "Continue",
+  "back": "Back",
+  "shippingForm": {
+    "title": "Shipping address",
+    "fullName": "Full name",
+    "line1": "Address line 1",
+    "line2": "Address line 2 (optional)",
+    "city": "City",
+    "region": "State / Region",
+    "postalCode": "Postal code",
+    "country": "Country",
+    "phone": "Phone number",
+    "errors": {
+      "required": "This field is required",
+      "postalCode": "Enter a valid postal code",
+      "phone": "Enter a valid phone number"
+    }
+  },
+  "deliveryForm": {
+    "title": "Delivery method",
+    "shippingTo": "Shipping to"
+  },
+  "paymentForm": {
+    "title": "Payment",
+    "disclaimer": "This is a demo checkout. Payment processing is a backend responsibility and no real transaction is made — do not enter real card details.",
+    "cardNumber": "Card number",
+    "expiry": "Expiry (MM/YY)",
+    "cvc": "CVC",
+    "nameOnCard": "Name on card",
+    "billingSameAsShipping": "Billing address same as shipping",
+    "errors": {
+      "cardNumber": "Enter a 16-digit card number",
+      "expiry": "Enter a valid expiry (MM/YY)",
+      "cvc": "Enter a valid 3-digit CVC",
+      "nameOnCard": "This field is required"
+    }
+  },
+  "review": {
+    "title": "Review your order",
+    "items": "Items",
+    "shippingAddress": "Shipping address",
+    "deliveryMethod": "Delivery method",
+    "payment": "Payment",
+    "edit": "Edit",
+    "placeOrder": "Place order",
+    "placingOrder": "Placing order…"
+  },
+  "summary": {
+    "title": "Order summary",
+    "subtotal": "Subtotal",
+    "discount": "Discount",
+    "shipping": "Shipping",
+    "free": "Free",
+    "calculatedAtCheckout": "Calculated at checkout",
+    "tax": "Tax",
+    "total": "Total",
+    "couponLabel": "Coupon code",
+    "couponPlaceholder": "Enter code",
+    "applyCoupon": "Apply",
+    "couponApplied": "Applied: {{code}} (-{{percent}}%)",
+    "couponInvalid": "That code isn't valid",
+    "removeCoupon": "Remove",
+    "freeShippingProgress": "You're {{amount}} away from free shipping",
+    "freeShippingUnlocked": "You've unlocked free shipping"
+  },
+  "success": {
+    "title": "Order confirmed",
+    "subtitle": "Thanks — we've got it from here.",
+    "orderNumber": "Order number",
+    "estimatedDelivery": "Estimated delivery",
+    "continueShopping": "Continue shopping",
+    "viewOrder": "View order"
+  }
+}

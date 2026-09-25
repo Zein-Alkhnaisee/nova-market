@@ -1,0 +1,148 @@
+@import "tailwindcss";
+
+/* ============================================================
+   NOVA MARKET — DESIGN TOKENS
+   Semantic tokens only. Components must never hardcode colors.
+   ============================================================ */
+
+@theme {
+  --font-sans: "Inter", "IBM Plex Sans Arabic", "Noto Sans Arabic", system-ui, sans-serif;
+  --font-arabic: "IBM Plex Sans Arabic", "Noto Sans Arabic", system-ui, sans-serif;
+
+  /* Radius scale */
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl: 24px;
+
+  /* Shadow scale — kept subtle per design system */
+  --shadow-elevation-sm: 0 1px 2px rgba(15, 15, 20, 0.06), 0 1px 1px rgba(15, 15, 20, 0.04);
+  --shadow-elevation-md: 0 4px 12px rgba(15, 15, 20, 0.08), 0 2px 4px rgba(15, 15, 20, 0.04);
+  --shadow-elevation-lg: 0 12px 32px rgba(15, 15, 20, 0.12), 0 4px 8px rgba(15, 15, 20, 0.04);
+  --shadow-elevation-xl: 0 24px 48px rgba(15, 15, 20, 0.16), 0 8px 16px rgba(15, 15, 20, 0.06);
+
+  /* Z-index layers */
+  --z-index-base: 0;
+  --z-index-sticky: 20;
+  --z-index-dropdown: 30;
+  --z-index-popover: 40;
+  --z-index-drawer: 50;
+  --z-index-modal: 60;
+  --z-index-toast: 70;
+  --z-index-command: 80;
+
+  /* Motion */
+  --ease-standard: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  /* Map semantic colors to Tailwind utility namespace so bg-background, text-foreground, etc. work */
+  --color-background: var(--nova-background);
+  --color-surface: var(--nova-surface);
+  --color-surface-elevated: var(--nova-surface-elevated);
+  --color-surface-hover: var(--nova-surface-hover);
+  --color-surface-muted: var(--nova-surface-muted);
+  --color-foreground: var(--nova-foreground);
+  --color-muted-foreground: var(--nova-muted-foreground);
+  --color-border: var(--nova-border);
+  --color-border-strong: var(--nova-border-strong);
+  --color-primary: var(--nova-primary);
+  --color-primary-foreground: var(--nova-primary-foreground);
+  --color-secondary: var(--nova-secondary);
+  --color-secondary-foreground: var(--nova-secondary-foreground);
+  --color-accent: var(--nova-accent);
+  --color-accent-foreground: var(--nova-accent-foreground);
+  --color-success: var(--nova-success);
+  --color-warning: var(--nova-warning);
+  --color-danger: var(--nova-danger);
+  --color-info: var(--nova-info);
+}
+
+/* ---------- Light theme (default) ---------- */
+:root {
+  --nova-background: #faf9f7;
+  --nova-surface: #ffffff;
+  --nova-surface-elevated: #ffffff;
+  --nova-surface-hover: #f2f1ee;
+  --nova-surface-muted: #f2f1ee;
+  --nova-foreground: #17181c;
+  --nova-muted-foreground: #63666f;
+  --nova-border: #e6e4df;
+  --nova-border-strong: #d3d1ca;
+
+  --nova-primary: #16181d;
+  --nova-primary-foreground: #faf9f7;
+  --nova-secondary: #eceae4;
+  --nova-secondary-foreground: #16181d;
+
+  --nova-accent: #2f5dff;
+  --nova-accent-foreground: #ffffff;
+
+  --nova-success: #1a8a5f;
+  --nova-warning: #b3760a;
+  --nova-danger: #d1403a;
+  --nova-info: #2f5dff;
+}
+
+/* ---------- Dark theme (independently designed, not an inversion) ---------- */
+.dark {
+  --nova-background: #0b0c0e;
+  --nova-surface: #131417;
+  --nova-surface-elevated: #191a1e;
+  --nova-surface-hover: #202126;
+  --nova-surface-muted: #17181b;
+  --nova-foreground: #f2f1ee;
+  --nova-muted-foreground: #9a9ca3;
+  --nova-border: #2a2b30;
+  --nova-border-strong: #37383e;
+
+  --nova-primary: #f2f1ee;
+  --nova-primary-foreground: #131417;
+  --nova-secondary: #202126;
+  --nova-secondary-foreground: #f2f1ee;
+
+  --nova-accent: #6d8bff;
+  --nova-accent-foreground: #0b0c0e;
+
+  --nova-success: #35c98a;
+  --nova-warning: #e0a733;
+  --nova-danger: #f0665f;
+  --nova-info: #6d8bff;
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  html,
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+  }
+
+  body {
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  [dir="rtl"] body {
+    font-family: var(--font-arabic);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}

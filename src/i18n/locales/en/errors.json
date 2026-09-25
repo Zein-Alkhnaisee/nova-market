@@ -1,0 +1,6 @@
+{
+  "generic": "Something went wrong.",
+  "network": "We couldn't reach the server. Check your connection and try again.",
+  "notFound": "We couldn't find what you were looking for.",
+  "retry": "Try again"
+}

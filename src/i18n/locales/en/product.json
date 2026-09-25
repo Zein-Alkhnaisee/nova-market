@@ -1,0 +1,47 @@
+{
+  "price": "Price",
+  "previousPrice": "Was",
+  "rating": "Rating",
+  "reviews": "Reviews",
+  "specifications": "Specifications",
+  "addToCart": "Add to cart",
+  "addToWishlist": "Add to wishlist",
+  "addToCompare": "Add to compare",
+  "quickView": "Quick view",
+  "outOfStock": "Out of stock",
+  "inStock": "In stock",
+  "quantity": "Quantity",
+  "quantityDecrease": "Decrease quantity",
+  "quantityIncrease": "Increase quantity",
+  "youMayAlsoLike": "You may also like",
+  "viewFullDetails": "View full details",
+  "gallery": {
+    "thumbnails": "Product images",
+    "imageOf": "image {{index}} of {{total}}"
+  },
+  "reviewsSection": {
+    "title": "Reviews",
+    "basedOn": "Based on {{count}} reviews",
+    "writeReview": "Write a review",
+    "yourRating": "Your rating",
+    "nameLabel": "Name (optional)",
+    "namePlaceholder": "e.g. Jordan",
+    "titleLabel": "Review title",
+    "bodyLabel": "Your review",
+    "submit": "Submit review",
+    "submitting": "Submitting…",
+    "cancel": "Cancel",
+    "ratingRequired": "Please select a rating.",
+    "fieldsRequired": "Please add a title and a review.",
+    "anonymous": "Anonymous",
+    "verified": "Verified purchase",
+    "helpfulCount_one": "{{count}} person found this helpful",
+    "helpfulCount_other": "{{count}} people found this helpful",
+    "empty": "No reviews yet — be the first to share your thoughts."
+  },
+  "configurator": {
+    "title": "Build your own",
+    "subtitle": "Pick the options that matter to you — price updates as you go.",
+    "included": "Included"
+  }
+}

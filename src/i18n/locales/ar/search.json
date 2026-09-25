@@ -1,0 +1,19 @@
+{
+  "placeholder": "ابحث عن منتجات، ماركات، فئات…",
+  "recent": "عمليات بحث سابقة",
+  "trending": "الأكثر بحثًا",
+  "clearRecent": "مسح",
+  "removeRecent": "إزالة عملية البحث",
+  "categories": "الفئات",
+  "products": "المنتجات",
+  "viewAllResults": "عرض كل النتائج لـ \"{{query}}\"",
+  "noSuggestions": "لا توجد نتائج بعد — تابع الكتابة.",
+  "resultsTitle": "نتائج \"{{query}}\"",
+  "resultsCount_one": "نتيجة واحدة",
+  "resultsCount_other": "{{count}} نتيجة",
+  "noResultsTitle": "لا توجد نتائج لـ \"{{query}}\"",
+  "noResultsDescription": "جرّب كلمة مختلفة أو امسح عوامل التصفية.",
+  "clearSearch": "مسح البحث",
+  "startTitle": "ابحث في نوفا ماركت",
+  "startDescription": "اعثر على المنتجات والماركات والفئات فورًا."
+}
