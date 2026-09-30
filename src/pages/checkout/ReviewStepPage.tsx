@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useCheckoutGuard } from "../../hooks/useCheckoutGuard";
 import { useAppDispatch, useAppSelector } from "../../app/store/hooks";
 import { selectCartLines, clearCart } from "../../features/cart/cartSlice";
+import { selectUser } from "../../features/auth/authSlice";
 import {
   selectCouponCode,
   selectDeliveryOption,
@@ -35,6 +36,7 @@ export function ReviewStepPage() {
   const deliveryOption = useAppSelector(selectDeliveryOption);
   const couponCode = useAppSelector(selectCouponCode);
   const discountPercent = useAppSelector(selectDiscountPercent);
+  const user = useAppSelector(selectUser);
   const [placeOrder, { isLoading, isError, reset }] = usePlaceOrderMutation();
 
   const paymentSummary = (location.state as { paymentSummary?: PaymentSummary } | null)?.paymentSummary;
@@ -58,6 +60,7 @@ export function ReviewStepPage() {
       deliveryOption,
       discountPercent,
       paymentSummary,
+      customerId: user?.id,
     });
     if ("data" in result && result.data) {
       // Navigate away first — otherwise clearing the cart while still on

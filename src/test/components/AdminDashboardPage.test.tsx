@@ -18,7 +18,7 @@ describe("AdminDashboardPage", () => {
     expect(screen.getByText("No revenue in this period yet.")).toBeInTheDocument();
     // Conversion is never invented: the card says it is unavailable and why.
     expect(screen.getByText("Not available")).toBeInTheDocument();
-    expect(screen.getByText(/needs visit tracking/i)).toBeInTheDocument();
+    expect(screen.getByText(/needs visit \(session\) data/i)).toBeInTheDocument();
     expect(screen.getByText(String(products.length))).toBeInTheDocument();
   });
 

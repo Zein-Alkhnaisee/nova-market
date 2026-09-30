@@ -161,7 +161,7 @@ inferred from the phase-list bullets alone.
 **Known, honest limitation**: the mock AI matches by category id, not fine-grained product type — asking for "a laptop under $1000" can surface a mechanical keyboard, since both share the `computers` category and the mock has no separate "laptop vs. peripheral" distinction. This is documented, not hidden; a real NLU/LLM backend behind the same `AIProvider` interface wouldn't have this limitation.
 
 ## PHASE 12 — ADMIN — IN_PROGRESS
-Checkpoint order: admin auth → shell → dashboard → products → categories → orders → customers → coupons → analytics.
+Checkpoint order (revised: Customers moved ahead of Products): admin auth → shell → dashboard → customers → products → categories → orders → coupons → analytics.
 
 | Feature | Status | Notes |
 |---|---|---|
@@ -172,11 +172,12 @@ Checkpoint order: admin auth → shell → dashboard → products → categories
 | Admin i18n | DONE | `admin` namespace now has real en/ar files (shell, nav, forbidden, pending); previously registered but empty |
 | Admin routes | DONE | All 9 `/admin/*` routes now render inside `AdminLayout`; each section shows `AdminPendingPage` until its checkpoint lands |
 | Dashboard | DONE (Conversion KPI excepted — see next row) | `/admin` — `AdminDashboardPage`: KPI cards (Revenue, Orders + "needs attention" count, Customers, Products + out-of-stock count, Conversion), 14-day revenue bar chart (`BarChart`, token-based SVG, aria-hidden drawing + visually hidden data table), Top products by revenue (top 5, meter bars), Recent orders table (5, newest first, `OrderStatusBadge`). Skeleton while loading, designed empty states for no orders/no sales/no revenue, human-readable error with working retry. Stats are computed by the pure `lib/adminStats.ts::computeDashboardStats` behind `adminApi.getDashboardStats`; revenue excludes cancelled/refunded orders; recent orders show the shipping recipient name as "Customer" |
-| Dashboard — Conversion KPI | IN_PROGRESS | Shown as "Not available" with the reason, by design. Conversion needs visits (not collected) or an order→customer link (orders store no customer id — only the shipping recipient). `DashboardStats.conversion` is `number \| null` and the card already renders a percentage when it is non-null, so it lights up as soon as a real definition is possible. Decision needed — see HANDOFF §7 |
-| Products management | TODO | |
+| Dashboard — Conversion KPI | DONE as "Not available" (deliberate) | No honest definition exists: a conversion rate needs visits/sessions, which the demo doesn't collect, and orders linked to accounts can't supply a visitor denominator. `DashboardStats.conversion` stays `null`; the card explains exactly what's missing and will render a percentage the day a real definition is possible. Not a defect — a documented limitation |
+| Order → customer link (Phase 12 enabler) | DONE | Optional `Order.customerId`, set at checkout from the signed-in session (`ReviewStepPage` passes `user?.id`; `placeOrder` stores it only when present). Additive change to Phase 7/8 code, approved by the owner. Guest orders and orders placed before this field have none and still load and render everywhere (a test covers `getOrders`/`getOrderById`) |
+| Customers | DONE | `/admin/customers` — list (name, email, order count, lifetime spend, last order), spend-ranked with a stable alphabetical tiebreak, URL-synced search (`?q=`), a "N orders can't be linked to an account" note for guest/legacy orders, skeleton, empty ("No customers yet"), no-match and error states. `/admin/customers/:id` — customer KPIs (orders, lifetime spend, average order, last/first order) + order history table; **a customer with no linked orders shows a designed empty state, not an error**; unknown ids and the admin account show not-found. Lifetime spend excludes cancelled/refunded orders (same rule as the dashboard). `/admin/customers/:id` is a new route beyond MASTER_SPEC §11's admin list, needed for the "detail view" in the Phase 12 checklist |
+| Products management | TODO | Next. **Storefront-connection options must be presented to the owner before any implementation** (shared store vs. admin-only overlay vs. read-only storefront) |
 | Categories management | TODO | |
 | Orders management | TODO | |
-| Customers | TODO | |
 | Coupons | TODO | |
 | Analytics | TODO | |
 
@@ -184,10 +185,10 @@ Checkpoint order: admin auth → shell → dashboard → products → categories
 
 ## PHASE 13 — POLISH — TODO
 
-Recommended next: continue **Phase 12 (Admin)** at the **Products management** checkpoint.
+Recommended next: continue **Phase 12 (Admin)** at the **Products management** checkpoint — starting with the storefront-connection discussion.
 
 ## Testing
-Vitest + Testing Library. 239 tests across 46 files:
+Vitest + Testing Library. 256 tests across 50 files:
 - Reducers: cart, wishlist, compare, recent searches, recently viewed, checkout draft, auth session, saved addresses, saved payment methods, user collections, feature flags
 - Persistence helpers (`lib/persist.ts`)
 - `productsApi` filter/sort logic, `reviewsApi` (breakdown computation, submit mutation),
@@ -244,6 +245,7 @@ Vitest + Testing Library. 239 tests across 46 files:
   closes)
 - Phase 12 (admin auth + shell, so far): `authApi` seeded admin (10 → 4 tests: admin login returns role and no password, wrong password rejected, new registrations are customers, the admin email can't be registered over) and `AdminLayout` access control (6 tests: signed-out redirect to login, customer sees no-access without redirect or content leak, a pre-Phase-12 session with no role is treated as customer, "log in with a different account" signs out and goes to login, admin sees shell + all 7 nav links + current-page marker, admin sign-out returns to the storefront)
 - Phase 12 (dashboard): `adminStats` (7 tests — zero/empty data with a full zero-filled 14-day window and null conversion; cancelled/refunded excluded from revenue and top products but still counted as orders; only pending/confirmed/processing count as needing attention; local-day bucketing with older orders excluded from the chart but not from total revenue; top-product aggregation across orders ranked by revenue and capped at 5; recent orders newest-first capped at 5; product and out-of-stock counts) and `AdminDashboardPage` (3 tests — skeleton then empty states with the honest "Not available" conversion; a placed order flowing into top products, revenue table, recent orders and status badge; a forced API failure showing the human-readable error, hiding the raw message, and recovering on retry)
+- Phase 12 (customers + order→customer link): `adminCustomers` (7 — linking by customerId and spend ranking; cancelled/refunded counted as orders but not spend; zero rows for customers with no orders; guest/legacy/unknown-account orders counted as unlinked rather than hidden; stable alphabetical tiebreak; detail returns only this customer's orders newest-first with first/last dates and average; degrades to empty history / null average), `orderCustomerLink` (3 — customerId stored and persisted; guest orders carry no customerId key and still load via `getOrders`/`getOrderById`; storefront totals unchanged by the new field), `ReviewCustomerLink` (2 — the real `ReviewStepPage` stamps the signed-in user's id, and records none for a guest while checkout still succeeds), `AdminCustomersPages` (5 — empty state; list with counts/spend/unlinked note/search/no-match and admins excluded; detail with history and cancelled excluded from spend; designed empty state for a customer with no orders; not-found for an unknown id and for the admin account)
 - **End-to-end**: a full `CheckoutFlow` integration test drives the real Shipping → Delivery →
   Payment → Review → Order Success flow through actual routing (not mocked), then asserts the
   cart was cleared and that the raw card number is unreachable from both Redux state and
@@ -251,7 +253,7 @@ Vitest + Testing Library. 239 tests across 46 files:
   authenticated session, validation failures, bad-credential errors, and the account auth guard
 
 ## Known issues / deliberate deferrals
-- Admin dashboard: the Conversion KPI is unavailable (no visit tracking; orders record no customer id). Dashboard product counts currently read the static product mock and will move to the admin product store at the Products checkpoint. Admin only sees orders and accounts stored in the current browser (same localStorage boundary as everything else).
+- Admin dashboard: the Conversion KPI is unavailable (no visit/session tracking, so there is no honest denominator). Orders placed as a guest, or before `customerId` existed, can't be attributed to an account; the Customers list counts and flags them instead of hiding them. The dashboard's "Customer" column in Recent orders is the shipping recipient's name, not a resolved account. Dashboard product counts currently read the static product mock and will move to the admin product store at the Products checkpoint. Admin only sees orders and accounts stored in the current browser (same localStorage boundary as everything else).
 - Smart filters only compute counts for rating and in-stock — price range isn't counted/disabled dynamically (the numeric inputs don't lend themselves to discrete option counts the same way).
 - Only 2 of 9 mock products have configurator groups (the Kite laptop and the new Nova Forge Custom PC) — intentional, since MASTER_SPEC's configurator examples are specifically laptop/PC, not every product category.
 - Feature flags persist per-browser only, same localStorage-based mock-backend boundary as every other piece of state in this project — there's no server-side remote-config system to fetch flags from.

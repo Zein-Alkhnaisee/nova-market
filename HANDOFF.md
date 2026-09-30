@@ -1,6 +1,6 @@
 # HANDOFF.md — NOVA Market
 
-**Last updated:** 2026-09-30, after Phase 12 checkpoint 3 (Dashboard) was completed and verified. Phase 12 is IN PROGRESS.
+**Last updated:** 2026-09-30, after Phase 12 checkpoint 4 (Customers + order→customer link) was completed and verified. Phase 12 is IN PROGRESS.
 
 This document is written for a **new AI agent or a different AI tool** picking this project up
 cold. It reflects the actual state of the repository at export time, not a plan or an aspiration.
@@ -201,7 +201,7 @@ Phase numbers are `MASTER_SPEC.md`'s (§107). See `PROGRESS.md` for full feature
 
 **Current phase: Phase 12 (Admin) is IN PROGRESS.** Phases 1–11 are untouched and complete. The working tree is in a clean, fully passing state at the end of each checkpoint.
 
-**Phase 12 checkpoint order:** auth → shell → dashboard → products → categories → orders → customers → coupons → analytics.
+**Phase 12 checkpoint order (revised by the owner):** auth → shell → dashboard → customers → products → categories → orders → coupons → analytics.
 
 **DONE so far:**
 - **Admin auth**: `User.role?`, a seeded mock admin in `authApi.ts` (`admin@nova.demo` / `admin-demo-123` — mock only, plain text, says so in a comment), and `useAuthGuard({ role })`. A wrong role is *not* redirected; the hook returns false and the layout renders `AdminForbidden`. UX only — the backend must enforce roles when one exists (MASTER_SPEC §97).
@@ -209,11 +209,10 @@ Phase numbers are `MASTER_SPEC.md`'s (§107). See `PROGRESS.md` for full feature
 
 - **Dashboard** (`/admin`, `AdminDashboardPage`): KPI cards, 14-day revenue `BarChart` (reusable token-based SVG in `components/admin/charts/`), top products, recent orders; skeleton/empty/error states. Figures come from the pure `lib/adminStats.ts` behind `services/api/adminApi.ts` (admin-only module; additive accessors `listAllOrders()` in `ordersApi.ts` and `listMockCustomers()` in `authApi.ts`). **Its Conversion KPI is intentionally "Not available"** — see below.
 
-**Exact next step:** the **Products management** checkpoint — replace `AdminPendingPage section="products"` on `/admin/products`, `/admin/products/new` and `/admin/products/:id` with real pages (list, search, filters, create, edit, delete, inventory, pricing). Build an admin-side product store in `adminApi.ts` (seeded from `mocks/data/products`, IDs via `generateId`, validation and constraints enforced in the API layer). **When it lands, repoint the dashboard's product counts at that store** (they read the static product mock today) and check whether storefront reads should see admin edits — the storefront `productsApi` currently reads the static mock, so decide deliberately and document it. Reuse `AdminPageHeader`, `Card`, `Skeleton`, `EmptyState`/`ErrorState`, `Button`, `TextField`, `Badge`. Each later section replaces its own `AdminPendingPage` route in `app/router/index.tsx`.
+- **Customers** (`/admin/customers`, `/admin/customers/:id`): list with search/ranking/unlinked-orders note, detail with KPIs and order history, designed empty state for customers with no linked orders. Backed by `lib/adminCustomers.ts` + `adminApi` (`getAdminCustomers`, `getAdminCustomer`).
+- **Order→customer link (Phase 12 enabler touching Phase 7/8 code):** optional `Order.customerId`, set in `ReviewStepPage` from the signed-in session and stored by `placeOrder` only when present. Old and guest orders have none and must keep working — never make this field required or fail a load on it.
 
-**Open decision (needed before the Customers checkpoint):** orders record no customer id, only the shipping recipient. Admin Customers detail ("orders for this customer") and a real Conversion KPI both need an optional `customerId` on `Order`, set at checkout from the signed-in session — a small change to Phase 7/8 code (`placeOrder` input + `ReviewStepPage`). The alternative is to keep the Phase 7/8 code untouched and show customers without linked orders and Conversion as unavailable. Recommendation: add the optional field (additive, old orders simply have none) — but it is the owner's call because it touches completed phases.
-
-**Design decisions already agreed for the remaining checkpoints:** admin-side mock stores owned by the API layer with constraints enforced there (e.g. 409 on deleting a category that still has products, mirroring `cancelOrder`); do not modify the checkout slice for coupons (whether checkout should read admin coupons is Phase 13); Analytics uses small token-based SVG charts (revenue over time, orders by status, top products, sales by category) with no new charting library; IDs via `generateId`.
+**Exact next step:** the **Products management** checkpoint — but **first present the storefront-connection options to the owner and wait for a decision; do not implement before that.** Options and tradeoffs to present: (a) *shared store* — admin CRUD writes the same store the storefront's `productsApi` reads, so edits show up everywhere (most realistic; touches storefront API code and any existing tests that assume the static catalog); (b) *admin-only overlay* — admin has its own product store seeded from `mocks/data/products`, storefront unchanged (zero risk to Phases 1–11, but admin edits visibly do nothing on the storefront, which can confuse a demo); (c) *read-only storefront* — admin edits are stored but the storefront never reads them, documented as the backend's job (same as (b) in effect, with the limitation stated up front). Then implement list, search, filters, create, edit, delete, inventory and pricing on `/admin/products`, `/admin/products/new`, `/admin/products/:id`, with validation and constraints enforced in `adminApi.ts`, IDs via `generateId`, and **repoint the dashboard's product counts** (they read the static product mock today) at whichever store results. Reuse `AdminPageHeader`, `Card`, `Skeleton`, `EmptyState`/`ErrorState`, `Button`, `TextField`, `Badge`. Each later section replaces its own `AdminPendingPage` route in `app/router/index.tsx`.
 
 **Remaining after Phase 12:** Phase 13 (Polish).
 
@@ -319,7 +318,7 @@ npm test          # must be all-passing
 npm run build     # must succeed
 ```
 
-Current state: **239 tests across 46 files, all passing.** `tsc -b` clean. `oxlint` 0 errors
+Current state: **256 tests across 50 files, all passing.** `tsc -b` clean. `oxlint` 0 errors
 with 4 advisory `only-export-components` / `set-state-in-effect` warnings that are the
 long-standing accepted baseline — **do not let this number grow**; if a change adds a warning,
 fix the cause rather than suppressing it.
@@ -358,7 +357,7 @@ Test conventions:
   cover realistic failure paths today.
 - **Some i18n namespaces are registered but empty** (e.g. `validation`, `admin`) — fill them as
   their phases are built.
-- **Admin area is a demo boundary.** The seeded admin's credentials are public in the repo and stored in plain text in the mock store; the role check (`useAuthGuard({ role })`) is a client-side UX guard that anyone can bypass. Real admin provisioning, hashing and role enforcement are backend work. Only the shell and the Dashboard are built so far (see §7). The Dashboard's Conversion KPI is unavailable by design (no visit tracking, no order→customer link), and the admin only sees orders/accounts stored in the current browser.
+- **Admin area is a demo boundary.** The seeded admin's credentials are public in the repo and stored in plain text in the mock store; the role check (`useAuthGuard({ role })`) is a client-side UX guard that anyone can bypass. Real admin provisioning, hashing and role enforcement are backend work. Only the shell, Dashboard and Customers are built so far (see §7). Guest orders and orders placed before `Order.customerId` existed can't be attributed to an account (surfaced, not hidden). The Dashboard's Conversion KPI is unavailable by design (no visit/session tracking, so no honest denominator), and the admin only sees orders/accounts stored in the current browser.
 - **Not visually QA'd in a real browser** across RTL/mobile/dark combinations; correctness there
   rests on logical properties, semantic tokens, and responsive classes rather than manual review.
 - **Arabic translations are functional but unreviewed by a native speaker.**

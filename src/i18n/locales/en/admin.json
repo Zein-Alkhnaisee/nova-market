@@ -43,7 +43,7 @@
       "productsHint_other": "{{count}} out of stock",
       "conversion": "Conversion",
       "unavailable": "Not available",
-      "conversionUnavailable": "Needs visit tracking, which this demo doesn't collect"
+      "conversionUnavailable": "Needs visit (session) data, which this demo doesn't collect. Orders linked to accounts can't supply a visitor count."
     },
     "revenueTrend": {
       "title": "Revenue",
@@ -68,5 +68,34 @@
       "emptyTitle": "No orders yet",
       "emptyDescription": "Orders placed in this browser will show up here."
     }
+  },
+  "customers": {
+    "description": "Accounts registered in this browser, with the orders linked to them.",
+    "error": "We couldn't load customers right now.",
+    "detailError": "We couldn't load this customer right now.",
+    "search": "Search customers",
+    "searchPlaceholder": "Name or email",
+    "name": "Name",
+    "email": "Email",
+    "orders": "Orders",
+    "lifetimeSpend": "Lifetime spend",
+    "lastOrder": "Last order",
+    "never": "No orders yet",
+    "emptyTitle": "No customers yet",
+    "emptyDescription": "Accounts will appear here once people register.",
+    "noMatchTitle": "No customers match your search",
+    "noMatchDescription": "Try a different name or email.",
+    "unlinkedNote_one": "{{count}} order can't be linked to an account (guest checkout, or placed before orders were linked to accounts).",
+    "unlinkedNote_other": "{{count}} orders can't be linked to an account (guest checkout, or placed before orders were linked to accounts).",
+    "backToList": "All customers",
+    "notFoundTitle": "Customer not found",
+    "notFoundDescription": "There's no customer account with that id.",
+    "averageOrder": "Average order",
+    "notAvailable": "Not available",
+    "spendHint": "Excludes cancelled and refunded orders",
+    "firstOrderHint": "First order: {{date}}",
+    "orderHistory": "Order history",
+    "noOrdersTitle": "No orders linked to this customer",
+    "noOrdersDescription": "They haven't placed an order while signed in. Guest orders and older orders can't be linked to an account."
   }
 }

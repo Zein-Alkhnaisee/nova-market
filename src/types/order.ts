@@ -44,6 +44,12 @@ export interface OrderTimelineEntry {
 export interface Order {
   id: string;
   orderNumber: string;
+  /**
+   * Id of the signed-in account that placed the order (Phase 12 enabler for the
+   * admin Customers views). Optional: guest orders and orders placed before this
+   * field existed have none, and must keep loading and rendering normally.
+   */
+  customerId?: string;
   items: OrderItem[];
   subtotal: number;
   discount: number;

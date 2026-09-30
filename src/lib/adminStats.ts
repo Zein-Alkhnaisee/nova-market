@@ -6,6 +6,11 @@ const NON_REVENUE: OrderStatus[] = ["cancelled", "refunded"];
 /** Orders still waiting on the store to act. */
 const OPEN: OrderStatus[] = ["pending", "confirmed", "processing"];
 
+/** True when an order counts toward revenue / lifetime spend. */
+export function isRevenueOrder(order: Order): boolean {
+  return !NON_REVENUE.includes(order.status);
+}
+
 export const REVENUE_DAYS = 14;
 export const TOP_PRODUCT_LIMIT = 5;
 export const RECENT_ORDER_LIMIT = 5;
@@ -20,8 +25,9 @@ export interface DashboardStats {
   outOfStockCount: number;
   /**
    * Share (0–1) of visits that ended in an order. null = not measurable: the
-   * demo collects no visit data and orders don't record which customer placed
-   * them, so there is nothing honest to divide by. Never fabricated.
+   * demo collects no visit/session data, and orders linked to accounts can't
+   * supply a visitor denominator, so there is nothing honest to divide by.
+   * Never fabricated; only computed once a real definition exists.
    */
   conversion: number | null;
   revenueByDay: { date: string; revenue: number }[];
@@ -53,7 +59,7 @@ export function computeDashboardStats(input: {
 }): DashboardStats {
   const { orders, customerCount, products } = input;
   const now = input.now ?? new Date();
-  const counted = orders.filter((o) => !NON_REVENUE.includes(o.status));
+  const counted = orders.filter(isRevenueOrder);
 
   const revenue = counted.reduce((sum, o) => sum + o.total, 0);
 

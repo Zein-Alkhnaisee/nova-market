@@ -41,6 +41,8 @@ export interface PlaceOrderInput {
   deliveryOption: DeliveryOption;
   discountPercent: number;
   paymentSummary: { brand: string; last4: string };
+  /** Signed-in account placing the order, if any. Guests have none. */
+  customerId?: string;
 }
 
 export const ordersApi = baseApi.injectEndpoints({
@@ -55,6 +57,7 @@ export const ordersApi = baseApi.injectEndpoints({
         const order: Order = {
           id: generateId("order"),
           orderNumber: generateOrderNumber(),
+          ...(input.customerId ? { customerId: input.customerId } : {}),
           items: input.lines.map((line) => ({
             productId: line.productId,
             slug: line.slug,
