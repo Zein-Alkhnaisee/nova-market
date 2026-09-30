@@ -27,5 +27,58 @@
   "pending": {
     "title": "هذا القسم قيد الإنجاز",
     "description": "لم يتم بناؤه بعد، وسيصل في مرحلة لاحقة من المرحلة 12."
+  },
+  "dashboard": {
+    "description": "نظرة على أداء المتجر من الطلبات والحسابات في هذا المتصفح.",
+    "error": "تعذّر تحميل لوحة التحكم الآن.",
+    "kpi": {
+      "revenue": "الإيرادات",
+      "revenueHint": "لا تشمل الطلبات الملغاة والمستردة",
+      "orders": "الطلبات",
+      "ordersHint_zero": "لا طلبات تحتاج إلى إجراء",
+      "ordersHint_one": "طلب واحد يحتاج إلى إجراء",
+      "ordersHint_two": "طلبان يحتاجان إلى إجراء",
+      "ordersHint_few": "{{count}} طلبات تحتاج إلى إجراء",
+      "ordersHint_many": "{{count}} طلبًا يحتاج إلى إجراء",
+      "ordersHint_other": "{{count}} طلب يحتاج إلى إجراء",
+      "customers": "العملاء",
+      "products": "المنتجات",
+      "productsHint_zero": "لا منتجات نفدت",
+      "productsHint_one": "منتج واحد نفد من المخزون",
+      "productsHint_two": "منتجان نفدا من المخزون",
+      "productsHint_few": "{{count}} منتجات نفدت من المخزون",
+      "productsHint_many": "{{count}} منتجًا نفد من المخزون",
+      "productsHint_other": "{{count}} منتج نفد من المخزون",
+      "conversion": "معدل التحويل",
+      "unavailable": "غير متاح",
+      "conversionUnavailable": "يتطلب تتبّع الزيارات، وهو غير مفعّل في هذا العرض التجريبي"
+    },
+    "revenueTrend": {
+      "title": "الإيرادات",
+      "subtitle": "آخر {{count}} يومًا",
+      "empty": "لا إيرادات في هذه الفترة بعد.",
+      "day": "اليوم"
+    },
+    "topProducts": {
+      "title": "أفضل المنتجات",
+      "subtitle": "حسب الإيرادات",
+      "empty": "لا مبيعات بعد.",
+      "units_zero": "لا وحدات",
+      "units_one": "وحدة واحدة",
+      "units_two": "وحدتان",
+      "units_few": "{{count}} وحدات",
+      "units_many": "{{count}} وحدة",
+      "units_other": "{{count}} وحدة"
+    },
+    "recentOrders": {
+      "title": "أحدث الطلبات",
+      "order": "الطلب",
+      "customer": "العميل",
+      "date": "التاريخ",
+      "status": "الحالة",
+      "total": "الإجمالي",
+      "emptyTitle": "لا طلبات بعد",
+      "emptyDescription": "ستظهر هنا الطلبات التي تُنشأ في هذا المتصفح."
+    }
   }
 }

@@ -6,6 +6,9 @@ import { AccountLayout } from "../../components/account/AccountLayout";
 import { AdminLayout } from "../../components/admin/AdminLayout";
 import { NotFoundPage } from "../../pages/NotFoundPage";
 
+const AdminDashboardPage = lazy(() =>
+  import("../../pages/admin/AdminDashboardPage").then((m) => ({ default: m.AdminDashboardPage }))
+);
 const AdminPendingPage = lazy(() =>
   import("../../pages/admin/AdminPendingPage").then((m) => ({ default: m.AdminPendingPage }))
 );
@@ -178,7 +181,7 @@ export const router = createBrowserRouter([
 
   { path: "/assistant", element: withShell(<AssistantPage />) },
 
-  { path: "/admin", element: withAdminShell(<AdminPendingPage section="dashboard" />) },
+  { path: "/admin", element: withAdminShell(<AdminDashboardPage />) },
   { path: "/admin/products", element: withAdminShell(<AdminPendingPage section="products" />) },
   { path: "/admin/products/new", element: withAdminShell(<AdminPendingPage section="products" />) },
   { path: "/admin/products/:id", element: withAdminShell(<AdminPendingPage section="products" />) },

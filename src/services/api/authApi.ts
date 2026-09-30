@@ -62,6 +62,11 @@ function toPublicUser(record: MockUserRecord): User {
   return user;
 }
 
+/** Admin-only mock accessor: registered customer accounts (never includes passwords). */
+export function listMockCustomers(): User[] {
+  return userStore.filter((u) => (u.role ?? "customer") === "customer").map(toPublicUser);
+}
+
 export interface LoginInput {
   email: string;
   password: string;

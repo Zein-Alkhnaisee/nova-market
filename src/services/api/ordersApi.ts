@@ -12,6 +12,15 @@ function persistOrders() {
   savePersisted("orders", orderStore);
 }
 
+/**
+ * Admin-only mock accessor: every order in this browser's mock store, newest
+ * first. A real backend exposes this as a staff-scoped endpoint; the storefront
+ * must keep using `getOrders`/`getOrderById`. Additive — no existing behavior changed.
+ */
+export function listAllOrders(): Order[] {
+  return orderStore;
+}
+
 function generateOrderNumber() {
   const random = Math.floor(100000 + Math.random() * 900000);
   return `NV-${random}`;

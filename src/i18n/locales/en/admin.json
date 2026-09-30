@@ -27,5 +27,46 @@
   "pending": {
     "title": "This section is on its way",
     "description": "It hasn't been built yet. It's coming in a later Phase 12 checkpoint."
+  },
+  "dashboard": {
+    "description": "How the store is doing, from the orders and accounts in this browser.",
+    "error": "We couldn't load the dashboard right now.",
+    "kpi": {
+      "revenue": "Revenue",
+      "revenueHint": "Excludes cancelled and refunded orders",
+      "orders": "Orders",
+      "ordersHint_one": "{{count}} needs attention",
+      "ordersHint_other": "{{count}} need attention",
+      "customers": "Customers",
+      "products": "Products",
+      "productsHint_one": "{{count}} out of stock",
+      "productsHint_other": "{{count}} out of stock",
+      "conversion": "Conversion",
+      "unavailable": "Not available",
+      "conversionUnavailable": "Needs visit tracking, which this demo doesn't collect"
+    },
+    "revenueTrend": {
+      "title": "Revenue",
+      "subtitle": "Last {{count}} days",
+      "empty": "No revenue in this period yet.",
+      "day": "Day"
+    },
+    "topProducts": {
+      "title": "Top products",
+      "subtitle": "By revenue",
+      "empty": "No sales yet.",
+      "units_one": "{{count}} unit",
+      "units_other": "{{count}} units"
+    },
+    "recentOrders": {
+      "title": "Recent orders",
+      "order": "Order",
+      "customer": "Customer",
+      "date": "Date",
+      "status": "Status",
+      "total": "Total",
+      "emptyTitle": "No orders yet",
+      "emptyDescription": "Orders placed in this browser will show up here."
+    }
   }
 }

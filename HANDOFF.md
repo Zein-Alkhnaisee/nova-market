@@ -1,6 +1,6 @@
 # HANDOFF.md — NOVA Market
 
-**Last updated:** 2026-09-30, after Phase 12 checkpoint 1 (admin auth + shell) was completed and verified. Phase 12 is IN PROGRESS.
+**Last updated:** 2026-09-30, after Phase 12 checkpoint 3 (Dashboard) was completed and verified. Phase 12 is IN PROGRESS.
 
 This document is written for a **new AI agent or a different AI tool** picking this project up
 cold. It reflects the actual state of the repository at export time, not a plan or an aspiration.
@@ -207,7 +207,11 @@ Phase numbers are `MASTER_SPEC.md`'s (§107). See `PROGRESS.md` for full feature
 - **Admin auth**: `User.role?`, a seeded mock admin in `authApi.ts` (`admin@nova.demo` / `admin-demo-123` — mock only, plain text, says so in a comment), and `useAuthGuard({ role })`. A wrong role is *not* redirected; the hook returns false and the layout renders `AdminForbidden`. UX only — the backend must enforce roles when one exists (MASTER_SPEC §97).
 - **Admin shell**: `components/admin/AdminLayout.tsx` (+ `AdminPageHeader`, `AdminForbidden`), the `admin` i18n namespace (en/ar), and all nine `/admin/*` routes rendering inside the shell.
 
-**Exact next step:** the **Dashboard** checkpoint — replace `AdminPendingPage section="dashboard"` at `/admin` with a real page (Revenue, Orders, Customers, Products, Conversion, Top Products, Recent Orders per MASTER_SPEC §56), with skeleton/empty/error states. Reuse `AdminPageHeader`, `OrderStatusBadge`, `Card`, `Skeleton`, `EmptyState`/`ErrorState`; compute figures in the API layer (a new admin API module), not in components. Then continue down the checkpoint order. Each later section replaces its own `AdminPendingPage` route in `app/router/index.tsx`.
+- **Dashboard** (`/admin`, `AdminDashboardPage`): KPI cards, 14-day revenue `BarChart` (reusable token-based SVG in `components/admin/charts/`), top products, recent orders; skeleton/empty/error states. Figures come from the pure `lib/adminStats.ts` behind `services/api/adminApi.ts` (admin-only module; additive accessors `listAllOrders()` in `ordersApi.ts` and `listMockCustomers()` in `authApi.ts`). **Its Conversion KPI is intentionally "Not available"** — see below.
+
+**Exact next step:** the **Products management** checkpoint — replace `AdminPendingPage section="products"` on `/admin/products`, `/admin/products/new` and `/admin/products/:id` with real pages (list, search, filters, create, edit, delete, inventory, pricing). Build an admin-side product store in `adminApi.ts` (seeded from `mocks/data/products`, IDs via `generateId`, validation and constraints enforced in the API layer). **When it lands, repoint the dashboard's product counts at that store** (they read the static product mock today) and check whether storefront reads should see admin edits — the storefront `productsApi` currently reads the static mock, so decide deliberately and document it. Reuse `AdminPageHeader`, `Card`, `Skeleton`, `EmptyState`/`ErrorState`, `Button`, `TextField`, `Badge`. Each later section replaces its own `AdminPendingPage` route in `app/router/index.tsx`.
+
+**Open decision (needed before the Customers checkpoint):** orders record no customer id, only the shipping recipient. Admin Customers detail ("orders for this customer") and a real Conversion KPI both need an optional `customerId` on `Order`, set at checkout from the signed-in session — a small change to Phase 7/8 code (`placeOrder` input + `ReviewStepPage`). The alternative is to keep the Phase 7/8 code untouched and show customers without linked orders and Conversion as unavailable. Recommendation: add the optional field (additive, old orders simply have none) — but it is the owner's call because it touches completed phases.
 
 **Design decisions already agreed for the remaining checkpoints:** admin-side mock stores owned by the API layer with constraints enforced there (e.g. 409 on deleting a category that still has products, mirroring `cancelOrder`); do not modify the checkout slice for coupons (whether checkout should read admin coupons is Phase 13); Analytics uses small token-based SVG charts (revenue over time, orders by status, top products, sales by category) with no new charting library; IDs via `generateId`.
 
@@ -315,7 +319,7 @@ npm test          # must be all-passing
 npm run build     # must succeed
 ```
 
-Current state: **229 tests across 44 files, all passing.** `tsc -b` clean. `oxlint` 0 errors
+Current state: **239 tests across 46 files, all passing.** `tsc -b` clean. `oxlint` 0 errors
 with 4 advisory `only-export-components` / `set-state-in-effect` warnings that are the
 long-standing accepted baseline — **do not let this number grow**; if a change adds a warning,
 fix the cause rather than suppressing it.
@@ -354,7 +358,7 @@ Test conventions:
   cover realistic failure paths today.
 - **Some i18n namespaces are registered but empty** (e.g. `validation`, `admin`) — fill them as
   their phases are built.
-- **Admin area is a demo boundary.** The seeded admin's credentials are public in the repo and stored in plain text in the mock store; the role check (`useAuthGuard({ role })`) is a client-side UX guard that anyone can bypass. Real admin provisioning, hashing and role enforcement are backend work. Admin sections other than the shell are not built yet (see §7).
+- **Admin area is a demo boundary.** The seeded admin's credentials are public in the repo and stored in plain text in the mock store; the role check (`useAuthGuard({ role })`) is a client-side UX guard that anyone can bypass. Real admin provisioning, hashing and role enforcement are backend work. Only the shell and the Dashboard are built so far (see §7). The Dashboard's Conversion KPI is unavailable by design (no visit tracking, no order→customer link), and the admin only sees orders/accounts stored in the current browser.
 - **Not visually QA'd in a real browser** across RTL/mobile/dark combinations; correctness there
   rests on logical properties, semantic tokens, and responsive classes rather than manual review.
 - **Arabic translations are functional but unreviewed by a native speaker.**

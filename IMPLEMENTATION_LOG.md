@@ -185,3 +185,27 @@
 
 **Known limitations / not done**: no admin section has real content yet (dashboard through analytics are all still pending); the shell has not been visually checked in a real browser across RTL/mobile/dark; Arabic strings for the admin namespace are unreviewed by a native speaker.
 
+## 2026-09-30 — Phase 12 (checkpoint 3 of 9): Admin Dashboard
+
+**Scope**: the MASTER_SPEC §56 dashboard — Revenue, Orders, Customers, Products, Conversion, Top Products, Recent Orders — with token-based SVG for the chart and no charting library, as agreed. Baseline at start: 229 tests / 44 files, lint at 4 warnings.
+
+**Stats are a pure function, behind an admin-only API module**: `lib/adminStats.ts::computeDashboardStats({ orders, customerCount, products, now })` does all the arithmetic and takes `now` as a parameter so day-bucketing is testable without faking the clock. `services/api/adminApi.ts` wraps it as `getDashboardStats` and is deliberately separate from the storefront modules, so the customer-facing API surface never gains an "all orders / all customers" method; its header notes every endpoint there needs server-side role enforcement on a real backend (MASTER_SPEC §97). It reads through two small *additive* accessors — `listAllOrders()` in `ordersApi.ts` and `listMockCustomers()` in `authApi.ts` — because both stores are module-private. No existing behavior in either file changed. The query provides the `Order`/`User`/`Products` list tags so a newly placed order invalidates it, and the page also refetches on mount so an admin who opens the dashboard after checking out sees fresh numbers.
+
+**Revenue semantics**: revenue and top products exclude cancelled and refunded orders (the card says so); the Orders count includes every order; "needs attention" counts pending/confirmed/processing. The chart window is 14 local calendar days, zero-filled so quiet days still render, while the Revenue KPI covers all time — a test pins that older orders are in the KPI but not on the chart.
+
+**Conversion is not faked — the main judgment call**: a real conversion rate needs visits, which the demo doesn't collect, or an order→customer link, which doesn't exist: `Order` stores only the shipping recipient, not who was signed in. Inventing a proxy (e.g. orders ÷ customers) would put a plausible-looking but meaningless percentage on a screen an operator might act on. `DashboardStats.conversion` is therefore `number | null`; it is `null` today and the card shows "Not available" with the reason. The UI already formats a percentage when a value arrives. Closing this properly means adding an optional customer id to orders at checkout, which touches Phase 7/8 code and is also what the Customers detail checkpoint will need — left as an explicit decision in HANDOFF §7 rather than silently changing checkout. Similarly, "Customer" in Recent orders is the shipping recipient's name, labelled as such in the data, not a resolved account.
+
+**Chart component built for reuse**: `components/admin/charts/BarChart.tsx` draws tokens only (`fill-accent`, `stroke-border`; no hex), keeps the drawing `aria-hidden` and exposes the same data as a visually hidden `<table>` (with caption and header scopes), pins `dir="ltr"` because time series read left→right in Arabic too, and renders zero days as a thin muted stub. It only handles one series; Analytics will reuse it for revenue over time and category sales, and extend it if a second shape is needed. Top products deliberately uses simple meter bars in HTML rather than SVG — they are logical-property/RTL-friendly for free and need no drawing.
+
+**States**: skeleton that mirrors the final layout (KPI row, two panels, table), a designed empty state per panel, and an error state that shows human copy (never the raw error) with a Retry that actually refetches. A test drives all three, including the failure → retry → recovery path.
+
+**A test I rewrote rather than shipped**: the first version of the error-state test was named "recovers on retry" but never clicked retry and carried dead scaffolding. It was replaced with a test that forces the first fetch to fail, asserts the raw message is not rendered, clicks "Try again", and asserts the dashboard then renders. Also noted: the mock order store is module-level state, so the dashboard page tests are order-dependent by necessity (empty-state test first); this is commented in the file.
+
+**i18n**: `admin.dashboard.*` in en and ar, including full Arabic plural forms (zero/one/two/few/many/other) for the counts. Currency, numbers, percent and dates go through `Intl` with the active language. Arabic strings are unreviewed by a native speaker.
+
+**Testing**: 10 new tests in 2 files — `adminStats` (7) and `AdminDashboardPage` (3); see PROGRESS.md.
+
+**Verification**: `tsc -b` clean, `oxlint` — 0 errors, 4 advisory warnings (unchanged baseline), `vitest run` — 239/239 passing across 46 files (was 229 / 44), `vite build` succeeds (`AdminDashboardPage` 9.7 KB / 3.0 KB gzip, lazy chunk).
+
+**Known limitations / not done**: Conversion KPI unavailable (above); dashboard product counts read the static product mock until the Products checkpoint introduces an admin product store, at which point the dashboard must be pointed at it; the admin only sees orders/accounts in the current browser; not visually checked in a real browser across RTL/mobile/dark.
+
