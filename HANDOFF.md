@@ -1,6 +1,6 @@
 # HANDOFF.md — NOVA Market
 
-**Last updated:** 2026-09-20, immediately after Phase 11 (AI Shopping Assistant) was completed and verified.
+**Last updated:** 2026-09-30, after Phase 12 checkpoint 1 (admin auth + shell) was completed and verified. Phase 12 is IN PROGRESS.
 
 This document is written for a **new AI agent or a different AI tool** picking this project up
 cold. It reflects the actual state of the repository at export time, not a plan or an aspiration.
@@ -199,19 +199,19 @@ Phase numbers are `MASTER_SPEC.md`'s (§107). See `PROGRESS.md` for full feature
 
 ## 7. Current phase and what remains
 
-**Current phase: Phase 11 is complete and verified.** Nothing is mid-flight — the working tree
-is in a clean, fully passing state.
+**Current phase: Phase 12 (Admin) is IN PROGRESS.** Phases 1–11 are untouched and complete. The working tree is in a clean, fully passing state at the end of each checkpoint.
 
-**Exact next step:** implement **Phase 12 — Admin**. Read `MASTER_SPEC.md`'s Phase 12 section
-for the exact checklist before starting — do not assume anything from earlier phases (e.g.
-`OrdersPage`/`OrderDetailPage` from Phase 8, `addressesSlice`, `userCollectionsSlice`) already
-constitutes an admin surface; Admin is a distinct, typically staff-facing area of the app (its
-own route namespace is already reserved at `/admin/*` as placeholders — check the router). Likely
-needs its own auth concept (an admin role, not just "is logged in") — read §9 of this document
-(security/data rules) before inventing one, and extend `useAuthGuard`'s pattern rather than
-building a parallel guard if a role check is genuinely needed.
+**Phase 12 checkpoint order:** auth → shell → dashboard → products → categories → orders → customers → coupons → analytics.
 
-**Remaining after that:** Phase 13 (Polish).
+**DONE so far:**
+- **Admin auth**: `User.role?`, a seeded mock admin in `authApi.ts` (`admin@nova.demo` / `admin-demo-123` — mock only, plain text, says so in a comment), and `useAuthGuard({ role })`. A wrong role is *not* redirected; the hook returns false and the layout renders `AdminForbidden`. UX only — the backend must enforce roles when one exists (MASTER_SPEC §97).
+- **Admin shell**: `components/admin/AdminLayout.tsx` (+ `AdminPageHeader`, `AdminForbidden`), the `admin` i18n namespace (en/ar), and all nine `/admin/*` routes rendering inside the shell.
+
+**Exact next step:** the **Dashboard** checkpoint — replace `AdminPendingPage section="dashboard"` at `/admin` with a real page (Revenue, Orders, Customers, Products, Conversion, Top Products, Recent Orders per MASTER_SPEC §56), with skeleton/empty/error states. Reuse `AdminPageHeader`, `OrderStatusBadge`, `Card`, `Skeleton`, `EmptyState`/`ErrorState`; compute figures in the API layer (a new admin API module), not in components. Then continue down the checkpoint order. Each later section replaces its own `AdminPendingPage` route in `app/router/index.tsx`.
+
+**Design decisions already agreed for the remaining checkpoints:** admin-side mock stores owned by the API layer with constraints enforced there (e.g. 409 on deleting a category that still has products, mirroring `cancelOrder`); do not modify the checkout slice for coupons (whether checkout should read admin coupons is Phase 13); Analytics uses small token-based SVG charts (revenue over time, orders by status, top products, sales by category) with no new charting library; IDs via `generateId`.
+
+**Remaining after Phase 12:** Phase 13 (Polish).
 
 ---
 
@@ -315,7 +315,7 @@ npm test          # must be all-passing
 npm run build     # must succeed
 ```
 
-Current state: **219 tests across 42 files, all passing.** `tsc -b` clean. `oxlint` 0 errors
+Current state: **229 tests across 44 files, all passing.** `tsc -b` clean. `oxlint` 0 errors
 with 4 advisory `only-export-components` / `set-state-in-effect` warnings that are the
 long-standing accepted baseline — **do not let this number grow**; if a change adds a warning,
 fix the cause rather than suppressing it.
@@ -354,6 +354,7 @@ Test conventions:
   cover realistic failure paths today.
 - **Some i18n namespaces are registered but empty** (e.g. `validation`, `admin`) — fill them as
   their phases are built.
+- **Admin area is a demo boundary.** The seeded admin's credentials are public in the repo and stored in plain text in the mock store; the role check (`useAuthGuard({ role })`) is a client-side UX guard that anyone can bypass. Real admin provisioning, hashing and role enforcement are backend work. Admin sections other than the shell are not built yet (see §7).
 - **Not visually QA'd in a real browser** across RTL/mobile/dark combinations; correctness there
   rests on logical properties, semantic tokens, and responsive classes rather than manual review.
 - **Arabic translations are functional but unreviewed by a native speaker.**

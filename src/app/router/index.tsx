@@ -3,9 +3,12 @@ import { createBrowserRouter, Navigate, RouterProvider } from "react-router-dom"
 import { AppShell } from "../../components/layout/AppShell";
 import { CheckoutLayout } from "../../components/checkout/CheckoutLayout";
 import { AccountLayout } from "../../components/account/AccountLayout";
-import { PagePlaceholder } from "../../components/common/PagePlaceholder";
+import { AdminLayout } from "../../components/admin/AdminLayout";
 import { NotFoundPage } from "../../pages/NotFoundPage";
 
+const AdminPendingPage = lazy(() =>
+  import("../../pages/admin/AdminPendingPage").then((m) => ({ default: m.AdminPendingPage }))
+);
 const HomePage = lazy(() => import("../../pages/home/HomePage").then((m) => ({ default: m.HomePage })));
 const ShopPage = lazy(() => import("../../pages/shop/ShopPage").then((m) => ({ default: m.ShopPage })));
 const ProductDetailPage = lazy(() =>
@@ -124,8 +127,14 @@ function withAccountShell(node: React.ReactNode) {
   );
 }
 
-function placeholder(title: string, description?: string) {
-  return withShell(<PagePlaceholder title={title} description={description} />);
+function withAdminShell(node: React.ReactNode) {
+  return (
+    <AdminLayout>
+      <Suspense fallback={<div className="py-24 text-center text-sm text-muted-foreground">Loading…</div>}>
+        {node}
+      </Suspense>
+    </AdminLayout>
+  );
 }
 
 export const router = createBrowserRouter([
@@ -169,15 +178,15 @@ export const router = createBrowserRouter([
 
   { path: "/assistant", element: withShell(<AssistantPage />) },
 
-  { path: "/admin", element: placeholder("Admin dashboard", "Phase 12.") },
-  { path: "/admin/products", element: placeholder("Admin · Products") },
-  { path: "/admin/products/new", element: placeholder("Admin · New product") },
-  { path: "/admin/products/:id", element: placeholder("Admin · Edit product") },
-  { path: "/admin/orders", element: placeholder("Admin · Orders") },
-  { path: "/admin/customers", element: placeholder("Admin · Customers") },
-  { path: "/admin/categories", element: placeholder("Admin · Categories") },
-  { path: "/admin/coupons", element: placeholder("Admin · Coupons") },
-  { path: "/admin/analytics", element: placeholder("Admin · Analytics") },
+  { path: "/admin", element: withAdminShell(<AdminPendingPage section="dashboard" />) },
+  { path: "/admin/products", element: withAdminShell(<AdminPendingPage section="products" />) },
+  { path: "/admin/products/new", element: withAdminShell(<AdminPendingPage section="products" />) },
+  { path: "/admin/products/:id", element: withAdminShell(<AdminPendingPage section="products" />) },
+  { path: "/admin/orders", element: withAdminShell(<AdminPendingPage section="orders" />) },
+  { path: "/admin/customers", element: withAdminShell(<AdminPendingPage section="customers" />) },
+  { path: "/admin/categories", element: withAdminShell(<AdminPendingPage section="categories" />) },
+  { path: "/admin/coupons", element: withAdminShell(<AdminPendingPage section="coupons" />) },
+  { path: "/admin/analytics", element: withAdminShell(<AdminPendingPage section="analytics" />) },
 
   { path: "*", element: <NotFoundPage /> },
 ]);

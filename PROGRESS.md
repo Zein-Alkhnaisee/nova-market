@@ -160,14 +160,33 @@ inferred from the phase-list bullets alone.
 
 **Known, honest limitation**: the mock AI matches by category id, not fine-grained product type — asking for "a laptop under $1000" can surface a mechanical keyboard, since both share the `computers` category and the mock has no separate "laptop vs. peripheral" distinction. This is documented, not hidden; a real NLU/LLM backend behind the same `AIProvider` interface wouldn't have this limitation.
 
-## PHASE 12 — ADMIN — TODO
+## PHASE 12 — ADMIN — IN_PROGRESS
+Checkpoint order: admin auth → shell → dashboard → products → categories → orders → customers → coupons → analytics.
+
+| Feature | Status | Notes |
+|---|---|---|
+| Admin auth (role) | DONE | `User.role?: "customer" \| "admin"` (optional so sessions persisted before Phase 12 still load; a missing role counts as customer). `authApi` seeds one demo admin (`admin@nova.demo` / `admin-demo-123`), clearly commented as mock-only; new registrations get `role: "customer"`; nobody can register over the admin email (409) |
+| Role-aware guard | DONE | `useAuthGuard({ role })` extends the existing hook — no parallel guard. Still checks once per landing (HANDOFF §8 #4). Signed-out → login with `?redirect=`. Signed-in with the wrong role → **not** redirected; the hook returns false and the layout renders an in-place "no access" state. UX only — real authorization belongs on the backend (MASTER_SPEC §97) |
+| Admin shell | DONE | `AdminLayout` — compact sticky top bar (brand, Admin badge, view store, language, theme, sign out), sidebar nav on desktop / scrollable row on mobile, skip link, `<main id="admin-main">`. Same tokens and primitives as the storefront; deliberately no public header/footer/CompareBar/floating assistant |
+| Admin no-access state | DONE | `AdminForbidden` — back to account, or sign out and log in with a different account |
+| Admin i18n | DONE | `admin` namespace now has real en/ar files (shell, nav, forbidden, pending); previously registered but empty |
+| Admin routes | DONE | All 9 `/admin/*` routes now render inside `AdminLayout`; each section shows `AdminPendingPage` until its checkpoint lands |
+| Dashboard | TODO | |
+| Products management | TODO | |
+| Categories management | TODO | |
+| Orders management | TODO | |
+| Customers | TODO | |
+| Coupons | TODO | |
+| Analytics | TODO | |
+
+**Not yet verified in a real browser** for the admin shell across RTL/mobile/dark (same standing caveat as the rest of the project).
+
 ## PHASE 13 — POLISH — TODO
 
-Recommended next: **Phase 12 (Admin)**. Read `MASTER_SPEC.md`'s Phase 12 section for the exact
-checklist before starting.
+Recommended next: continue **Phase 12 (Admin)** at the **Dashboard** checkpoint.
 
 ## Testing
-Vitest + Testing Library. 219 tests across 42 files:
+Vitest + Testing Library. 229 tests across 44 files:
 - Reducers: cart, wishlist, compare, recent searches, recently viewed, checkout draft, auth session, saved addresses, saved payment methods, user collections, feature flags
 - Persistence helpers (`lib/persist.ts`)
 - `productsApi` filter/sort logic, `reviewsApi` (breakdown computation, submit mutation),
@@ -222,6 +241,7 @@ Vitest + Testing Library. 219 tests across 42 files:
   regression described above), and `FloatingAssistant` (visible on ordinary routes, hidden on
   checkout/auth/the assistant page itself, hidden when the `aiAssistant` flag is off, opens and
   closes)
+- Phase 12 (admin auth + shell, so far): `authApi` seeded admin (10 → 4 tests: admin login returns role and no password, wrong password rejected, new registrations are customers, the admin email can't be registered over) and `AdminLayout` access control (6 tests: signed-out redirect to login, customer sees no-access without redirect or content leak, a pre-Phase-12 session with no role is treated as customer, "log in with a different account" signs out and goes to login, admin sees shell + all 7 nav links + current-page marker, admin sign-out returns to the storefront)
 - **End-to-end**: a full `CheckoutFlow` integration test drives the real Shipping → Delivery →
   Payment → Review → Order Success flow through actual routing (not mocked), then asserts the
   cart was cleared and that the raw card number is unreachable from both Redux state and

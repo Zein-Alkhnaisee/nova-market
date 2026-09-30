@@ -17,6 +17,7 @@ import enAssistant from "./locales/en/assistant.json";
 import enAuth from "./locales/en/auth.json";
 import enAccount from "./locales/en/account.json";
 import enOrders from "./locales/en/orders.json";
+import enAdmin from "./locales/en/admin.json";
 
 import arCommon from "./locales/ar/common.json";
 import arNavigation from "./locales/ar/navigation.json";
@@ -33,6 +34,7 @@ import arAssistant from "./locales/ar/assistant.json";
 import arAuth from "./locales/ar/auth.json";
 import arAccount from "./locales/ar/account.json";
 import arOrders from "./locales/ar/orders.json";
+import arAdmin from "./locales/ar/admin.json";
 
 export const supportedLanguages = ["en", "ar"] as const;
 export type SupportedLanguage = (typeof supportedLanguages)[number];
@@ -79,6 +81,7 @@ i18n
         auth: enAuth,
         account: enAccount,
         orders: enOrders,
+        admin: enAdmin,
       },
       ar: {
         common: arCommon,
@@ -96,6 +99,7 @@ i18n
         auth: arAuth,
         account: arAccount,
         orders: arOrders,
+        admin: arAdmin,
       },
     },
     fallbackLng: "en",

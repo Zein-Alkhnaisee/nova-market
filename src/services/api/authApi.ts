@@ -26,7 +26,32 @@ interface MockUserRecord extends User {
   password: string;
 }
 
-let userStore: MockUserRecord[] = loadPersisted<MockUserRecord[]>("mockUsers", []);
+/**
+ * SEEDED DEMO ADMIN — MOCK ONLY (Phase 12).
+ *
+ * A fixed admin account so the /admin area can be exercised without a backend.
+ * The credentials are public in this repo and the password is plain text, like
+ * every other password in this mock store. A real system must provision admins
+ * server-side, hash their credentials, and enforce the role on the backend:
+ * the frontend role check (`useAuthGuard({ role })`) is UX only (MASTER_SPEC §97).
+ */
+export const SEEDED_ADMIN_EMAIL = "admin@nova.demo";
+export const SEEDED_ADMIN_PASSWORD = "admin-demo-123";
+const SEEDED_ADMIN_ID = "user-admin-seed";
+
+const seededAdmin: MockUserRecord = {
+  id: SEEDED_ADMIN_ID,
+  fullName: "NOVA Admin",
+  email: SEEDED_ADMIN_EMAIL,
+  password: SEEDED_ADMIN_PASSWORD,
+  role: "admin",
+};
+
+function withSeededAdmin(users: MockUserRecord[]): MockUserRecord[] {
+  return users.some((u) => u.id === SEEDED_ADMIN_ID) ? users : [seededAdmin, ...users];
+}
+
+let userStore: MockUserRecord[] = withSeededAdmin(loadPersisted<MockUserRecord[]>("mockUsers", []));
 
 function persistUsers() {
   savePersisted("mockUsers", userStore);
@@ -65,7 +90,13 @@ export const authApi = baseApi.injectEndpoints({
         if (exists) {
           return { error: { status: 409, message: "An account with that email already exists." } };
         }
-        const record: MockUserRecord = { id: generateId("user"), fullName, email, password };
+        const record: MockUserRecord = {
+          id: generateId("user"),
+          fullName,
+          email,
+          password,
+          role: "customer",
+        };
         userStore = [...userStore, record];
         persistUsers();
         return { data: await delay(toPublicUser(record), 400) };

@@ -164,3 +164,24 @@
 **Verification**: `tsc -b` clean, `oxlint` — 0 errors, 4 advisory warnings (unchanged baseline — no new warnings from any Phase 11 file), `vitest run` — 219/219 passing (was 187), `vite build` succeeds with `AssistantPage` and every assistant component correctly code-split.
 
 **Deferred**: nothing from MASTER_SPEC §11's actual scope — all 9 listed items are implemented and reuse existing architecture where the spec calls for it. The category-granularity limitation in the mock AI (documented above) is the only noteworthy gap, and it's a mock-backend characteristic, not a missing feature — a real AI provider behind the same `AIProvider` interface wouldn't have it.
+
+## 2026-09-30 — Phase 12 (checkpoint 1 of 9): Admin auth + shell
+
+**Scope**: Phase 12 is being delivered in checkpoints (auth → shell → dashboard → products → categories → orders → customers → coupons → analytics). This entry covers the first two: an admin role and the admin shell. Baseline verified clean before any code: `tsc -b` clean, `oxlint` 0 errors / 4 warnings, 219/219 tests, build succeeds.
+
+**Role on the user, optional on purpose**: `User` gained `role?: "customer" | "admin"`. It is optional because sessions already persisted in someone's localStorage from before this phase have no role; making it required would have either broken loading them or forced a migration. A missing role is treated as `"customer"` everywhere it is read, and a test asserts a role-less session gets the no-access state rather than admin rights.
+
+**Seeded demo admin, in the one file that is already the mock-auth boundary**: `authApi.ts` seeds a single admin (`admin@nova.demo`) into the user store at load, re-adding it if the persisted list lacks it (keyed by a fixed id, not by email, so it can't be duplicated or shadowed). It carries a comment stating the credentials are public and plain text and that real admins must be provisioned and hashed server-side. Registration still 409s on the admin email, so a visitor can't register over it. This follows MASTER_SPEC §29 (no faking production security) rather than hiding the shortcut.
+
+**Guard extended, not duplicated**: `useAuthGuard({ role })` keeps the once-per-landing effect from HANDOFF §8 #4 and adds a role check to the *return value* only. The deliberate choice is what happens on a role mismatch: no redirect. A signed-in customer who lands on `/admin` and is silently bounced to `/account` would never learn why; the hook returns false and `AdminLayout` renders an in-place "no access" state with a way to switch accounts. Signed-out visitors still go to login with `?redirect=`. Existing callers use the hook with no arguments and are unchanged (it still returns a boolean). The guard is UX only; the code comments say authorization belongs on the backend (MASTER_SPEC §97).
+
+**Shell**: `AdminLayout` reuses the storefront tokens and primitives (`Badge`, `EmptyState`, `buttonVariants`) with a denser layout per DESIGN_SYSTEM §37/§57, and intentionally omits the public header, footer, CompareBar and floating assistant. It has its own language and theme toggles (both already live in providers, so dark and RTL work with no extra wiring), a skip link, logical-property spacing (`ms-`, `start-`) and a scrollable nav row on mobile. `AdminPageHeader` is the shared heading the coming pages will use. The `admin` i18n namespace, which was registered but empty, now has real en/ar files. The nine reserved `/admin/*` routes now render inside the shell, each showing an honest `AdminPendingPage` until its own checkpoint replaces it; the old `placeholder()` helper in the router became unused and was removed.
+
+**A real (small) issue caught by the process, not shipped**: the first full run had `oxlint` at 5 warnings, one over the accepted baseline — `AdminLayout.tsx` exported its nav-items constant alongside the component (`only-export-components`). Nothing else used it, so it was made module-private rather than the baseline being raised. Back to 4.
+
+**Testing**: 10 new tests in 2 files — `adminAuth` (4) and `AdminLayout` (6); see PROGRESS.md for what each asserts. The layout tests drive real routing (login redirect, switch-account sign-out, admin sign-out to the storefront) rather than mocking the guard.
+
+**Verification**: `tsc -b` clean, `oxlint` — 0 errors, 4 advisory warnings (unchanged baseline), `vitest run` — 229/229 passing across 44 files (was 219 / 42), `vite build` succeeds (`AdminPendingPage` is its own 0.8 KB chunk).
+
+**Known limitations / not done**: no admin section has real content yet (dashboard through analytics are all still pending); the shell has not been visually checked in a real browser across RTL/mobile/dark; Arabic strings for the admin namespace are unreviewed by a native speaker.
+
