@@ -1,5 +1,5 @@
 import { baseApi } from "./baseApi";
-import { products } from "../../mocks/data/products";
+import { listProducts } from "../catalog/productStore";
 import { categories } from "../../mocks/data/categories";
 import { delay } from "../../lib/delay";
 import type { ProductSummary, RecommendedProduct } from "../../types/product";
@@ -33,6 +33,7 @@ export const recommendationsApi = baseApi.injectEndpoints({
     // "Customers also considered" — same category, excluding the product itself.
     getRelatedProducts: builder.query<RecommendedProduct[], RelatedProductsParams>({
       queryFn: async ({ productId, limit = 4 }) => {
+        const products = listProducts();
         const source = products.find((p) => p.id === productId);
         if (!source) return { data: [] };
 
@@ -69,6 +70,7 @@ export const recommendationsApi = baseApi.injectEndpoints({
     // in (wishlist + recently viewed), falling back to trending for new visitors.
     getPersonalizedProducts: builder.query<RecommendedProduct[], PersonalizedParams>({
       queryFn: async ({ categoryIds, excludeIds = [], limit = 4 }) => {
+        const products = listProducts();
         let picks: RecommendedProduct[] = [];
         if (categoryIds.length > 0) {
           picks = products
@@ -84,12 +86,14 @@ export const recommendationsApi = baseApi.injectEndpoints({
         }
         return { data: await delay(picks.slice(0, limit), 250) };
       },
+      providesTags: [{ type: "Recommendation" as const, id: "LIST" }],
     }),
 
     // Smart cart suggestions (MASTER_SPEC §24) — "Complete your setup" /
     // "Frequently bought with this item", surfaced on the Cart page.
     getCartSuggestions: builder.query<RecommendedProduct[], CartSuggestionsParams>({
       queryFn: async ({ cartProductIds, limit = 4 }) => {
+        const products = listProducts();
         if (cartProductIds.length === 0) return { data: [] };
         const cartProducts = products.filter((p) => cartProductIds.includes(p.id));
         const cartCategoryIds = new Set(cartProducts.map((p) => p.categoryId));
@@ -104,6 +108,7 @@ export const recommendationsApi = baseApi.injectEndpoints({
 
         return { data: await delay(suggestions, 250) };
       },
+      providesTags: [{ type: "Recommendation" as const, id: "LIST" }],
     }),
   }),
 });

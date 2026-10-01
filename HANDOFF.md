@@ -1,6 +1,6 @@
 # HANDOFF.md — NOVA Market
 
-**Last updated:** 2026-09-30, after Phase 12 checkpoint 4 (Customers + order→customer link) was completed and verified. Phase 12 is IN PROGRESS.
+**Last updated:** 2026-09-30, after Phase 12 checkpoint 5 (Products + the shared catalog store) was completed and verified. Phase 12 is IN PROGRESS.
 
 This document is written for a **new AI agent or a different AI tool** picking this project up
 cold. It reflects the actual state of the repository at export time, not a plan or an aspiration.
@@ -87,6 +87,8 @@ src/
                     RecommendedProduct[] — product + reason — for related/
                     personalized/cart-suggestion queries), ordersApi, authApi,
                     assistantApi (POST /assistant/messages equivalent)
+  services/catalog/ productStore.ts — THE product catalog (single store; see §8 #16). The static
+                    mocks/data/products.ts is seed data only and is imported by nothing else.
   services/assistant/ aiProvider.ts (the AIProvider interface — the AI API abstraction) +
                     mockAIProvider.ts (the mock AI service implementation). This is a
                     sibling of services/api/, not nested inside it, since it's not an
@@ -201,7 +203,7 @@ Phase numbers are `MASTER_SPEC.md`'s (§107). See `PROGRESS.md` for full feature
 
 **Current phase: Phase 12 (Admin) is IN PROGRESS.** Phases 1–11 are untouched and complete. The working tree is in a clean, fully passing state at the end of each checkpoint.
 
-**Phase 12 checkpoint order (revised by the owner):** auth → shell → dashboard → customers → products → categories → orders → coupons → analytics.
+**Phase 12 checkpoint order (revised by the owner):** auth → shell → dashboard → customers → products → categories → orders → coupons → analytics. **Done through Products.**
 
 **DONE so far:**
 - **Admin auth**: `User.role?`, a seeded mock admin in `authApi.ts` (`admin@nova.demo` / `admin-demo-123` — mock only, plain text, says so in a comment), and `useAuthGuard({ role })`. A wrong role is *not* redirected; the hook returns false and the layout renders `AdminForbidden`. UX only — the backend must enforce roles when one exists (MASTER_SPEC §97).
@@ -212,7 +214,9 @@ Phase numbers are `MASTER_SPEC.md`'s (§107). See `PROGRESS.md` for full feature
 - **Customers** (`/admin/customers`, `/admin/customers/:id`): list with search/ranking/unlinked-orders note, detail with KPIs and order history, designed empty state for customers with no linked orders. Backed by `lib/adminCustomers.ts` + `adminApi` (`getAdminCustomers`, `getAdminCustomer`).
 - **Order→customer link (Phase 12 enabler touching Phase 7/8 code):** optional `Order.customerId`, set in `ReviewStepPage` from the signed-in session and stored by `placeOrder` only when present. Old and guest orders have none and must keep working — never make this field required or fail a load on it.
 
-**Exact next step:** the **Products management** checkpoint — but **first present the storefront-connection options to the owner and wait for a decision; do not implement before that.** Options and tradeoffs to present: (a) *shared store* — admin CRUD writes the same store the storefront's `productsApi` reads, so edits show up everywhere (most realistic; touches storefront API code and any existing tests that assume the static catalog); (b) *admin-only overlay* — admin has its own product store seeded from `mocks/data/products`, storefront unchanged (zero risk to Phases 1–11, but admin edits visibly do nothing on the storefront, which can confuse a demo); (c) *read-only storefront* — admin edits are stored but the storefront never reads them, documented as the backend's job (same as (b) in effect, with the limitation stated up front). Then implement list, search, filters, create, edit, delete, inventory and pricing on `/admin/products`, `/admin/products/new`, `/admin/products/:id`, with validation and constraints enforced in `adminApi.ts`, IDs via `generateId`, and **repoint the dashboard's product counts** (they read the static product mock today) at whichever store results. Reuse `AdminPageHeader`, `Card`, `Skeleton`, `EmptyState`/`ErrorState`, `Button`, `TextField`, `Badge`. Each later section replaces its own `AdminPendingPage` route in `app/router/index.tsx`.
+- **Products + the shared catalog store**: `services/catalog/productStore.ts` is now the single source of truth for products; the four storefront readers (`productsApi`, `recommendationsApi`, `searchApi`, `mockAIProvider`) read through it; admin CRUD at `/admin/products`, `/admin/products/new`, `/admin/products/:id` writes to it; delete is archive (restorable). Admin product mutations invalidate the storefront's cache tags so edits show up. The dashboard's product count now reads the store. See §8 #16 and §11.
+
+**Exact next step:** the **Categories management** checkpoint — replace `AdminPendingPage section="categories"` on `/admin/categories` with list, create, edit, delete. Categories are static seed data today (`mocks/data/categories.ts`, read by `categoriesApi`, `searchApi` and the product store's validation). Follow the same pattern as products: an admin-side store behind a narrow module with validation/constraints enforced there, `generateId`, versioned localStorage key (`nova:categories:v1`) with seed fallback, a `resetStore()` called from `test/setup.ts`, and storefront reads going through the store with tag invalidation (`Category`). **Present the storefront-connection choice for categories to the owner before implementing**, as was done for products — it is the same decision (shared store vs. overlay) and the products answer (shared store) is the default recommendation. Constraints to enforce in the store, mirroring `cancelOrder`'s 409 pattern: deleting a category that still has products must be rejected with 409 — **count archived products too** (`listProducts({ includeArchived: true })`), because restoring an archived product into a deleted category would orphan it; `productStore`'s `categoryId` validation currently checks the static `categories` array and must be repointed at the category store when it exists. Then Orders, Coupons, Analytics. Each later section replaces its own `AdminPendingPage` route in `app/router/index.tsx`.
 
 **Remaining after Phase 12:** Phase 13 (Polish).
 
@@ -284,6 +288,26 @@ Phase numbers are `MASTER_SPEC.md`'s (§107). See `PROGRESS.md` for full feature
     there is no second, parallel chat implementation. When a feature needs both an "embedded"
     and a "full page" presentation, build one component with a display-mode prop, not two.
 
+16. **The product catalog is a single store module behind a narrow interface; storefront
+    readers and admin views share it; the static mock is seed data only.**
+    `services/catalog/productStore.ts` (`listProducts`, `getProductById`, `createProduct`,
+    `updateProduct`, `archiveProduct`, `restoreProduct`, `resetStore`) is the only thing that
+    reads `mocks/data/products.ts`. Everything else — storefront API modules, the assistant,
+    admin — calls the store. Rules that follow from it: (a) it is a plain module, **not Redux**;
+    storefront reactivity comes from RTK Query tag invalidation (admin writes invalidate
+    `Products`, `Product`, `Recommendation`, `Search/SUGGESTIONS` on success only); (b) call
+    `listProducts()` at use time inside functions, never at module load, or edits won't be seen;
+    (c) the archive filter lives in `listProducts()` and nowhere else — never re-filter archived
+    products in a reader; only admin passes `includeArchived`; (d) persistence is the versioned
+    key `nova:products:v1` with a `{ version, items }` envelope and a seed fallback on any
+    empty/corrupt/mismatched data — **bump the version when `ProductSummary` changes shape**;
+    (e) validation and constraints are enforced in the store, with error *codes* translated in
+    the UI; (f) any test that mutates the store is protected by `resetStore()` in
+    `test/setup.ts` — if you add another in-memory store, reset it there too. A new storefront
+    query that needs products must read through the store; importing the static mock directly
+    would silently ignore admin edits. Use this same shape for categories, coupons, and any
+    future admin-managed catalog data.
+
 ---
 
 ## 9. Security and data rules — these are hard requirements
@@ -318,7 +342,7 @@ npm test          # must be all-passing
 npm run build     # must succeed
 ```
 
-Current state: **256 tests across 50 files, all passing.** `tsc -b` clean. `oxlint` 0 errors
+Current state: **319 tests across 54 files, all passing.** `tsc -b` clean. `oxlint` 0 errors
 with 4 advisory `only-export-components` / `set-state-in-effect` warnings that are the
 long-standing accepted baseline — **do not let this number grow**; if a change adds a warning,
 fix the cause rather than suppressing it.
@@ -357,7 +381,25 @@ Test conventions:
   cover realistic failure paths today.
 - **Some i18n namespaces are registered but empty** (e.g. `validation`, `admin`) — fill them as
   their phases are built.
-- **Admin area is a demo boundary.** The seeded admin's credentials are public in the repo and stored in plain text in the mock store; the role check (`useAuthGuard({ role })`) is a client-side UX guard that anyone can bypass. Real admin provisioning, hashing and role enforcement are backend work. Only the shell, Dashboard and Customers are built so far (see §7). Guest orders and orders placed before `Order.customerId` existed can't be attributed to an account (surfaced, not hidden). The Dashboard's Conversion KPI is unavailable by design (no visit/session tracking, so no honest denominator), and the admin only sees orders/accounts stored in the current browser.
+- **Archived products inside lists that hold product ids (decision: silently dropped).**
+  Wishlists, user collections (owner and public share view), editorial collections and the
+  recently-viewed rail resolve stored ids against the storefront catalog, which excludes archived
+  products — so an archived product just disappears from them; a list of only archived products
+  shows the normal empty state, not an error. The alternative (a "no longer available"
+  placeholder) was rejected because it needs edits to each of those Phase 8/9 pages. **Known
+  cost:** counts computed from stored ids can exceed what is visible after an archive — the
+  header wishlist badge, the account overview counter, "N items" on user and public collections,
+  and editorial collection counts. Fix path if it matters: derive those counts from the resolved
+  products instead of `ids.length`. Restoring the product makes it reappear everywhere.
+- **Carts are not revalidated against the catalog.** Cart lines carry their own name/price
+  snapshot, so an archived (or repriced, or out-of-stock) product already in a cart can still be
+  checked out. Pre-existing for price/stock; archiving extends it. Orders likewise snapshot
+  name/image/price, so order history is unaffected by catalog edits.
+- **Catalog edits are per-browser** (`nova:products:v1`), like every other store here. Product
+  rating/review count aren't editable (new products start at 0); changing a product's main image
+  drops its gallery; the admin form has no image upload (URL only), bulk actions, or
+  variant/configurator editing.
+- **Admin area is a demo boundary.** The seeded admin's credentials are public in the repo and stored in plain text in the mock store; the role check (`useAuthGuard({ role })`) is a client-side UX guard that anyone can bypass. Real admin provisioning, hashing and role enforcement are backend work. Only the shell, Dashboard, Customers and Products are built so far (see §7). Guest orders and orders placed before `Order.customerId` existed can't be attributed to an account (surfaced, not hidden). The Dashboard's Conversion KPI is unavailable by design (no visit/session tracking, so no honest denominator), and the admin only sees orders/accounts stored in the current browser.
 - **Not visually QA'd in a real browser** across RTL/mobile/dark combinations; correctness there
   rests on logical properties, semantic tokens, and responsive classes rather than manual review.
 - **Arabic translations are functional but unreviewed by a native speaker.**

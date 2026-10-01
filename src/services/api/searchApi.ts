@@ -1,5 +1,5 @@
 import { baseApi } from "./baseApi";
-import { products } from "../../mocks/data/products";
+import { listProducts } from "../catalog/productStore";
 import { categories } from "../../mocks/data/categories";
 import { trendingSearchTerms } from "../../mocks/data/trendingSearches";
 import { delay } from "../../lib/delay";
@@ -19,7 +19,7 @@ export const searchApi = baseApi.injectEndpoints({
         if (!query) {
           return { data: { products: [], categories: [], query: rawQuery } };
         }
-        const matchedProducts = products
+        const matchedProducts = listProducts()
           .filter(
             (p) =>
               p.name.toLowerCase().includes(query) ||

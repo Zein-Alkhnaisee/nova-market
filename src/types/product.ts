@@ -23,6 +23,12 @@ export interface ProductSummary {
   configuratorGroups?: import("./configurator").ConfiguratorGroup[];
   badge?: "new" | "trending" | "deal" | "premium";
   inStock: boolean;
+  /**
+   * Units on hand, when tracked (Phase 12 admin). Optional: the seed catalog
+   * doesn't track quantities. When present, `inStock` is always `inventory > 0`
+   * — the store keeps them consistent so the storefront only ever needs `inStock`.
+   */
+  inventory?: number;
 }
 
 /**

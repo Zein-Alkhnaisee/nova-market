@@ -15,6 +15,12 @@ const AdminCustomersPage = lazy(() =>
 const AdminCustomerDetailPage = lazy(() =>
   import("../../pages/admin/AdminCustomerDetailPage").then((m) => ({ default: m.AdminCustomerDetailPage }))
 );
+const AdminProductsPage = lazy(() =>
+  import("../../pages/admin/AdminProductsPage").then((m) => ({ default: m.AdminProductsPage }))
+);
+const AdminProductFormPage = lazy(() =>
+  import("../../pages/admin/AdminProductFormPage").then((m) => ({ default: m.AdminProductFormPage }))
+);
 const AdminPendingPage = lazy(() =>
   import("../../pages/admin/AdminPendingPage").then((m) => ({ default: m.AdminPendingPage }))
 );
@@ -188,9 +194,9 @@ export const router = createBrowserRouter([
   { path: "/assistant", element: withShell(<AssistantPage />) },
 
   { path: "/admin", element: withAdminShell(<AdminDashboardPage />) },
-  { path: "/admin/products", element: withAdminShell(<AdminPendingPage section="products" />) },
-  { path: "/admin/products/new", element: withAdminShell(<AdminPendingPage section="products" />) },
-  { path: "/admin/products/:id", element: withAdminShell(<AdminPendingPage section="products" />) },
+  { path: "/admin/products", element: withAdminShell(<AdminProductsPage />) },
+  { path: "/admin/products/new", element: withAdminShell(<AdminProductFormPage />) },
+  { path: "/admin/products/:id", element: withAdminShell(<AdminProductFormPage />) },
   { path: "/admin/orders", element: withAdminShell(<AdminPendingPage section="orders" />) },
   { path: "/admin/customers", element: withAdminShell(<AdminCustomersPage />) },
   { path: "/admin/customers/:id", element: withAdminShell(<AdminCustomerDetailPage />) },

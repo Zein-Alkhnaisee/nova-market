@@ -1,5 +1,5 @@
 import { baseApi } from "./baseApi";
-import { products } from "../../mocks/data/products";
+import { listProducts } from "../catalog/productStore";
 import { delay } from "../../lib/delay";
 import type { ProductSummary } from "../../types/product";
 
@@ -47,6 +47,7 @@ export const productsApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getProducts: builder.query<ProductSummary[], ProductListParams | void>({
       queryFn: async (params) => {
+        const products = listProducts();
         let result = products;
         if (params?.categoryId) {
           result = result.filter((p) => p.categoryId === params.categoryId);
@@ -85,7 +86,7 @@ export const productsApi = baseApi.injectEndpoints({
     }),
     getProductBySlug: builder.query<ProductSummary | undefined, string>({
       queryFn: async (slug) => {
-        const product = products.find((p) => p.slug === slug);
+        const product = listProducts().find((p) => p.slug === slug);
         return { data: await delay(product) };
       },
       providesTags: (_result, _error, slug) => [{ type: "Product", id: slug }],

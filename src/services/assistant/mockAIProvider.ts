@@ -1,4 +1,4 @@
-import { products } from "../../mocks/data/products";
+import { listProducts } from "../catalog/productStore";
 import { categories } from "../../mocks/data/categories";
 import { generateId } from "../../lib/id";
 import type { AIProvider } from "./aiProvider";
@@ -44,7 +44,7 @@ function detectBudget(query: string): number | undefined {
 }
 
 function findMentionedProducts(query: string): ProductSummary[] {
-  return products.filter(
+  return listProducts().filter(
     (p) => query.includes(p.name.toLowerCase()) || query.includes(p.brand.toLowerCase())
   );
 }
@@ -125,6 +125,7 @@ function handleSpecs(query: string): AssistantMessage | null {
 function handleGift(query: string): AssistantMessage | null {
   if (!query.includes("gift")) return null;
   const categoryId = detectCategoryId(query);
+  const products = listProducts();
   const pool = categoryId
     ? products.filter((p) => p.categoryId === categoryId)
     : products.filter((p) => p.badge === "premium" || p.badge === "trending");
@@ -143,7 +144,7 @@ function handleBudgetOrCategory(query: string): AssistantMessage | null {
   const categoryId = detectCategoryId(query);
   if (budget == null && categoryId == null) return null;
 
-  let matches = products.filter((p) => p.inStock);
+  let matches = listProducts().filter((p) => p.inStock);
   if (categoryId) matches = matches.filter((p) => p.categoryId === categoryId);
   if (budget != null) matches = matches.filter((p) => p.price <= budget);
   matches = [...matches].sort((a, b) => b.rating - a.rating).slice(0, 3);
@@ -162,7 +163,7 @@ function handleBudgetOrCategory(query: string): AssistantMessage | null {
 
 function handleFallback(query: string): AssistantMessage {
   const tokens = query.split(/\s+/).filter((t) => t.length > 2);
-  const matches = products
+  const matches = listProducts()
     .filter((p) => tokens.some((t) => p.name.toLowerCase().includes(t) || p.brand.toLowerCase().includes(t)))
     .slice(0, 3);
 

@@ -5,6 +5,7 @@ import { AdminDashboardPage } from "../../pages/admin/AdminDashboardPage";
 import { createTestStore, renderWithProviders } from "../renderWithProviders";
 import { ordersApi } from "../../services/api/ordersApi";
 import { products } from "../../mocks/data/products";
+import { archiveProduct } from "../../services/catalog/productStore";
 
 // The mock order store is module-level state shared by every test in this
 // file, so the empty-state test must run before anything places an order.
@@ -70,5 +71,12 @@ describe("AdminDashboardPage", () => {
 
     spy.mockRestore();
     consoleSpy.mockRestore();
+  });
+
+  it("counts products from the shared catalog store, so archiving one lowers the count", async () => {
+    archiveProduct(products[0].id);
+    renderWithProviders(<AdminDashboardPage />);
+    const label = await screen.findByText("Products");
+    expect(label.nextElementSibling).toHaveTextContent(String(products.length - 1));
   });
 });

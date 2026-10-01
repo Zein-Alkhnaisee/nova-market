@@ -97,5 +97,108 @@
     "orderHistory": "Order history",
     "noOrdersTitle": "No orders linked to this customer",
     "noOrdersDescription": "They haven't placed an order while signed in. Guest orders and older orders can't be linked to an account."
+  },
+  "products": {
+    "description": "The shared catalog. Edits here show up in the store.",
+    "new": "New product",
+    "search": "Search products",
+    "searchPlaceholder": "Name, brand or slug",
+    "filters": {
+      "category": "Category",
+      "allCategories": "All categories",
+      "status": "Status",
+      "active": "Active",
+      "archived": "Archived",
+      "all": "All",
+      "stock": "Stock",
+      "anyStock": "Any stock",
+      "inStock": "In stock",
+      "lowStock": "Low stock (≤ {{max}})",
+      "outOfStock": "Out of stock",
+      "clear": "Clear filters"
+    },
+    "columns": {
+      "product": "Product",
+      "category": "Category",
+      "price": "Price",
+      "stock": "Stock",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "stockNotTracked": "Not tracked",
+    "stockBadge": {
+      "out": "Out of stock",
+      "low": "Low"
+    },
+    "status": {
+      "active": "Active",
+      "archived": "Archived"
+    },
+    "edit": "Edit",
+    "editLabel": "Edit {{name}}",
+    "archive": "Archive",
+    "archiveLabel": "Archive {{name}}",
+    "restore": "Restore",
+    "restoreLabel": "Restore {{name}}",
+    "undo": "Undo",
+    "notice": {
+      "archived": "“{{name}}” archived. It's hidden from the store.",
+      "restored": "“{{name}}” restored. It's visible in the store again."
+    },
+    "emptyTitle": "No products yet",
+    "emptyDescription": "Create the first product to start building the catalog.",
+    "noMatchTitle": "No products match these filters",
+    "noMatchDescription": "Try different filters, or clear them.",
+    "error": "We couldn't load products right now.",
+    "actionError": "We couldn't update that product. Please try again.",
+    "form": {
+      "newTitle": "New product",
+      "newDescription": "Add a product to the catalog.",
+      "editDescription": "Changes show up in the store as soon as you save.",
+      "back": "All products",
+      "name": "Name",
+      "slug": "Slug",
+      "slugHint": "Used in the product's web address. Leave empty to generate it from the name.",
+      "brand": "Brand",
+      "category": "Category",
+      "selectCategory": "Select a category",
+      "price": "Price (USD)",
+      "previousPrice": "Previous price (USD)",
+      "previousPriceHint": "Optional. Shown struck through; must be higher than the price.",
+      "inventory": "Stock quantity",
+      "inventoryHint": "Units on hand. At 0 the product shows as out of stock.",
+      "inventoryUntracked": "Not tracked yet. Enter a quantity to start tracking stock; leave empty to keep availability as it is.",
+      "badge": "Badge",
+      "badgeNone": "None",
+      "badges": {
+        "new": "New",
+        "trending": "Trending",
+        "deal": "Deal",
+        "premium": "Premium"
+      },
+      "image": "Image URL",
+      "imageHint": "A full https:// link to the main product image.",
+      "description": "Description",
+      "save": "Save changes",
+      "create": "Create product",
+      "saving": "Saving…",
+      "cancel": "Cancel",
+      "archivedBanner": "This product is archived. It's hidden from the store until you restore it.",
+      "notFoundTitle": "Product not found",
+      "notFoundDescription": "There's no product with that id.",
+      "loadError": "We couldn't load this product right now.",
+      "saveError": "We couldn't save this product. Please try again."
+    },
+    "errors": {
+      "required": "This field is required.",
+      "tooLong": "This is too long.",
+      "invalidFormat": "This isn't in a valid format.",
+      "taken": "This slug is already used by another product.",
+      "unknownCategory": "Choose one of the listed categories.",
+      "mustBePositive": "Enter an amount greater than 0.",
+      "mustExceedPrice": "Must be higher than the price.",
+      "mustBeWholeNumber": "Enter a whole number, 0 or more.",
+      "invalidBadge": "Choose one of the listed badges."
+    }
   }
 }
