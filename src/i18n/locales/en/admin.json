@@ -200,5 +200,59 @@
       "mustBeWholeNumber": "Enter a whole number, 0 or more.",
       "invalidBadge": "Choose one of the listed badges."
     }
+  },
+  "categories": {
+    "description": "The shared category list. Changes show up in the store's navigation and search.",
+    "new": "New category",
+    "columns": {
+      "category": "Category",
+      "slug": "Slug",
+      "products": "Products",
+      "actions": "Actions"
+    },
+    "archivedSuffix": "+{{count}} archived",
+    "edit": "Edit",
+    "editLabel": "Edit {{name}}",
+    "delete": "Delete",
+    "deleteLabel": "Delete {{name}}",
+    "deleteBlocked_one": "Can't delete while it still has {{count}} product (archived products count).",
+    "deleteBlocked_other": "Can't delete while it still has {{count}} products (archived products count).",
+    "blocked_one": "“{{name}}” wasn't deleted: it still has {{count}} product, including archived ones. Move or remove them first.",
+    "blocked_other": "“{{name}}” wasn't deleted: it still has {{count}} products, including archived ones. Move or remove them first.",
+    "emptyTitle": "No categories yet",
+    "emptyDescription": "Create the first category to organize the catalog.",
+    "error": "We couldn't load categories right now.",
+    "actionError": "We couldn't update that category. Please try again.",
+    "notice": {
+      "created": "“{{name}}” created.",
+      "updated": "“{{name}}” updated.",
+      "deleted": "“{{name}}” deleted."
+    },
+    "confirm": {
+      "title": "Delete “{{name}}”?",
+      "description": "This permanently removes the category. It can't be undone.",
+      "confirm": "Delete category",
+      "cancel": "Keep it"
+    },
+    "form": {
+      "newTitle": "New category",
+      "editTitle": "Edit “{{name}}”",
+      "name": "Name",
+      "slug": "Slug",
+      "slugHint": "Used in the category's web address and fixed once created. Leave empty to generate it from the name.",
+      "slugLocked": "The slug can't be changed after creation — store links depend on it.",
+      "image": "Image URL",
+      "imageHint": "Optional. A full https:// link.",
+      "save": "Save changes",
+      "create": "Create category",
+      "saving": "Saving…",
+      "cancel": "Cancel"
+    },
+    "errors": {
+      "required": "This field is required.",
+      "tooLong": "This is too long.",
+      "invalidFormat": "This isn't in a valid format.",
+      "taken": "This is already used by another category."
+    }
   }
 }

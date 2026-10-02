@@ -4,6 +4,16 @@ import { computeDashboardStats, type DashboardStats } from "../../lib/adminStats
 import { listAllOrders } from "./ordersApi";
 import { listMockCustomers } from "./authApi";
 import {
+  createCategory,
+  deleteCategory,
+  listCategories,
+  updateCategory,
+  type CategoryDeleteResult,
+  type CategoryInput,
+  type CategoryWriteResult,
+} from "../catalog/categoryStore";
+import type { Category } from "../../types/product";
+import {
   archiveProduct,
   createProduct,
   getProductById,
@@ -33,6 +43,20 @@ const PRODUCT_CHANGED_TAGS = [
   { type: "Search" as const, id: "SUGGESTIONS" },
 ];
 const afterWrite = (result: ProductWriteResult | undefined) => (result?.ok ? PRODUCT_CHANGED_TAGS : []);
+
+/** What a category write can make stale: the category list/shop nav, search suggestions, and recommendation reason text. */
+const CATEGORY_CHANGED_TAGS = [
+  { type: "Category" as const },
+  { type: "Search" as const, id: "SUGGESTIONS" },
+  { type: "Recommendation" as const },
+];
+const afterCategoryWrite = (result: { ok: boolean } | undefined) => (result?.ok ? CATEGORY_CHANGED_TAGS : []);
+
+export interface AdminCategoryRow extends Category {
+  /** Active (non-archived) products. */
+  productCount: number;
+  archivedProductCount: number;
+}
 
 /**
  * Admin API (mock). Staff-facing endpoints live here, separate from the
@@ -109,6 +133,36 @@ export const adminApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: (result) => afterWrite(result),
     }),
+
+    // ---- Categories (shared category store; see services/catalog/categoryStore.ts) ----
+    getAdminCategories: builder.query<AdminCategoryRow[], void>({
+      queryFn: async () => {
+        const all = listProducts({ includeArchived: true });
+        const rows = listCategories().map((c): AdminCategoryRow => {
+          const mine = all.filter((p) => p.categoryId === c.id);
+          const archived = mine.filter((p) => p.archivedAt !== undefined).length;
+          return { ...c, productCount: mine.length - archived, archivedProductCount: archived };
+        });
+        return { data: await delay(rows, 250) };
+      },
+      // Product counts depend on products, so product writes (which invalidate "Products") refresh this too.
+      providesTags: [
+        { type: "Category" as const, id: "ADMIN" },
+        { type: "Products" as const, id: "ADMIN" },
+      ],
+    }),
+    createAdminCategory: builder.mutation<CategoryWriteResult, CategoryInput>({
+      queryFn: async (input) => ({ data: await delay(createCategory(input), 300) }),
+      invalidatesTags: (result) => afterCategoryWrite(result),
+    }),
+    updateAdminCategory: builder.mutation<CategoryWriteResult, { id: string; input: Pick<CategoryInput, "name" | "image"> }>({
+      queryFn: async ({ id, input }) => ({ data: await delay(updateCategory(id, input), 300) }),
+      invalidatesTags: (result) => afterCategoryWrite(result),
+    }),
+    deleteAdminCategory: builder.mutation<CategoryDeleteResult, string>({
+      queryFn: async (id) => ({ data: await delay(deleteCategory(id), 250) }),
+      invalidatesTags: (result) => afterCategoryWrite(result),
+    }),
   }),
 });
 
@@ -121,4 +175,8 @@ export const {
   useCreateAdminProductMutation,
   useUpdateAdminProductMutation,
   useSetAdminProductArchivedMutation,
+  useGetAdminCategoriesQuery,
+  useCreateAdminCategoryMutation,
+  useUpdateAdminCategoryMutation,
+  useDeleteAdminCategoryMutation,
 } = adminApi;

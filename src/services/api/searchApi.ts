@@ -1,6 +1,6 @@
 import { baseApi } from "./baseApi";
 import { listProducts } from "../catalog/productStore";
-import { categories } from "../../mocks/data/categories";
+import { listCategories } from "../catalog/categoryStore";
 import { trendingSearchTerms } from "../../mocks/data/trendingSearches";
 import { delay } from "../../lib/delay";
 import type { Category, ProductSummary } from "../../types/product";
@@ -26,7 +26,7 @@ export const searchApi = baseApi.injectEndpoints({
               p.brand.toLowerCase().includes(query)
           )
           .slice(0, 5);
-        const matchedCategories = categories
+        const matchedCategories = listCategories()
           .filter((c) => c.name.toLowerCase().includes(query))
           .slice(0, 4);
         return {

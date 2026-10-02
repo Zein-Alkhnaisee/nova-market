@@ -24,7 +24,7 @@
 import { loadPersisted, savePersisted } from "../../lib/persist";
 import { generateId } from "../../lib/id";
 import { products as seedProducts } from "../../mocks/data/products";
-import { categories } from "../../mocks/data/categories";
+import { listCategories } from "./categoryStore";
 import type { ProductSummary } from "../../types/product";
 
 /** localStorage key (`nova:` prefix is added by lib/persist). Bump the version when the shape changes. */
@@ -162,7 +162,7 @@ function validate(
   else if (input.brand.trim().length > 60) fields.brand = "tooLong";
 
   if (!input.categoryId) fields.categoryId = "required";
-  else if (!categories.some((c) => c.id === input.categoryId)) fields.categoryId = "unknownCategory";
+  else if (!listCategories().some((c) => c.id === input.categoryId)) fields.categoryId = "unknownCategory";
 
   if (typeof input.price !== "number" || Number.isNaN(input.price)) fields.price = "required";
   else if (!Number.isFinite(input.price) || input.price <= 0) fields.price = "mustBePositive";

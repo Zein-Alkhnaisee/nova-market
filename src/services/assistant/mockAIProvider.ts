@@ -1,5 +1,5 @@
 import { listProducts } from "../catalog/productStore";
-import { categories } from "../../mocks/data/categories";
+import { listCategories } from "../catalog/categoryStore";
 import { generateId } from "../../lib/id";
 import type { AIProvider } from "./aiProvider";
 import type { AssistantAction, AssistantMessage } from "../../types/assistant";
@@ -34,7 +34,7 @@ function detectCategoryId(query: string): string | undefined {
   for (const [keyword, categoryId] of Object.entries(CATEGORY_KEYWORDS)) {
     if (query.includes(keyword)) return categoryId;
   }
-  const directMatch = categories.find((c) => query.includes(c.name.toLowerCase()));
+  const directMatch = listCategories().find((c) => query.includes(c.name.toLowerCase()));
   return directMatch?.id;
 }
 

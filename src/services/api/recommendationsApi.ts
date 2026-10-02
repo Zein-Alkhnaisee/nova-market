@@ -1,11 +1,11 @@
 import { baseApi } from "./baseApi";
 import { listProducts } from "../catalog/productStore";
-import { categories } from "../../mocks/data/categories";
+import { listCategories } from "../catalog/categoryStore";
 import { delay } from "../../lib/delay";
 import type { ProductSummary, RecommendedProduct } from "../../types/product";
 
 function categoryName(categoryId: string): string {
-  return categories.find((c) => c.id === categoryId)?.name ?? categoryId.replace(/-/g, " ");
+  return listCategories().find((c) => c.id === categoryId)?.name ?? categoryId.replace(/-/g, " ");
 }
 
 function withReason(product: ProductSummary, reason: string): RecommendedProduct {
