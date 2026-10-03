@@ -1,7 +1,9 @@
 import { baseApi } from "./baseApi";
 import { delay } from "../../lib/delay";
 import { computeDashboardStats, type DashboardStats } from "../../lib/adminStats";
-import { listAllOrders } from "./ordersApi";
+import { listAllOrders, updateOrderStatus, type OrderTransitionResult } from "./ordersApi";
+import { buildOrderDetail, buildOrderRows, type AdminOrderDetail, type AdminOrderRow } from "../../lib/adminOrders";
+import type { OrderStatus } from "../../types/order";
 import { listMockCustomers } from "./authApi";
 import {
   createCategory,
@@ -163,6 +165,38 @@ export const adminApi = baseApi.injectEndpoints({
       queryFn: async (id) => ({ data: await delay(deleteCategory(id), 250) }),
       invalidatesTags: (result) => afterCategoryWrite(result),
     }),
+
+    // ---- Orders (the same order store the customer pages read; see ordersApi.ts) ----
+    getAdminOrders: builder.query<AdminOrderRow[], void>({
+      queryFn: async () => ({ data: await delay(buildOrderRows(listAllOrders(), listMockCustomers()), 250) }),
+      providesTags: [
+        { type: "Order", id: "LIST" },
+        { type: "User", id: "LIST" },
+      ],
+    }),
+    getAdminOrder: builder.query<AdminOrderDetail, string>({
+      queryFn: async (id) => {
+        const order = listAllOrders().find((o) => o.id === id);
+        if (!order) return { error: { status: 404, message: "Order not found." } };
+        return { data: await delay(buildOrderDetail(order, listMockCustomers()), 250) };
+      },
+      providesTags: (_r, _e, id) => [
+        { type: "Order", id },
+        { type: "User", id: "LIST" },
+      ],
+    }),
+    // Invalidates the order's own tag and the list tag, so the customer-facing
+    // order pages (which provide the same tags) show the new status too.
+    updateAdminOrderStatus: builder.mutation<OrderTransitionResult, { id: string; to: OrderStatus }>({
+      queryFn: async ({ id, to }) => ({ data: await delay(updateOrderStatus(id, to), 250) }),
+      invalidatesTags: (result, _e, { id }) =>
+        result?.ok
+          ? [
+              { type: "Order" as const, id },
+              { type: "Order" as const, id: "LIST" },
+            ]
+          : [],
+    }),
   }),
 });
 
@@ -179,4 +213,7 @@ export const {
   useCreateAdminCategoryMutation,
   useUpdateAdminCategoryMutation,
   useDeleteAdminCategoryMutation,
+  useGetAdminOrdersQuery,
+  useGetAdminOrderQuery,
+  useUpdateAdminOrderStatusMutation,
 } = adminApi;

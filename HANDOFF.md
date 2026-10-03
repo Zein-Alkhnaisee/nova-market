@@ -1,6 +1,6 @@
 # HANDOFF.md — NOVA Market
 
-**Last updated:** 2026-09-30, after Phase 12 checkpoint 6 (Categories + the shared category store) was completed and verified. Phase 12 is IN PROGRESS.
+**Last updated:** 2026-09-30, after Phase 12 checkpoint 7 (Orders) was completed and verified. Phase 12 is IN PROGRESS.
 
 This document is written for a **new AI agent or a different AI tool** picking this project up
 cold. It reflects the actual state of the repository at export time, not a plan or an aspiration.
@@ -204,7 +204,7 @@ Phase numbers are `MASTER_SPEC.md`'s (§107). See `PROGRESS.md` for full feature
 
 **Current phase: Phase 12 (Admin) is IN PROGRESS.** Phases 1–11 are untouched and complete. The working tree is in a clean, fully passing state at the end of each checkpoint.
 
-**Phase 12 checkpoint order (revised by the owner):** auth → shell → dashboard → customers → products → categories → orders → coupons → analytics. **Done through Categories.**
+**Phase 12 checkpoint order (revised by the owner):** auth → shell → dashboard → customers → products → categories → orders → coupons → analytics. **Done through Orders.**
 
 **DONE so far:**
 - **Admin auth**: `User.role?`, a seeded mock admin in `authApi.ts` (`admin@nova.demo` / `admin-demo-123` — mock only, plain text, says so in a comment), and `useAuthGuard({ role })`. A wrong role is *not* redirected; the hook returns false and the layout renders `AdminForbidden`. UX only — the backend must enforce roles when one exists (MASTER_SPEC §97).
@@ -219,7 +219,9 @@ Phase numbers are `MASTER_SPEC.md`'s (§107). See `PROGRESS.md` for full feature
 
 - **Categories + the shared category store**: `services/catalog/categoryStore.ts` (same pattern as products) with admin CRUD at `/admin/categories`. Five files read it (`categoriesApi`, `searchApi`, `recommendationsApi`, `mockAIProvider`, `productStore` validation). Slugs are fixed at creation (`id === slug` — see §8 #17); delete is blocked with a 409 while any product, archived included, belongs to the category.
 
-**Exact next step:** the **Orders management** checkpoint — replace `AdminPendingPage section="orders"` on `/admin/orders` with a real page: list (order number, status, customer, total, date), filters/search, and details (MASTER_SPEC §56 and the Phase 12 checklist; the spec lists only `/admin/orders`, so decide whether details are an inline panel or a new `/admin/orders/:id` route and say which — Customers added `/admin/customers/:id`). Data: `listAllOrders()` in `ordersApi.ts` already exists as the admin accessor. **Status changes are the new part**: an admin-side status transition (e.g. confirmed → processing → shipped → out for delivery → delivered; cancel/refund) must be enforced in the API layer like `cancelOrder` is (illegal transitions rejected with 409, timeline appended, persisted via the existing orders persistence), must not alter the payment boundary (§9), and must keep customer-facing `OrderDetailPage`/orders list working (they read the same store). "Customer" should use the linked account via `Order.customerId` when present and fall back to the shipping recipient for guest/older orders — never fail on a missing id. Orders reference products only by snapshot, so catalog edits don't affect them. Then Coupons, Analytics. Each later section replaces its own `AdminPendingPage` route in `app/router/index.tsx`.
+- **Orders** (`/admin/orders`, `/admin/orders/:id`): list with search/status filter, detail with items, customer, address, masked payment, totals, timeline, and status changes. The lifecycle lives in `lib/orderTransitions.ts` and is enforced by `updateOrderStatus` in `ordersApi.ts` (illegal → 409; see §8 #18). Admin changes invalidate the order tags so customer order pages update.
+
+**Exact next step:** the **Coupons** checkpoint — replace `AdminPendingPage section="coupons"` on `/admin/coupons` with list, create, edit, delete. Coupons today are hard-coded in the checkout flow (`checkoutSlice` holds `couponCode`/`discountPercent`; find where codes are validated — likely a lookup in `lib/` or the coupon input component). **Owner decision, already given: do not modify the checkout slice; the admin coupon store is a separate concern, and whether checkout should read admin coupons is a Phase 13 matter.** So: build an admin-side coupon store behind a plain module (same shape as `productStore`/`categoryStore`: versioned key `nova:coupons:v1`, seed fallback on bad storage, `resetStore()` in `test/setup.ts`, validation and constraints in the store, `generateId`), seeded with the codes checkout currently accepts so the admin list isn't misleading — and **state clearly in the UI/docs that editing coupons here does not change what checkout accepts yet** (this is the key honesty point; a silent disconnect would mislead an operator). Validation to enforce in the store: unique code (case-insensitive), code format, percent in 1–100, optional expiry and usage limit, active flag; "delete" can be a hard delete since nothing references coupons except orders' `discount` snapshots. Then **Analytics**: reuse `components/admin/charts/BarChart` for the approved four views (revenue over time, orders by status, top products, sales by category), computed in a pure `lib/` function behind `adminApi`; sales-by-category needs `Order.items` → product category (resolve via the product store, tolerating archived/deleted products since orders only snapshot name/price). Each later section replaces its own `AdminPendingPage` route in `app/router/index.tsx`.
 
 **Remaining after Phase 12:** Phase 13 (Polish).
 
@@ -320,6 +322,16 @@ Phase numbers are `MASTER_SPEC.md`'s (§107). See `PROGRESS.md` for full feature
     other, but only call each other inside functions at call time — never call the other store
     at module top level in either file.
 
+18. **Order status changes go through `updateOrderStatus` and the lifecycle table in
+    `lib/orderTransitions.ts` — never by writing a status directly.** The table is forward-only
+    (cancel only before shipment, refund only after delivery, cancelled/refunded terminal) and is
+    enforced in the API layer: illegal moves are 409, unknown ids 404, a rejected change alters
+    nothing. The customer-facing `cancelOrder` (Phase 8) keeps its own cancellable list; a test
+    (`orderTransitions.test.ts`) pins that it agrees with the table at every reachable status —
+    if you change either, that test tells you. Any new feature that changes an order's status must
+    use `updateOrderStatus`, append a timeline entry, and invalidate the `Order` id and `LIST`
+    tags so customer pages refresh.
+
 ---
 
 ## 9. Security and data rules — these are hard requirements
@@ -354,7 +366,7 @@ npm test          # must be all-passing
 npm run build     # must succeed
 ```
 
-Current state: **364 tests across 57 files, all passing.** (The full suite takes ~100 s normally but can exceed a 300 s limit on a single-core machine; running it in chunks — `src/test/unit`, then the component files in two halves — is a valid way to verify. One pre-existing test, `ProductConfigurator` "adds the configured price…", failed once under load and passed on every rerun; it is believed to be a timing flake from RTL's 1000 ms `waitFor` default.) `tsc -b` clean. `oxlint` 0 errors
+Current state: **392 tests across 61 files, all passing.** (The full suite takes ~100 s normally but can exceed a 300 s limit on a single-core machine; running it in chunks — `src/test/unit`, then the component files in two halves — is a valid way to verify. One pre-existing test, `ProductConfigurator` "adds the configured price…", failed once under load and passed on every rerun; it is believed to be a timing flake from RTL's 1000 ms `waitFor` default.) `tsc -b` clean. `oxlint` 0 errors
 with 4 advisory `only-export-components` / `set-state-in-effect` warnings that are the
 long-standing accepted baseline — **do not let this number grow**; if a change adds a warning,
 fix the cause rather than suppressing it.
@@ -403,6 +415,12 @@ Test conventions:
   header wishlist badge, the account overview counter, "N items" on user and public collections,
   and editorial collection counts. Fix path if it matters: derive those counts from the resolved
   products instead of `ids.length`. Restoring the product makes it reappear everywhere.
+- **Orders (admin) are status-only, and don't touch inventory.** A refund moves no money; there
+  are no tracking numbers, notes, bulk updates, date-range filter or customer notifications. Placing
+  an order does **not** decrement a product's `inventory`, and cancel/refund doesn't restock it —
+  the catalog store and the order store are independent, so the quantities set at Admin → Products
+  are never consumed by orders. `placeOrder` creates orders as "confirmed" (timeline
+  pending → confirmed), so "pending" is never an at-rest status in this mock.
 - **Order detail links to archived products land on "not found".** `OrderDetailPage` links each
   line to `/product/<snapshot slug>`; once that product is archived the storefront no longer
   serves it. (Inferred from `getProductBySlug` returning nothing for archived products, which is
@@ -419,7 +437,7 @@ Test conventions:
   rating/review count aren't editable (new products start at 0); changing a product's main image
   drops its gallery; the admin form has no image upload (URL only), bulk actions, or
   variant/configurator editing.
-- **Admin area is a demo boundary.** The seeded admin's credentials are public in the repo and stored in plain text in the mock store; the role check (`useAuthGuard({ role })`) is a client-side UX guard that anyone can bypass. Real admin provisioning, hashing and role enforcement are backend work. Only the shell, Dashboard, Customers, Products and Categories are built so far (see §7). Guest orders and orders placed before `Order.customerId` existed can't be attributed to an account (surfaced, not hidden). The Dashboard's Conversion KPI is unavailable by design (no visit/session tracking, so no honest denominator), and the admin only sees orders/accounts stored in the current browser.
+- **Admin area is a demo boundary.** The seeded admin's credentials are public in the repo and stored in plain text in the mock store; the role check (`useAuthGuard({ role })`) is a client-side UX guard that anyone can bypass. Real admin provisioning, hashing and role enforcement are backend work. Only the shell, Dashboard, Customers, Products, Categories and Orders are built so far (see §7). Guest orders and orders placed before `Order.customerId` existed can't be attributed to an account (surfaced, not hidden). The Dashboard's Conversion KPI is unavailable by design (no visit/session tracking, so no honest denominator), and the admin only sees orders/accounts stored in the current browser.
 - **Not visually QA'd in a real browser** across RTL/mobile/dark combinations; correctness there
   rests on logical properties, semantic tokens, and responsive classes rather than manual review.
 - **Arabic translations are functional but unreviewed by a native speaker.**

@@ -278,5 +278,78 @@
       "invalidFormat": "الصيغة غير صالحة.",
       "taken": "هذه القيمة مستخدمة لفئة أخرى."
     }
+  },
+  "orders": {
+    "description": "كل الطلبات المُنشأة في هذا المتصفح. افتح طلبًا لرؤية تفاصيله ونقله عبر مراحل التنفيذ.",
+    "search": "ابحث في الطلبات",
+    "searchPlaceholder": "رقم الطلب أو العميل",
+    "statusFilter": "الحالة",
+    "allStatuses": "كل الحالات",
+    "clear": "مسح عوامل التصفية",
+    "columns": {
+      "order": "الطلب",
+      "date": "التاريخ",
+      "customer": "العميل",
+      "items": "العناصر",
+      "status": "الحالة",
+      "total": "الإجمالي"
+    },
+    "guest": "ضيف",
+    "emptyTitle": "لا طلبات بعد",
+    "emptyDescription": "ستظهر هنا الطلبات التي تُنشأ في هذا المتصفح.",
+    "noMatchTitle": "لا طلبات تطابق عوامل التصفية هذه",
+    "noMatchDescription": "جرّب بحثًا أو حالة مختلفة، أو امسح عوامل التصفية.",
+    "error": "تعذّر تحميل الطلبات الآن.",
+    "detailError": "تعذّر تحميل هذا الطلب الآن.",
+    "backToList": "كل الطلبات",
+    "notFoundTitle": "الطلب غير موجود",
+    "notFoundDescription": "لا يوجد طلب بهذا المعرّف.",
+    "placedOn": "أُنشئ في {{date}}",
+    "updateStatus": "تحديث الحالة",
+    "finalStatus": "هذا الطلب في حالة نهائية ولا يمكن تغييره.",
+    "actions": {
+      "confirmed": "تأكيد الطلب",
+      "processing": "بدء المعالجة",
+      "shipped": "تعليم كمشحون",
+      "out_for_delivery": "تعليم كخارج للتوصيل",
+      "delivered": "تعليم كمُسلَّم",
+      "cancelled": "إلغاء الطلب",
+      "refunded": "استرداد الطلب"
+    },
+    "confirm": {
+      "keep": "إبقاؤه كما هو",
+      "cancelled": {
+        "title": "إلغاء هذا الطلب؟",
+        "description": "سيراه العميل ملغيًا. لا يمكن التراجع عن ذلك."
+      },
+      "refunded": {
+        "title": "استرداد هذا الطلب؟",
+        "description": "سيراه العميل مستردًا. لا يمكن التراجع عن ذلك."
+      }
+    },
+    "notice": "تم تعليم الطلب: {{status}}.",
+    "illegal": "لا يمكن نقل هذا الطلب من «{{from}}» إلى «{{to}}» (ربما تغيّر). أعد التحميل لرؤية حالته الحالية.",
+    "actionError": "تعذّر تحديث هذا الطلب. حاول مرة أخرى.",
+    "items": "العناصر",
+    "itemColumns": {
+      "product": "المنتج",
+      "unitPrice": "سعر الوحدة",
+      "quantity": "الكمية",
+      "lineTotal": "الإجمالي"
+    },
+    "summary": {
+      "subtotal": "المجموع الفرعي",
+      "discount": "الخصم",
+      "shipping": "الشحن",
+      "tax": "الضريبة",
+      "total": "الإجمالي"
+    },
+    "customer": "العميل",
+    "notLinked": "غير مرتبط بحساب (ضيف أو طلب أقدم).",
+    "shippingAddress": "عنوان الشحن",
+    "delivery": "{{label}} · {{eta}}",
+    "payment": "الدفع",
+    "paymentValue": "{{brand}} تنتهي بـ {{last4}}",
+    "timeline": "المسار الزمني"
   }
 }

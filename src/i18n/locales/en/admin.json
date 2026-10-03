@@ -254,5 +254,78 @@
       "invalidFormat": "This isn't in a valid format.",
       "taken": "This is already used by another category."
     }
+  },
+  "orders": {
+    "description": "Every order placed in this browser. Open one to see details and move it through fulfilment.",
+    "search": "Search orders",
+    "searchPlaceholder": "Order number or customer",
+    "statusFilter": "Status",
+    "allStatuses": "All statuses",
+    "clear": "Clear filters",
+    "columns": {
+      "order": "Order",
+      "date": "Date",
+      "customer": "Customer",
+      "items": "Items",
+      "status": "Status",
+      "total": "Total"
+    },
+    "guest": "Guest",
+    "emptyTitle": "No orders yet",
+    "emptyDescription": "Orders placed in this browser will show up here.",
+    "noMatchTitle": "No orders match these filters",
+    "noMatchDescription": "Try a different search or status, or clear the filters.",
+    "error": "We couldn't load orders right now.",
+    "detailError": "We couldn't load this order right now.",
+    "backToList": "All orders",
+    "notFoundTitle": "Order not found",
+    "notFoundDescription": "There's no order with that id.",
+    "placedOn": "Placed {{date}}",
+    "updateStatus": "Update status",
+    "finalStatus": "This order is in a final status and can't be changed.",
+    "actions": {
+      "confirmed": "Confirm order",
+      "processing": "Start processing",
+      "shipped": "Mark as shipped",
+      "out_for_delivery": "Mark out for delivery",
+      "delivered": "Mark as delivered",
+      "cancelled": "Cancel order",
+      "refunded": "Refund order"
+    },
+    "confirm": {
+      "keep": "Keep as is",
+      "cancelled": {
+        "title": "Cancel this order?",
+        "description": "The customer will see it as cancelled. This can't be undone."
+      },
+      "refunded": {
+        "title": "Refund this order?",
+        "description": "The customer will see it as refunded. This can't be undone."
+      }
+    },
+    "notice": "Order marked as {{status}}.",
+    "illegal": "This order can't move from {{from}} to {{to}} (it may have changed). Reload to see its current status.",
+    "actionError": "We couldn't update this order. Please try again.",
+    "items": "Items",
+    "itemColumns": {
+      "product": "Product",
+      "unitPrice": "Unit price",
+      "quantity": "Qty",
+      "lineTotal": "Total"
+    },
+    "summary": {
+      "subtotal": "Subtotal",
+      "discount": "Discount",
+      "shipping": "Shipping",
+      "tax": "Tax",
+      "total": "Total"
+    },
+    "customer": "Customer",
+    "notLinked": "Not linked to an account (guest or older order).",
+    "shippingAddress": "Shipping address",
+    "delivery": "{{label}} · {{eta}}",
+    "payment": "Payment",
+    "paymentValue": "{{brand}} ending in {{last4}}",
+    "timeline": "Timeline"
   }
 }

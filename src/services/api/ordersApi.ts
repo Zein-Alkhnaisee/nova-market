@@ -1,3 +1,4 @@
+import { canTransition } from "../../lib/orderTransitions";
 import { baseApi } from "./baseApi";
 import { delay } from "../../lib/delay";
 import { loadPersisted, savePersisted } from "../../lib/persist";
@@ -19,6 +20,35 @@ function persistOrders() {
  */
 export function listAllOrders(): Order[] {
   return orderStore;
+}
+
+export type OrderTransitionResult =
+  | { ok: true; order: Order }
+  | { ok: false; status: 404 }
+  | { ok: false; status: 409; reason: "illegalTransition"; from: OrderStatus; to: OrderStatus };
+
+/**
+ * Admin-only mock mutation: move an order to its next lifecycle status.
+ * Enforced here (like `cancelOrder`), not just by hiding buttons in the UI:
+ * illegal moves are rejected with 409 and change nothing. Appends a timeline
+ * entry and persists through the same store the customer pages read, so the
+ * customer sees the new status. Additive — `cancelOrder` is untouched.
+ */
+export function updateOrderStatus(id: string, to: OrderStatus): OrderTransitionResult {
+  const index = orderStore.findIndex((o) => o.id === id);
+  if (index < 0) return { ok: false, status: 404 };
+  const existing = orderStore[index];
+  if (!canTransition(existing.status, to)) {
+    return { ok: false, status: 409, reason: "illegalTransition", from: existing.status, to };
+  }
+  const updated: Order = {
+    ...existing,
+    status: to,
+    timeline: [...existing.timeline, { status: to, timestamp: new Date().toISOString() }],
+  };
+  orderStore = [...orderStore.slice(0, index), updated, ...orderStore.slice(index + 1)];
+  persistOrders();
+  return { ok: true, order: updated };
 }
 
 function generateOrderNumber() {
