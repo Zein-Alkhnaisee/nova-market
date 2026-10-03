@@ -321,6 +321,13 @@ Phase numbers are `MASTER_SPEC.md`'s (§107). See `PROGRESS.md` for full feature
     `ShopPage`/`productsApi` to resolve slug → id. `categoryStore` and `productStore` import each
     other, but only call each other inside functions at call time — never call the other store
     at module top level in either file.
+    **`categoryStore` is a separate module from `productStore`; they share a pattern, not code.**
+    Each has its own ~30 lines of load / validate-envelope / commit / `resetStore` logic and its own
+    storage key. Extracting a generic "versioned persisted store" helper was considered and
+    deliberately not done yet (MASTER_SPEC §106: no abstractions without a real purpose) — with two
+    stores the duplication is small and each has different validation. **When a third admin-managed
+    store is added (coupons are next), extract the shared helper at that point** rather than copying
+    the pattern a third time.
 
 18. **Order status changes go through `updateOrderStatus` and the lifecycle table in
     `lib/orderTransitions.ts` — never by writing a status directly.** The table is forward-only
