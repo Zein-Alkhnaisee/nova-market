@@ -47,6 +47,8 @@ describe("AdminDashboardPage", () => {
     expect(within(revenueTable).getAllByRole("row").length).toBeGreaterThan(1);
     const recent = screen.getByRole("heading", { name: "Recent orders" }).closest("div") as HTMLElement;
     expect(within(recent).getByText("Confirmed")).toBeInTheDocument();
+    // Recent orders link through to the admin order detail.
+    expect(within(recent).getByRole("link").getAttribute("href")).toMatch(/^\/admin\/orders\/order-/);
   });
 
   it("shows a human-readable error state and recovers when the person retries", async () => {

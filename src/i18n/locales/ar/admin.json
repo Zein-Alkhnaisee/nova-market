@@ -294,7 +294,6 @@
       "status": "الحالة",
       "total": "الإجمالي"
     },
-    "guest": "ضيف",
     "emptyTitle": "لا طلبات بعد",
     "emptyDescription": "ستظهر هنا الطلبات التي تُنشأ في هذا المتصفح.",
     "noMatchTitle": "لا طلبات تطابق عوامل التصفية هذه",
@@ -350,6 +349,7 @@
     "delivery": "{{label}} · {{eta}}",
     "payment": "الدفع",
     "paymentValue": "{{brand}} تنتهي بـ {{last4}}",
-    "timeline": "المسار الزمني"
+    "timeline": "المسار الزمني",
+    "noAccount": "بلا حساب"
   }
 }

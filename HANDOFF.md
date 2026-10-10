@@ -1,6 +1,6 @@
 # HANDOFF.md — NOVA Market
 
-**Last updated:** 2026-09-30, after Phase 12 checkpoint 7 (Orders) was completed and verified. Phase 12 is IN PROGRESS.
+**Last updated:** 2026-09-30, after Phase 12 checkpoint 7 (Orders) was adopted, reviewed, fixed and verified. Phase 12 is IN PROGRESS.
 
 This document is written for a **new AI agent or a different AI tool** picking this project up
 cold. It reflects the actual state of the repository at export time, not a plan or an aspiration.
@@ -335,7 +335,7 @@ Phase numbers are `MASTER_SPEC.md`'s (§107). See `PROGRESS.md` for full feature
     enforced in the API layer: illegal moves are 409, unknown ids 404, a rejected change alters
     nothing. The customer-facing `cancelOrder` (Phase 8) keeps its own cancellable list; a test
     (`orderTransitions.test.ts`) pins that it agrees with the table at every reachable status —
-    if you change either, that test tells you. Any new feature that changes an order's status must
+    if you change either, that test tells you. (`updateOrderStatus` was added to `ordersApi.ts` in Phase 12 as an additive, owner-approved enabler touching Phase 7/8 code; `cancelOrder` is untouched.) Any new feature that changes an order's status must
     use `updateOrderStatus`, append a timeline entry, and invalidate the `Order` id and `LIST`
     tags so customer pages refresh.
 
@@ -373,7 +373,7 @@ npm test          # must be all-passing
 npm run build     # must succeed
 ```
 
-Current state: **392 tests across 61 files, all passing.** (The full suite takes ~100 s normally but can exceed a 300 s limit on a single-core machine; running it in chunks — `src/test/unit`, then the component files in two halves — is a valid way to verify. One pre-existing test, `ProductConfigurator` "adds the configured price…", failed once under load and passed on every rerun; it is believed to be a timing flake from RTL's 1000 ms `waitFor` default.) `tsc -b` clean. `oxlint` 0 errors
+Current state: **397 tests across 61 files, all passing.** (The full suite takes ~100 s normally but can exceed a 300 s limit on a single-core machine; running it in chunks — `src/test/unit`, then the component files in two halves — is a valid way to verify. One pre-existing test, `ProductConfigurator` "adds the configured price…", failed once under load and passed on every rerun; it is believed to be a timing flake from RTL's 1000 ms `waitFor` default.) `tsc -b` clean. `oxlint` 0 errors **Flake policy (owner directive): if `ProductConfigurator` "adds the configured price…" fails again in any checkpoint, treat it as a real flake and bump its `waitFor` timeout deliberately (it uses the 1000 ms default) rather than letting it flake indefinitely.** It has not failed in the last four chunked runs.
 with 4 advisory `only-export-components` / `set-state-in-effect` warnings that are the
 long-standing accepted baseline — **do not let this number grow**; if a change adds a warning,
 fix the cause rather than suppressing it.
@@ -422,6 +422,16 @@ Test conventions:
   header wishlist badge, the account overview counter, "N items" on user and public collections,
   and editorial collection counts. Fix path if it matters: derive those counts from the resolved
   products instead of `ids.length`. Restoring the product makes it reappear everywhere.
+- **Provenance of the Orders checkpoint (recorded for honesty).** Commit `bf7f48e` was found in
+  the repository without a record of who made it in the session that discovered it; the owner
+  concluded it came from the previous session (cut off before its final response) and decided to
+  adopt it. It was verified (tsc / lint / build / 392 tests / diff footprint) and then reviewed
+  for quality rather than assumed correct, and a follow-up commit fixed what the review found
+  (see IMPLEMENTATION_LOG, checkpoint 7). The provenance cannot be confirmed from the repo alone.
+  Its Phase 7/8 footprint is `updateOrderStatus` in `ordersApi.ts` (additive, owner-approved);
+  `cancelOrder` is untouched.
+- **Admin orders list is not paginated** and sorts newest-first only; unlinked orders are marked
+  "No account" (guest checkout, or placed before orders were linked to accounts).
 - **Orders (admin) are status-only, and don't touch inventory.** A refund moves no money; there
   are no tracking numbers, notes, bulk updates, date-range filter or customer notifications. Placing
   an order does **not** decrement a product's `inventory`, and cancel/refund doesn't restock it —

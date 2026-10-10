@@ -87,7 +87,9 @@ export function AdminCustomerDetailPage() {
               <tbody>
                 {data.orders.map((o) => (
                   <tr key={o.id} className="border-b border-border last:border-0">
-                    <th scope="row" className="py-2.5 pe-4 text-start font-medium text-foreground">{o.orderNumber}</th>
+                    <th scope="row" className="py-2.5 pe-4 text-start font-medium">
+                      <Link to={`/admin/orders/${o.id}`} className="text-foreground hover:text-accent hover:underline">{o.orderNumber}</Link>
+                    </th>
                     <td className="py-2.5 pe-4 text-muted-foreground">{date(o.placedAt)}</td>
                     <td className="py-2.5 pe-4"><OrderStatusBadge status={o.status} /></td>
                     <td className="py-2.5 text-end font-medium text-foreground">

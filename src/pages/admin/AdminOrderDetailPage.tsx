@@ -185,7 +185,7 @@ export function AdminOrderDetailPage() {
           <Card className="p-4">
             <h2 className="mb-2 text-sm font-semibold text-foreground">{t("admin:orders.shippingAddress")}</h2>
             <address className="text-sm not-italic text-muted-foreground">
-              {a.fullName}<br />{a.line1}<br />{a.line2 ? <>{a.line2}<br /></> : null}{a.city}, {a.region} {a.postalCode}<br />{a.country}<br />{a.phone}
+              {a.fullName}<br />{a.line1}<br />{a.line2 ? <>{a.line2}<br /></> : null}{a.city}, {a.region} {a.postalCode}<br />{a.country}<br /><bdi dir="ltr">{a.phone}</bdi>
             </address>
             <p className="mt-3 text-xs text-muted-foreground">{t("admin:orders.delivery", { label: order.deliveryOption.label, eta: order.deliveryOption.etaDays })}</p>
           </Card>

@@ -77,6 +77,8 @@ describe("Admin customers", () => {
     expect(await screen.findByRole("heading", { name: "Ada Byron" })).toBeInTheDocument();
     const history = screen.getByRole("table", { name: "Order history" });
     expect(within(history).getAllByRole("row")).toHaveLength(3); // header + 2 orders
+    // Each order number leads to the admin order detail (no dead end between customers and orders).
+    for (const link of within(history).getAllByRole("link")) expect(link.getAttribute("href")).toMatch(/^\/admin\/orders\/order-/);
     expect(within(history).getByText("Cancelled")).toBeInTheDocument();
     // One non-cancelled order, so lifetime spend and average order value are both $108.
     // The $540 cancelled order is in the history table but not in either KPI.

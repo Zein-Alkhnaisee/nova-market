@@ -41,7 +41,7 @@ describe("Admin orders", () => {
     expect(await screen.findByText("No orders yet")).toBeInTheDocument();
   });
 
-  it("lists orders newest first with customer names, a Guest marker, status badges and totals, and filters them", async () => {
+  it("lists orders newest first with customer names, a No-account marker, status badges and totals, and filters them", async () => {
     const store = createTestStore();
     const ada = ((await store.dispatch(authApi.endpoints.register.initiate({ fullName: "Ada Byron", email: `ada-${Date.now()}@example.com`, password: "password123" }))) as { data: User }).data;
     const linked = await place(store, orderInput("Ada Recipient", 100, ada.id));
@@ -54,7 +54,7 @@ describe("Admin orders", () => {
     expect(rows).toHaveLength(2);
     expect(rows[0]).toHaveTextContent(guest.orderNumber); // newest first
     expect(rows[0]).toHaveTextContent("Gus Guest");
-    expect(rows[0]).toHaveTextContent("Guest");
+    expect(rows[0]).toHaveTextContent("No account");
     expect(rows[0]).toHaveTextContent("Cancelled");
     expect(rows[1]).toHaveTextContent("Ada Byron"); // linked account name, not the recipient
     expect(rows[1]).toHaveTextContent(usd(216)); // 2 × 100 + 8% tax
@@ -86,6 +86,15 @@ describe("Admin orders", () => {
     expect(screen.queryByText(/4242424242424242/)).not.toBeInTheDocument();
     expect(within(screen.getByRole("heading", { name: "Timeline" }).closest("div")!).getByText("Confirmed")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "All orders" })).toBeInTheDocument();
+  });
+
+  it("renders the shipping phone number as a left-to-right isolate so it can't scramble in RTL", async () => {
+    const store = createTestStore();
+    const order = await place(store, orderInput("Pia Phone", 30));
+    renderWithProviders(<App />, { route: `/admin/orders/${order.id}`, store });
+    const phone = await screen.findByText("+14155550100");
+    expect(phone.tagName).toBe("BDI");
+    expect(phone).toHaveAttribute("dir", "ltr");
   });
 
   it("shows a guest order as not linked to an account", async () => {
@@ -166,4 +175,64 @@ describe("Admin orders", () => {
     spy.mockRestore();
     consoleSpy.mockRestore();
   });
+
+  it("confirms before refunding a delivered order, defaulting focus to the safe choice", async () => {
+    const store = createTestStore();
+    const order = await place(store, orderInput("Rita Refund", 30));
+    for (const to of ["processing", "shipped", "out_for_delivery", "delivered"] as const) updateOrderStatus(order.id, to);
+    renderWithProviders(<App />, { route: `/admin/orders/${order.id}`, store });
+
+    // Delivered orders offer only the refund — and it's the destructive, confirmed one.
+    expect(screen.queryByRole("button", { name: "Cancel order" })).not.toBeInTheDocument();
+    await userEvent.click(await screen.findByRole("button", { name: "Refund order" }));
+    const dialog = screen.getByRole("alertdialog", { name: "Refund this order?" });
+    expect(within(dialog).getByRole("button", { name: "Keep as is" })).toHaveFocus();
+    expect(listAllOrders().find((o) => o.id === order.id)?.status).toBe("delivered"); // nothing yet
+
+    await userEvent.click(within(dialog).getByRole("button", { name: "Refund order" }));
+    expect(await screen.findByText("Order marked as Refunded.")).toBeInTheDocument();
+    expect(await screen.findByText(/final status and can't be changed/i)).toBeInTheDocument();
+    expect(listAllOrders().find((o) => o.id === order.id)?.status).toBe("refunded");
+  });
+
+  it("shows a human-readable error on the detail page and recovers on retry", async () => {
+    const store = createTestStore();
+    const order = await place(store, orderInput("Dee Detail", 30));
+    const mod = await import("../../services/api/ordersApi");
+    const real = mod.listAllOrders;
+    let calls = 0;
+    const spy = vi.spyOn(mod, "listAllOrders").mockImplementation(() => {
+      calls += 1;
+      if (calls === 1) throw new Error("boom");
+      return real();
+    });
+    const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+    renderWithProviders(<App />, { route: `/admin/orders/${order.id}`, store });
+    expect(await screen.findByText("We couldn't load this order right now.")).toBeInTheDocument();
+    expect(screen.queryByText(/boom/)).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: /try again/i }));
+    expect(await screen.findByRole("button", { name: "Start processing" })).toBeInTheDocument();
+
+    spy.mockRestore();
+    consoleSpy.mockRestore();
+  });
+
+  it("ignores an invalid ?status= instead of filtering to nothing while the dropdown says All", async () => {
+    const store = createTestStore();
+    await place(store, orderInput("Ivy Invalid", 30));
+    renderWithProviders(<App />, { route: "/admin/orders?status=bogus", store });
+    const table = await screen.findByRole("table", { name: "Orders" });
+    expect(within(table).getAllByRole("row").length).toBeGreaterThan(1); // not the empty "no match" state
+    expect(screen.getByLabelText("Status")).toHaveValue("");
+  });
+
+  it("links each order number to its admin detail page", async () => {
+    const store = createTestStore();
+    const order = await place(store, orderInput("Lena Link", 30));
+    renderWithProviders(<App />, { route: "/admin/orders", store });
+    const link = await screen.findByRole("link", { name: order.orderNumber });
+    expect(link).toHaveAttribute("href", `/admin/orders/${order.id}`);
+  });
 });
+

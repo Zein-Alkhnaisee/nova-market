@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { AdminPageHeader } from "../../components/admin/AdminPageHeader";
 import { KpiCard } from "../../components/admin/KpiCard";
@@ -128,7 +129,9 @@ function DashboardContent({ stats }: { stats: DashboardStats }) {
               <tbody>
                 {stats.recentOrders.map((o) => (
                   <tr key={o.id} className="border-b border-border last:border-0">
-                    <th scope="row" className="py-2.5 pe-4 text-start font-medium text-foreground">{o.orderNumber}</th>
+                    <th scope="row" className="py-2.5 pe-4 text-start font-medium">
+                      <Link to={`/admin/orders/${o.id}`} className="text-foreground hover:text-accent hover:underline">{o.orderNumber}</Link>
+                    </th>
                     <td className="py-2.5 pe-4 text-foreground">{o.customerName}</td>
                     <td className="py-2.5 pe-4 text-muted-foreground">{new Date(o.placedAt).toLocaleDateString(locale)}</td>
                     <td className="py-2.5 pe-4"><OrderStatusBadge status={o.status} /></td>

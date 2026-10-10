@@ -19,7 +19,9 @@ export function AdminOrdersPage() {
   const locale = i18n.language;
   const [searchParams, setSearchParams] = useSearchParams();
   const q = searchParams.get("q") ?? "";
-  const status = searchParams.get("status") ?? "";
+  // Only a real status counts: a hand-edited ?status=bogus must not filter to nothing while the dropdown shows "All".
+  const rawStatus = searchParams.get("status") ?? "";
+  const status = (STATUSES as string[]).includes(rawStatus) ? rawStatus : "";
   const { data, isLoading, isError, refetch } = useGetAdminOrdersQuery(undefined, { refetchOnMountOrArgChange: true });
 
   const setParam = (key: string, value: string) => {
@@ -101,7 +103,7 @@ export function AdminOrdersPage() {
                         <td className="py-2.5 pe-4 text-muted-foreground">{new Date(o.placedAt).toLocaleDateString(locale)}</td>
                         <td className="py-2.5 pe-4 text-foreground">
                           {o.customerName}
-                          {!o.customerId ? <span className="ms-2 text-xs text-muted-foreground">{t("admin:orders.guest")}</span> : null}
+                          {!o.customerId ? <span className="ms-2 text-xs text-muted-foreground">{t("admin:orders.noAccount")}</span> : null}
                         </td>
                         <td className="py-2.5 pe-4 text-end">{new Intl.NumberFormat(locale).format(o.itemCount)}</td>
                         <td className="py-2.5 pe-4"><OrderStatusBadge status={o.status} /></td>

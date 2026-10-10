@@ -270,7 +270,6 @@
       "status": "Status",
       "total": "Total"
     },
-    "guest": "Guest",
     "emptyTitle": "No orders yet",
     "emptyDescription": "Orders placed in this browser will show up here.",
     "noMatchTitle": "No orders match these filters",
@@ -326,6 +325,7 @@
     "delivery": "{{label}} · {{eta}}",
     "payment": "Payment",
     "paymentValue": "{{brand}} ending in {{last4}}",
-    "timeline": "Timeline"
+    "timeline": "Timeline",
+    "noAccount": "No account"
   }
 }
