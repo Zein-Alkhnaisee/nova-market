@@ -327,5 +327,67 @@
     "paymentValue": "{{brand}} ending in {{last4}}",
     "timeline": "Timeline",
     "noAccount": "No account"
+  },
+  "coupons": {
+    "description": "Discount codes customers can apply at checkout. Changes take effect at checkout straight away.",
+    "new": "New coupon",
+    "columns": {
+      "code": "Code",
+      "discount": "Discount",
+      "status": "Status",
+      "used": "Used in orders",
+      "note": "Note",
+      "actions": "Actions"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "edit": "Edit",
+    "editLabel": "Edit {{code}}",
+    "delete": "Delete",
+    "deleteLabel": "Delete {{code}}",
+    "deleteBlocked_one": "Can't delete: it was used in {{count}} order. Deactivate it instead.",
+    "deleteBlocked_other": "Can't delete: it was used in {{count}} orders. Deactivate it instead.",
+    "blocked_one": "{{code}} wasn't deleted: it was used in {{count}} order. Deactivate it instead.",
+    "blocked_other": "{{code}} wasn't deleted: it was used in {{count}} orders. Deactivate it instead.",
+    "emptyTitle": "No coupons",
+    "emptyDescription": "Create a coupon to offer customers a discount at checkout.",
+    "error": "We couldn't load coupons right now.",
+    "actionError": "We couldn't update that coupon. Please try again.",
+    "notice": {
+      "created": "{{code}} created.",
+      "updated": "{{code}} updated.",
+      "deleted": "{{code}} deleted."
+    },
+    "confirm": {
+      "title": "Delete {{code}}?",
+      "description": "Customers will no longer be able to use this code. This can't be undone.",
+      "confirm": "Delete coupon",
+      "cancel": "Keep it"
+    },
+    "form": {
+      "newTitle": "New coupon",
+      "editTitle": "Edit {{code}}",
+      "code": "Code",
+      "codeHint": "3–32 letters, numbers, hyphens or underscores. Saved in upper case; customers can type it in any case.",
+      "codeLocked": "The code can't be changed after creation — orders record it. Create a new coupon instead.",
+      "percentOff": "Discount (%)",
+      "description": "Note",
+      "descriptionHint": "Optional. For your own reference.",
+      "active": "Active",
+      "activeHint": "Inactive coupons are rejected at checkout. Use this to retire a coupon that has been used.",
+      "save": "Save changes",
+      "create": "Create coupon",
+      "saving": "Saving…",
+      "cancel": "Cancel"
+    },
+    "errors": {
+      "required": "This field is required.",
+      "tooLong": "This is too long.",
+      "invalidFormat": "Use only letters, numbers, hyphens and underscores (3–32 characters).",
+      "taken": "This code is already used by another coupon.",
+      "invalidPercent": "Enter a whole number from 1 to 100."
+    }
   }
 }

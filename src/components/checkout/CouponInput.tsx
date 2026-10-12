@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { X } from "lucide-react";
-import { coupons } from "../../mocks/data/coupons";
+import { findActiveCoupon } from "../../services/catalog/couponStore";
 
 interface CouponInputProps {
   appliedCode: string | null;
@@ -17,7 +17,7 @@ export function CouponInput({ appliedCode, discountPercent, onApply, onRemove }:
 
   const handleApply = (e: React.FormEvent) => {
     e.preventDefault();
-    const match = coupons.find((c) => c.code.toLowerCase() === value.trim().toLowerCase());
+    const match = findActiveCoupon(value);
     if (!match) {
       setError(t("summary.couponInvalid"));
       return;

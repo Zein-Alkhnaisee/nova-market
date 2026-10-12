@@ -6,6 +6,17 @@ import { buildOrderDetail, buildOrderRows, type AdminOrderDetail, type AdminOrde
 import type { OrderStatus } from "../../types/order";
 import { listMockCustomers } from "./authApi";
 import {
+  countOrdersUsingCoupon,
+  createCoupon,
+  deleteCoupon,
+  listCoupons,
+  updateCoupon,
+  type CouponDeleteResult,
+  type CouponInput,
+  type CouponWriteResult,
+  type StoredCoupon,
+} from "../catalog/couponStore";
+import {
   createCategory,
   deleteCategory,
   listCategories,
@@ -53,6 +64,11 @@ const CATEGORY_CHANGED_TAGS = [
   { type: "Recommendation" as const },
 ];
 const afterCategoryWrite = (result: { ok: boolean } | undefined) => (result?.ok ? CATEGORY_CHANGED_TAGS : []);
+
+export interface AdminCouponRow extends StoredCoupon {
+  /** Orders that recorded this coupon code. */
+  orderCount: number;
+}
 
 export interface AdminCategoryRow extends Category {
   /** Active (non-archived) products. */
@@ -197,6 +213,33 @@ export const adminApi = baseApi.injectEndpoints({
             ]
           : [],
     }),
+
+    // ---- Coupons (shared coupon store; see services/catalog/couponStore.ts) ----
+    // Checkout reads the store directly (synchronously), so there is nothing on the
+    // storefront to invalidate — only the admin's own list.
+    getAdminCoupons: builder.query<AdminCouponRow[], void>({
+      queryFn: async () => {
+        const rows = listCoupons().map((c): AdminCouponRow => ({ ...c, orderCount: countOrdersUsingCoupon(c.code) }));
+        return { data: await delay(rows, 250) };
+      },
+      // Usage counts come from orders, so placing/changing an order refreshes this too.
+      providesTags: [
+        { type: "Coupon" as const, id: "LIST" },
+        { type: "Order" as const, id: "LIST" },
+      ],
+    }),
+    createAdminCoupon: builder.mutation<CouponWriteResult, CouponInput>({
+      queryFn: async (input) => ({ data: await delay(createCoupon(input), 300) }),
+      invalidatesTags: (result) => (result?.ok ? [{ type: "Coupon" as const }] : []),
+    }),
+    updateAdminCoupon: builder.mutation<CouponWriteResult, { id: string; input: Omit<CouponInput, "code"> }>({
+      queryFn: async ({ id, input }) => ({ data: await delay(updateCoupon(id, input), 300) }),
+      invalidatesTags: (result) => (result?.ok ? [{ type: "Coupon" as const }] : []),
+    }),
+    deleteAdminCoupon: builder.mutation<CouponDeleteResult, string>({
+      queryFn: async (id) => ({ data: await delay(deleteCoupon(id), 250) }),
+      invalidatesTags: (result) => (result?.ok ? [{ type: "Coupon" as const }] : []),
+    }),
   }),
 });
 
@@ -216,4 +259,8 @@ export const {
   useGetAdminOrdersQuery,
   useGetAdminOrderQuery,
   useUpdateAdminOrderStatusMutation,
+  useGetAdminCouponsQuery,
+  useCreateAdminCouponMutation,
+  useUpdateAdminCouponMutation,
+  useDeleteAdminCouponMutation,
 } = adminApi;

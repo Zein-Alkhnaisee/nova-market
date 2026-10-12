@@ -61,6 +61,7 @@ export function ReviewStepPage() {
       discountPercent,
       paymentSummary,
       customerId: user?.id,
+      couponCode: couponCode ?? undefined,
     });
     if ("data" in result && result.data) {
       // Navigate away first — otherwise clearing the cart while still on

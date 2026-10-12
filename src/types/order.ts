@@ -50,6 +50,11 @@ export interface Order {
    * field existed have none, and must keep loading and rendering normally.
    */
   customerId?: string;
+  /**
+   * Coupon code applied at checkout (Phase 12 enabler for admin Coupons). Optional:
+   * orders without a coupon, and orders placed before this field existed, have none.
+   */
+  couponCode?: string;
   items: OrderItem[];
   subtotal: number;
   discount: number;

@@ -30,6 +30,9 @@ const AdminOrdersPage = lazy(() =>
 const AdminOrderDetailPage = lazy(() =>
   import("../../pages/admin/AdminOrderDetailPage").then((m) => ({ default: m.AdminOrderDetailPage }))
 );
+const AdminCouponsPage = lazy(() =>
+  import("../../pages/admin/AdminCouponsPage").then((m) => ({ default: m.AdminCouponsPage }))
+);
 const AdminPendingPage = lazy(() =>
   import("../../pages/admin/AdminPendingPage").then((m) => ({ default: m.AdminPendingPage }))
 );
@@ -211,7 +214,7 @@ export const router = createBrowserRouter([
   { path: "/admin/customers", element: withAdminShell(<AdminCustomersPage />) },
   { path: "/admin/customers/:id", element: withAdminShell(<AdminCustomerDetailPage />) },
   { path: "/admin/categories", element: withAdminShell(<AdminCategoriesPage />) },
-  { path: "/admin/coupons", element: withAdminShell(<AdminPendingPage section="coupons" />) },
+  { path: "/admin/coupons", element: withAdminShell(<AdminCouponsPage />) },
   { path: "/admin/analytics", element: withAdminShell(<AdminPendingPage section="analytics" />) },
 
   { path: "*", element: <NotFoundPage /> },

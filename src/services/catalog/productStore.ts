@@ -21,7 +21,7 @@
  *
  * Swapping in a real backend: replace this module; callers don't change.
  */
-import { loadPersisted, savePersisted } from "../../lib/persist";
+import { createVersionedStore } from "../../lib/versionedStore";
 import { generateId } from "../../lib/id";
 import { products as seedProducts } from "../../mocks/data/products";
 import { listCategories } from "./categoryStore";
@@ -73,8 +73,6 @@ interface ListOptions {
   includeArchived?: boolean;
 }
 
-let cache: StoredProduct[] | null = null;
-
 function isValidStored(value: unknown): value is StoredProduct[] {
   return (
     Array.isArray(value) &&
@@ -96,24 +94,15 @@ function isValidStored(value: unknown): value is StoredProduct[] {
   );
 }
 
-function loadCatalog(): StoredProduct[] {
-  const stored = loadPersisted<{ version?: number; items?: unknown } | null>(STORAGE_KEY, null);
-  if (stored && stored.version === STORAGE_VERSION && isValidStored(stored.items)) {
-    return stored.items;
-  }
-  // Empty, corrupt, wrong version or wrong shape: fall back to the seed.
-  return seedProducts.map((p) => ({ ...p }));
-}
-
-function items(): StoredProduct[] {
-  if (!cache) cache = loadCatalog();
-  return cache;
-}
-
-function commit(next: StoredProduct[]) {
-  cache = next;
-  savePersisted(STORAGE_KEY, { version: STORAGE_VERSION, items: next });
-}
+const store = createVersionedStore<StoredProduct>({
+  key: STORAGE_KEY,
+  version: STORAGE_VERSION,
+  // Empty, corrupt, wrong version or wrong shape falls back to this seed.
+  seed: () => seedProducts.map((p) => ({ ...p })),
+  isValid: isValidStored,
+});
+const items = () => store.read();
+const commit = (next: StoredProduct[]) => store.write(next);
 
 export function isArchived(product: StoredProduct): boolean {
   return product.archivedAt !== undefined;
@@ -132,12 +121,7 @@ export function getProductById(id: string, options: ListOptions = {}): StoredPro
 
 /** Test/dev helper: forget in-memory state and stored edits; the next read re-seeds. */
 export function resetStore(): void {
-  cache = null;
-  try {
-    window.localStorage.removeItem(`nova:${STORAGE_KEY}`);
-  } catch {
-    // Storage unavailable — nothing to clear.
-  }
+  store.reset();
 }
 
 function slugify(name: string): string {

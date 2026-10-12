@@ -73,6 +73,8 @@ export interface PlaceOrderInput {
   paymentSummary: { brand: string; last4: string };
   /** Signed-in account placing the order, if any. Guests have none. */
   customerId?: string;
+  /** Coupon applied at checkout, if any. */
+  couponCode?: string;
 }
 
 export const ordersApi = baseApi.injectEndpoints({
@@ -88,6 +90,7 @@ export const ordersApi = baseApi.injectEndpoints({
           id: generateId("order"),
           orderNumber: generateOrderNumber(),
           ...(input.customerId ? { customerId: input.customerId } : {}),
+          ...(input.couponCode ? { couponCode: input.couponCode } : {}),
           items: input.lines.map((line) => ({
             productId: line.productId,
             slug: line.slug,

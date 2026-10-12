@@ -23,7 +23,7 @@
  * call time, never at module load, so the cycle is safe. Keep it that way: do
  * not call the other store at the top level of either module.
  */
-import { loadPersisted, savePersisted } from "../../lib/persist";
+import { createVersionedStore } from "../../lib/versionedStore";
 import { categories as seedCategories } from "../../mocks/data/categories";
 import { listProducts } from "./productStore";
 import type { Category } from "../../types/product";
@@ -49,8 +49,6 @@ export type CategoryDeleteResult =
   | { ok: false; status: 404 }
   | { ok: false; status: 409; reason: "hasProducts"; productCount: number };
 
-let cache: Category[] | null = null;
-
 function isValidStored(value: unknown): value is Category[] {
   return (
     Array.isArray(value) &&
@@ -67,21 +65,14 @@ function isValidStored(value: unknown): value is Category[] {
   );
 }
 
-function load(): Category[] {
-  const stored = loadPersisted<{ version?: number; items?: unknown } | null>(STORAGE_KEY, null);
-  if (stored && stored.version === STORAGE_VERSION && isValidStored(stored.items)) return stored.items;
-  return seedCategories.map((c) => ({ ...c }));
-}
-
-function items(): Category[] {
-  if (!cache) cache = load();
-  return cache;
-}
-
-function commit(next: Category[]) {
-  cache = next;
-  savePersisted(STORAGE_KEY, { version: STORAGE_VERSION, items: next });
-}
+const store = createVersionedStore<Category>({
+  key: STORAGE_KEY,
+  version: STORAGE_VERSION,
+  seed: () => seedCategories.map((c) => ({ ...c })),
+  isValid: isValidStored,
+});
+const items = () => store.read();
+const commit = (next: Category[]) => store.write(next);
 
 export function listCategories(): Category[] {
   return [...items()];
@@ -93,12 +84,7 @@ export function getCategoryById(id: string): Category | undefined {
 
 /** Test/dev helper: forget in-memory state and stored edits; the next read re-seeds. */
 export function resetStore(): void {
-  cache = null;
-  try {
-    window.localStorage.removeItem(`nova:${STORAGE_KEY}`);
-  } catch {
-    // Storage unavailable — nothing to clear.
-  }
+  store.reset();
 }
 
 /** Products (including archived) that belong to a category. */

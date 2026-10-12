@@ -3,6 +3,7 @@ import { afterEach } from "vitest";
 import { cleanup } from "@testing-library/react";
 import { resetStore } from "../services/catalog/productStore";
 import { resetStore as resetCategoryStore } from "../services/catalog/categoryStore";
+import { resetStore as resetCouponStore } from "../services/catalog/couponStore";
 
 afterEach(() => {
   cleanup();
@@ -10,6 +11,7 @@ afterEach(() => {
   // The product catalog caches in memory; clearing storage alone would leak admin edits between tests.
   resetStore();
   resetCategoryStore();
+  resetCouponStore();
 });
 
 // jsdom doesn't implement matchMedia — ThemeProvider relies on it.
