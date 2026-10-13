@@ -24,10 +24,6 @@
     "backToAccount": "Back to my account",
     "switchAccount": "Log in with a different account"
   },
-  "pending": {
-    "title": "This section is on its way",
-    "description": "It hasn't been built yet. It's coming in a later Phase 12 checkpoint."
-  },
   "dashboard": {
     "description": "How the store is doing, from the orders and accounts in this browser.",
     "error": "We couldn't load the dashboard right now.",
@@ -388,6 +384,51 @@
       "invalidFormat": "Use only letters, numbers, hyphens and underscores (3–32 characters).",
       "taken": "This code is already used by another coupon.",
       "invalidPercent": "Enter a whole number from 1 to 100."
+    }
+  },
+  "analytics": {
+    "description": "How the store is performing over a period, from the orders in this browser.",
+    "error": "We couldn't load analytics right now.",
+    "period": {
+      "label": "Period",
+      "last7": "Last 7 days",
+      "last30": "Last 30 days",
+      "last90": "Last 90 days"
+    },
+    "units_one": "{{count}} unit",
+    "units_other": "{{count}} units",
+    "kpi": {
+      "revenue": "Revenue",
+      "revenueHint": "Order totals, excluding cancelled and refunded orders",
+      "orders": "Orders",
+      "ordersHint": "All orders placed in this period",
+      "average": "Average order",
+      "averageHint": "Excludes cancelled and refunded orders",
+      "unavailable": "Not available",
+      "conversion": "Conversion",
+      "conversionUnavailable": "Needs visit (session) data, which this demo doesn't collect. Orders alone can't supply a visitor count."
+    },
+    "revenueTrend": {
+      "title": "Revenue over time",
+      "subtitle": "Daily, last {{count}} days",
+      "empty": "No revenue in this period yet.",
+      "day": "Day"
+    },
+    "status": {
+      "title": "Orders by status",
+      "subtitle": "Every order placed in this period, by its current status",
+      "empty": "No orders in this period."
+    },
+    "topProducts": {
+      "title": "Top products",
+      "subtitle": "By line-item sales — before discounts, shipping and tax",
+      "empty": "No sales in this period."
+    },
+    "categories": {
+      "title": "Sales by category",
+      "subtitle": "By line-item sales — before discounts, shipping and tax",
+      "empty": "No sales in this period.",
+      "unknown": "Unknown category"
     }
   }
 }

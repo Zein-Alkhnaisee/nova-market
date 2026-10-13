@@ -5,6 +5,7 @@ import { listAllOrders, updateOrderStatus, type OrderTransitionResult } from "./
 import { buildOrderDetail, buildOrderRows, type AdminOrderDetail, type AdminOrderRow } from "../../lib/adminOrders";
 import type { OrderStatus } from "../../types/order";
 import { listMockCustomers } from "./authApi";
+import { computeAnalytics, type AnalyticsStats, type RangeDays } from "../../lib/adminAnalytics";
 import {
   countOrdersUsingCoupon,
   createCoupon,
@@ -19,6 +20,7 @@ import {
 import {
   createCategory,
   deleteCategory,
+  getCategoryById,
   listCategories,
   updateCategory,
   type CategoryDeleteResult,
@@ -240,6 +242,31 @@ export const adminApi = baseApi.injectEndpoints({
       queryFn: async (id) => ({ data: await delay(deleteCoupon(id), 250) }),
       invalidatesTags: (result) => (result?.ok ? [{ type: "Coupon" as const }] : []),
     }),
+
+    // ---- Analytics (pure computation in lib/adminAnalytics.ts) ----
+    getAnalytics: builder.query<AnalyticsStats, { rangeDays: RangeDays }>({
+      queryFn: async ({ rangeDays }) => {
+        const stats = computeAnalytics({
+          orders: listAllOrders(),
+          rangeDays,
+          // Orders snapshot only name/image/price, so category comes from the CURRENT catalog.
+          // Archived products still resolve (includeArchived); a product or category that no
+          // longer exists falls into the "unknown" bucket instead of crashing.
+          categoryOf: (productId) => {
+            const product = getProductById(productId, { includeArchived: true });
+            const category = product ? getCategoryById(product.categoryId) : undefined;
+            return category ? { id: category.id, name: category.name } : null;
+          },
+        });
+        return { data: await delay(stats, 300) };
+      },
+      // Orders drive everything; product/category edits change the category attribution.
+      providesTags: [
+        { type: "Order" as const, id: "LIST" },
+        { type: "Products" as const },
+        { type: "Category" as const },
+      ],
+    }),
   }),
 });
 
@@ -263,4 +290,5 @@ export const {
   useCreateAdminCouponMutation,
   useUpdateAdminCouponMutation,
   useDeleteAdminCouponMutation,
+  useGetAnalyticsQuery,
 } = adminApi;

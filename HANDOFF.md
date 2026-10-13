@@ -1,6 +1,6 @@
 # HANDOFF.md — NOVA Market
 
-**Last updated:** 2026-09-30, after Phase 12 checkpoint 8 (Coupons + the shared versioned-store helper) was completed and verified. Phase 12 is IN PROGRESS.
+**Last updated:** 2026-10-13, after Phase 12 (Admin) was completed and verified — all nine checkpoints done. **Phase 13 (Polish) is NOT started and needs an explicit owner decision before work begins.**
 
 This document is written for a **new AI agent or a different AI tool** picking this project up
 cold. It reflects the actual state of the repository at export time, not a plan or an aspiration.
@@ -9,8 +9,8 @@ cold. It reflects the actual state of the repository at export time, not a plan 
 
 ## 0. READ THIS FIRST — do not restart or recreate work
 
-This is a large, multi-session project. Eleven of the spec's thirteen phases are already
-implemented, tested, and verified. **Do not**:
+This is a large, multi-session project. Twelve of the spec's thirteen phases are already
+implemented, tested, and verified (only Phase 13, Polish, remains). **Do not**:
 
 - re-scaffold the project, re-run `npm create vite`, or recreate the folder structure
 - rewrite the design-token system, theming, i18n, routing, or the Redux/RTK Query architecture
@@ -190,7 +190,7 @@ Phase numbers are `MASTER_SPEC.md`'s (§107). See `PROGRESS.md` for full feature
   rail on Cart), command/quick actions (`CommandPalette`, Ctrl/Cmd+K), and feature flags
   (`featureFlagsSlice`, 5 flags, with `productComparison` actually gating Compare's UI —
   see §8 for why that specific flag was chosen to prove the mechanism works).
-- **Phase 11 — AI Shopping Assistant**: DONE (most recent). All 9 items from MASTER_SPEC §11:
+- **Phase 11 — AI Shopping Assistant**: DONE. All 9 items from MASTER_SPEC §11:
   a shared `ConversationView` used identically by the floating panel (`FloatingAssistant`,
   hidden on checkout/auth/the assistant page itself) and the dedicated `/assistant` page;
   message bubbles, suggested prompts, compact product recommendation cards; comparison actions
@@ -199,15 +199,17 @@ Phase numbers are `MASTER_SPEC.md`'s (§107). See `PROGRESS.md` for full feature
   the required AI-provider abstraction, with `assistantApi` (`POST /assistant/messages`) the
   only thing that knows which implementation is currently wired in.
 
+- **Phase 12 — Admin**: DONE (most recent). All seven items from MASTER_SPEC §107 Phase 12, in nine checkpoints: admin auth + shell, Dashboard, Customers, Products, Categories, Orders, Coupons, Analytics. Role-guarded `/admin/*` (UX only — see §9/§11), a shared design system (same tokens and primitives as the storefront, denser layout), three admin-managed catalog stores behind `lib/versionedStore.ts` (products, categories, coupons — §8 #16/#17), and an admin-only API module (`services/api/adminApi.ts`). Details per checkpoint: `PROGRESS.md` and `IMPLEMENTATION_LOG.md`.
+
 ---
 
 ## 7. Current phase and what remains
 
-**Current phase: Phase 12 (Admin) is IN PROGRESS.** Phases 1–11 are untouched and complete. The working tree is in a clean, fully passing state at the end of each checkpoint.
+**Current phase: Phase 12 (Admin) is COMPLETE** (verified: `tsc -b` clean, lint 0 errors / 4 warnings, 510/510 tests across 67 files, build OK). **Phase 13 (Polish) has not been started and must not be started without an explicit owner decision.** The working tree is in a clean, fully passing state.
 
-**Phase 12 checkpoint order (revised by the owner):** auth → shell → dashboard → customers → products → categories → orders → coupons → analytics. **Done through Coupons.**
+**Phase 12 checkpoint order (revised by the owner):** auth → shell → dashboard → customers → products → categories → orders → coupons → analytics. **All nine done.**
 
-**DONE so far:**
+**Phase 12 deliverables:**
 - **Admin auth**: `User.role?`, a seeded mock admin in `authApi.ts` (`admin@nova.demo` / `admin-demo-123` — mock only, plain text, says so in a comment), and `useAuthGuard({ role })`. A wrong role is *not* redirected; the hook returns false and the layout renders `AdminForbidden`. UX only — the backend must enforce roles when one exists (MASTER_SPEC §97).
 - **Admin shell**: `components/admin/AdminLayout.tsx` (+ `AdminPageHeader`, `AdminForbidden`), the `admin` i18n namespace (en/ar), and all nine `/admin/*` routes rendering inside the shell.
 
@@ -225,9 +227,13 @@ Phase numbers are `MASTER_SPEC.md`'s (§107). See `PROGRESS.md` for full feature
 - **Coupons + the shared versioned-store helper**: `services/catalog/couponStore.ts` (same pattern as products/categories; key `nova:coupons:v1`; seeded with the two codes checkout always accepted, `SAVE10` and `WELCOME15`, both active) with admin CRUD at `/admin/coupons`. **Checkout now reads coupons through the store**: `CouponInput` calls `findActiveCoupon(code)` instead of searching the static array — a data-source swap only (same case-insensitive match, same discount math, same UI, same invalid message). `checkoutSlice` was **not** touched. Codes are stored upper-case, unique case-insensitively and **immutable** once created (orders record them); percent is a whole number 1–100; coupons have an `active` flag so a used coupon can be retired instead of deleted. **Deleting a coupon that any order used is blocked with a 409 + count** (see below for the limit of that guarantee). `createVersionedStore` was extracted into `lib/versionedStore.ts` and `productStore`/`categoryStore` refactored onto it (§8 #17).
 - **Order → coupon link (Phase 12 enabler touching Phase 7/8 code, third after `customerId` and `updateOrderStatus`)**: optional `Order.couponCode`, passed by `ReviewStepPage` (one added line) and stored by `placeOrder` only when present (same conditional-spread pattern as `customerId`). It exists because orders previously recorded only the discount, not which coupon produced it, so "block deleting a coupon any order used" was otherwise unenforceable. Orders placed before this field, and orders without a coupon, have none — **so the 409 only protects against orders that recorded a code; usage in older orders is unknowable.** Also added: the `"Coupon"` cache tag in `baseApi`.
 
-**Exact next step:** the **Analytics** checkpoint (the last Phase 12 item) — replace `AdminPendingPage section="analytics"` on `/admin/analytics` with the four agreed views: revenue over time, orders by status, top products, and sales by category, as restrained token-based SVG with **no new charting library**. `components/admin/charts/BarChart.tsx` already exists (single series; a visually hidden data table gives screen readers the same data; time runs left-to-right via `dir="ltr"`) — reuse it and extend only if a view genuinely needs another shape. Data: `listAllOrders()` (the admin accessor) + the existing pure helpers in `lib/adminStats.ts` (`isRevenueOrder`, day bucketing) — keep the arithmetic in pure functions behind `adminApi`, like the dashboard. **Decide and document the metric semantics**: revenue and sales exclude cancelled/refunded orders (match the dashboard and customers); "sales by category" must map order items → category through the catalog (`getProductById(id, { includeArchived: true })` — orders snapshot only name/image/price, so archived products still resolve, and a category rename/delete must degrade gracefully, e.g. to an "Unknown category" bucket rather than crash); a date-range control (e.g. 7 / 30 / 90 days) is reasonable and its value belongs in the URL. Needs loading skeleton, empty state (no orders — the demo starts with none), error + retry, i18n en/ar, and the usual tests. This also needs no further owner decision beyond what was approved ("approved as proposed, no new charting library"). After Analytics, Phase 12 is complete and Phase 13 (Polish) begins.
+- **Analytics** (`/admin/analytics`, `AdminAnalyticsPage`): four views over a selectable period (7 / 30 / 90 days, kept in the URL as `?range=`, an invalid value falls back to 30) — revenue over time (reuses `BarChart`; the drawing is `aria-hidden` and the same data is a visually hidden table), orders by status, top products, and sales by category. The last three use a new `components/admin/charts/HorizontalBarList` because they are categorical comparisons with long labels, which a vertical chart (it labels only its first and last bar) doesn't fit; every row is real text, so the data is natively accessible. No new dependency and no charting library. Arithmetic lives in the pure, unit-tested `lib/adminAnalytics.ts` behind `adminApi.getAnalytics`. Metric semantics are stated on the page: revenue = order totals excluding cancelled/refunded; the status view counts EVERY order in the period; top-products and category sales are **line-item sales before discounts, shipping and tax**, so they will not sum to revenue; average order excludes cancelled/refunded; **Conversion is "Not available"** (no visit data) exactly as on the dashboard. Category attribution uses the CURRENT catalog (archived products still resolve; a product or category that no longer exists falls in an "Unknown category" row). `AdminPendingPage` (the temporary placeholder) was deleted — Analytics was its last user.
 
-**Remaining after Phase 12:** Phase 13 (Polish).
+**Phase 12's footprint on Phases 1–11 code** (everything outside the admin area that Phase 12 changed, 16 source files + the shared test setup; all additive or a data-source swap, each owner-approved and recorded in `IMPLEMENTATION_LOG.md`): *Phase 7/8 enablers* — `types/order.ts` + `ordersApi.ts` (optional `customerId`, optional `couponCode`, `updateOrderStatus`, the `listAllOrders` accessor), `ReviewStepPage.tsx` (two added lines passing them), `authApi.ts` + `types/user.ts` + `hooks/useAuthGuard.ts` (role, seeded mock admin, `listMockCustomers`, role-aware guard), `CouponInput.tsx` (reads coupons through `couponStore`). *Catalog read-through* — `productsApi`, `recommendationsApi`, `searchApi`, `categoriesApi`, `mockAIProvider` (read products/categories through the stores). *Foundation* — `router/index.tsx` (admin routes), `i18n/config.ts` (`admin` namespace), `baseApi.ts` (`Coupon` tag), `types/product.ts` (optional `inventory`). The only modified test file is `test/setup.ts` (resets the three stores after each test); no pre-existing test was modified. `checkoutSlice` was never touched.
+
+**Phase 13 — Polish (NOT started; owner decision required first).** MASTER_SPEC §107 lists: responsive testing, RTL testing, accessibility, dark mode, loading states, error states, empty states, animations, performance, SEO metadata, tests, type checking, linting, production build. Candidates already on record in §11 and `PROGRESS.md` "Known issues": **nothing in the project (Phases 1–12) has ever been checked in a real browser across RTL / mobile / dark** — it has rested on logical properties, semantic tokens and responsive classes; no React error boundary (a Phase 1 gap); Playwright and MSW from the spec are not installed; Arabic strings are unreviewed by a native speaker; derived counts that can exceed visible items after an archive (§11); carts and applied coupons are not re-validated at checkout; and the `ProductConfigurator` timing-flake policy in §10. This list is a starting point for the conversation, not a plan.
+
+**Remaining after Phase 12:** Phase 13 (Polish) — see above; not started.
 
 ---
 
@@ -381,7 +387,7 @@ npm test          # must be all-passing
 npm run build     # must succeed
 ```
 
-Current state: **469 tests across 65 files, all passing.** (The full suite takes ~100 s normally but can exceed a 300 s limit on a single-core machine; running it in chunks — `src/test/unit`, then the component files in two halves — is a valid way to verify. One pre-existing test, `ProductConfigurator` "adds the configured price…", failed once under load and passed on every rerun; it is believed to be a timing flake from RTL's 1000 ms `waitFor` default.) `tsc -b` clean. `oxlint` 0 errors **Flake policy (owner directive): if `ProductConfigurator` "adds the configured price…" fails again in any checkpoint, treat it as a real flake and bump its `waitFor` timeout deliberately (it uses the 1000 ms default) rather than letting it flake indefinitely.** It has not failed in the last four chunked runs.
+Current state: **510 tests across 67 files, all passing.** (The full suite takes ~100 s normally but can exceed a 300 s limit on a single-core machine; running it in chunks — `src/test/unit`, then the component files in two halves — is a valid way to verify. One pre-existing test, `ProductConfigurator` "adds the configured price…", failed once under load and passed on every rerun; it is believed to be a timing flake from RTL's 1000 ms `waitFor` default.) `tsc -b` clean. `oxlint` 0 errors **Flake policy (owner directive): if `ProductConfigurator` "adds the configured price…" fails again in any checkpoint, treat it as a real flake and bump its `waitFor` timeout deliberately (it uses the 1000 ms default) rather than letting it flake indefinitely.** It has not failed in the last four chunked runs.
 with 4 advisory `only-export-components` / `set-state-in-effect` warnings that are the
 long-standing accepted baseline — **do not let this number grow**; if a change adds a warning,
 fix the cause rather than suppressing it.
@@ -438,6 +444,13 @@ Test conventions:
   (see IMPLEMENTATION_LOG, checkpoint 7). The provenance cannot be confirmed from the repo alone.
   Its Phase 7/8 footprint is `updateOrderStatus` in `ordersApi.ts` (additive, owner-approved);
   `cancelOrder` is untouched.
+- **Analytics:** per-browser data only (like everything else); one period at a time with no
+  comparison to the previous period; revenue is bucketed daily for every range (90 bars at the
+  widest); top products is capped at 8; category and product sales are line-item sales (unit price ×
+  quantity, before discounts, shipping and tax) while revenue is order totals, so the views don't
+  sum to each other (stated on the page); a category is attributed from the CURRENT catalog, so
+  moving a product to another category re-attributes its past sales; Conversion is "Not available"
+  (no visit data).
 - **Coupons:** the code can't be changed after creation (orders record it; create a new coupon
   instead); percent is a whole number 1–100; no expiry dates, usage limits, minimum spend or
   per-customer rules — a coupon is just code + percent + active. **The delete-409 only protects
@@ -473,7 +486,7 @@ Test conventions:
   rating/review count aren't editable (new products start at 0); changing a product's main image
   drops its gallery; the admin form has no image upload (URL only), bulk actions, or
   variant/configurator editing.
-- **Admin area is a demo boundary.** The seeded admin's credentials are public in the repo and stored in plain text in the mock store; the role check (`useAuthGuard({ role })`) is a client-side UX guard that anyone can bypass. Real admin provisioning, hashing and role enforcement are backend work. Only the shell, Dashboard, Customers, Products, Categories and Orders are built so far (see §7). Guest orders and orders placed before `Order.customerId` existed can't be attributed to an account (surfaced, not hidden). The Dashboard's Conversion KPI is unavailable by design (no visit/session tracking, so no honest denominator), and the admin only sees orders/accounts stored in the current browser.
+- **Admin area is a demo boundary.** The seeded admin's credentials are public in the repo and stored in plain text in the mock store; the role check (`useAuthGuard({ role })`) is a client-side UX guard that anyone can bypass. Real admin provisioning, hashing and role enforcement are backend work. Every admin section (shell, Dashboard, Customers, Products, Categories, Orders, Coupons, Analytics) is built (see §7). Guest orders and orders placed before `Order.customerId` existed can't be attributed to an account (surfaced, not hidden). The Dashboard's Conversion KPI is unavailable by design (no visit/session tracking, so no honest denominator), and the admin only sees orders/accounts stored in the current browser.
 - **Not visually QA'd in a real browser** across RTL/mobile/dark combinations; correctness there
   rests on logical properties, semantic tokens, and responsive classes rather than manual review.
 - **Arabic translations are functional but unreviewed by a native speaker.**
