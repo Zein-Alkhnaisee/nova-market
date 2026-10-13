@@ -2,6 +2,7 @@
   "title": "Account",
   "greeting": "Hi, {{name}}",
   "nav": {
+    "adminPanel": "Admin Panel",
     "overview": "Overview",
     "orders": "Orders",
     "wishlist": "Wishlist",

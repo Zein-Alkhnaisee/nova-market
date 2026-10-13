@@ -8,22 +8,20 @@ import { resetStore as resetCouponStore } from "../services/catalog/couponStore"
 afterEach(() => {
   cleanup();
   window.localStorage.clear();
-  // The product catalog caches in memory; clearing storage alone would leak admin edits between tests.
   resetStore();
   resetCategoryStore();
   resetCouponStore();
 });
 
-// jsdom doesn't implement matchMedia — ThemeProvider relies on it.
 if (!window.matchMedia) {
   window.matchMedia = ((query: string) => ({
     matches: false,
     media: query,
     onchange: null,
-    addListener: () => {},
-    removeListener: () => {},
-    addEventListener: () => {},
-    removeEventListener: () => {},
+    addListener: () => { },
+    removeListener: () => { },
+    addEventListener: () => { },
+    removeEventListener: () => { },
     dispatchEvent: () => false,
   })) as unknown as typeof window.matchMedia;
 }

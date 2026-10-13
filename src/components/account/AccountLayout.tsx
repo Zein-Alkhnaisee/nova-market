@@ -15,6 +15,7 @@ const NAV_ITEMS = [
   { key: "profile", to: "/account/profile", end: false },
   { key: "settings", to: "/account/settings", end: false },
 ];
+const ADMIN_NAV_ITEM = { key: "adminPanel", to: "/admin", end: false };
 
 export function AccountLayout({ children }: { children: ReactNode }) {
   const { t } = useTranslation("account");
@@ -32,6 +33,24 @@ export function AccountLayout({ children }: { children: ReactNode }) {
       <div className="flex flex-col gap-8 lg:flex-row lg:gap-12">
         <nav aria-label={t("title")} className="lg:w-56 lg:shrink-0">
           <ul className="flex gap-1 overflow-x-auto pb-2 lg:flex-col lg:overflow-visible lg:pb-0">
+            {user?.role === "admin" ? (
+              <li className="shrink-0">
+                <NavLink
+                  to={ADMIN_NAV_ITEM.to}
+                  end={ADMIN_NAV_ITEM.end}
+                  className={({ isActive }) =>
+                    cn(
+                      "block whitespace-nowrap rounded-[var(--radius-md)] px-3 py-2 text-sm font-medium transition-colors",
+                      isActive
+                        ? "bg-accent/15 text-accent"
+                        : "text-accent hover:bg-accent/10"
+                    )
+                  }
+                >
+                  {t(`nav.${ADMIN_NAV_ITEM.key}`)}
+                </NavLink>
+              </li>
+            ) : null}
             {NAV_ITEMS.map((item) => (
               <li key={item.key} className="shrink-0">
                 <NavLink

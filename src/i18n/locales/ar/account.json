@@ -2,6 +2,7 @@
   "title": "الحساب",
   "greeting": "مرحبًا، {{name}}",
   "nav": {
+    "adminPanel": "لوحة الإدارة",
     "overview": "نظرة عامة",
     "orders": "الطلبات",
     "wishlist": "المفضلة",

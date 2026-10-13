@@ -5,6 +5,7 @@ import { useAppSelector } from "../../app/store/hooks";
 import { selectWishlistIds } from "../../features/wishlist/wishlistSlice";
 import { selectAddresses } from "../../features/account/addressesSlice";
 import { useGetOrdersQuery } from "../../services/api/ordersApi";
+import { selectUser } from "../../features/auth/authSlice";
 import { OrderStatusBadge } from "../../components/account/OrderStatusBadge";
 import { Skeleton } from "../../components/ui/Skeleton";
 import { ErrorState } from "../../components/common/ErrorState";
@@ -14,14 +15,17 @@ import { cn } from "../../lib/cn";
 export function AccountOverviewPage() {
   const isAuthenticated = useAuthGuard();
   const { t } = useTranslation(["account", "orders"]);
+  const user = useAppSelector(selectUser);
   const wishlistIds = useAppSelector(selectWishlistIds);
   const addresses = useAppSelector(selectAddresses);
-  const { data: orders, isLoading, isError, refetch } = useGetOrdersQuery(undefined, {
+  const { data: allOrders, isLoading, isError, refetch } = useGetOrdersQuery(undefined, {
     skip: !isAuthenticated,
   });
 
   if (!isAuthenticated) return null;
 
+  // Same filter as the orders page — only this account's own orders.
+  const orders = allOrders?.filter((o) => o.customerId && o.customerId === user?.id);
   const recentOrders = orders?.slice(0, 3) ?? [];
 
   return (

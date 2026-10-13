@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useAuthGuard } from "../../hooks/useAuthGuard";
+import { useAppSelector } from "../../app/store/hooks";
+import { selectUser } from "../../features/auth/authSlice";
 import { useGetOrdersQuery } from "../../services/api/ordersApi";
 import { OrderStatusBadge } from "../../components/account/OrderStatusBadge";
 import { Skeleton } from "../../components/ui/Skeleton";
@@ -11,12 +13,18 @@ import { cn } from "../../lib/cn";
 
 export function OrdersPage() {
   const isAuthenticated = useAuthGuard();
+  const user = useAppSelector(selectUser);
   const { t } = useTranslation("orders");
-  const { data: orders, isLoading, isError, refetch } = useGetOrdersQuery(undefined, {
+  const { data: allOrders, isLoading, isError, refetch } = useGetOrdersQuery(undefined, {
     skip: !isAuthenticated,
   });
 
   if (!isAuthenticated) return null;
+
+  // Only show this account's own orders. Guest orders (no customerId)
+  // and other users' orders are never shown. The previous version leaked
+  // guest orders because `undefined === undefined` matched.
+  const orders = allOrders?.filter((o) => o.customerId && o.customerId === user?.id);
 
   return (
     <div>
