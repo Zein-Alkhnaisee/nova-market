@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { formatCurrency } from "../../lib/format";
 import type { PricingBreakdown } from "../../lib/pricing";
 
 interface OrderSummaryProps {
@@ -10,10 +11,7 @@ interface OrderSummaryProps {
 
 export function OrderSummary({ pricing, currency, couponCode, shippingNote }: OrderSummaryProps) {
   const { t } = useTranslation("checkout");
-  const format = (amount: number) =>
-    new Intl.NumberFormat(undefined, { style: "currency", currency, maximumFractionDigits: 2 }).format(
-      amount
-    );
+  const format = (amount: number) => formatCurrency(amount, currency, { maximumFractionDigits: 2 });
 
   return (
     <div className="rounded-[var(--radius-lg)] border border-border bg-surface p-6">

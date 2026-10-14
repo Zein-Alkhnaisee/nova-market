@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { formatCurrency } from "../../lib/format";
 import { Star, X } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../../app/store/hooks";
 import { clearCompare, selectCompareIds, toggleCompare } from "../../features/compare/compareSlice";
@@ -58,9 +59,7 @@ export function ComparePage() {
   }
 
   const formatPrice = (amount: number, currency: string) =>
-    new Intl.NumberFormat(undefined, { style: "currency", currency, maximumFractionDigits: 0 }).format(
-      amount
-    );
+    formatCurrency(amount, currency, { maximumFractionDigits: 0 });
 
   const rows: { label: string; render: (p: (typeof products)[number]) => React.ReactNode }[] = [
     { label: t("attributes.price"), render: (p) => formatPrice(p.price, p.currency) },

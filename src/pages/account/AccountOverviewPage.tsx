@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { formatCurrency } from "../../lib/format";
 import { useAuthGuard } from "../../hooks/useAuthGuard";
 import { useAppSelector } from "../../app/store/hooks";
 import { selectWishlistIds } from "../../features/wishlist/wishlistSlice";
@@ -60,10 +61,7 @@ export function AccountOverviewPage() {
                     <p className="text-sm font-medium text-foreground">{order.orderNumber}</p>
                     <p className="mt-0.5 text-xs text-muted-foreground">
                       {t("orders:itemsCount", { count: order.items.length })} ·{" "}
-                      {new Intl.NumberFormat(undefined, {
-                        style: "currency",
-                        currency: order.currency,
-                      }).format(order.total)}
+                      {formatCurrency(order.total, order.currency)}
                     </p>
                   </div>
                   <OrderStatusBadge status={order.status} />

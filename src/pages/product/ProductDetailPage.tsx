@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { formatCurrency } from "../../lib/format";
 import { Heart, Scale, Star } from "lucide-react";
 import { useGetProductBySlugQuery } from "../../services/api/productsApi";
 import { useGetRelatedProductsQuery } from "../../services/api/recommendationsApi";
@@ -100,17 +101,9 @@ function ProductDetailContent({ product }: { product: ProductSummary }) {
   });
 
   const images = product.images && product.images.length > 0 ? product.images : [product.image];
-  const formattedPrice = new Intl.NumberFormat(undefined, {
-    style: "currency",
-    currency: product.currency,
-    maximumFractionDigits: 0,
-  }).format(product.price);
+  const formattedPrice = formatCurrency(product.price, product.currency, { maximumFractionDigits: 0 });
   const formattedPrevious = product.previousPrice
-    ? new Intl.NumberFormat(undefined, {
-        style: "currency",
-        currency: product.currency,
-        maximumFractionDigits: 0,
-      }).format(product.previousPrice)
+    ? formatCurrency(product.previousPrice, product.currency, { maximumFractionDigits: 0 })
     : null;
 
   return (
@@ -138,11 +131,7 @@ function ProductDetailContent({ product }: { product: ProductSummary }) {
           <div className="mt-6 flex items-baseline gap-3">
             <p className="text-3xl font-semibold text-foreground">
               {hasConfigurator
-                ? new Intl.NumberFormat(undefined, {
-                    style: "currency",
-                    currency: product.currency,
-                    maximumFractionDigits: 0,
-                  }).format(configuredPrice)
+                ? formatCurrency(configuredPrice, product.currency, { maximumFractionDigits: 0 })
                 : formattedPrice}
             </p>
             {!hasConfigurator && formattedPrevious ? (

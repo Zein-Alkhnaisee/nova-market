@@ -197,6 +197,12 @@ Checkpoint order (revised: Customers moved ahead of Products): admin auth → sh
 
 **Not yet verified in a real browser** for the admin shell across RTL/mobile/dark (same standing caveat as the rest of the project).
 
+## BUG FIXES BETWEEN PHASES 12 AND 13
+| Bug | Status | Notes |
+|---|---|---|
+| Bug C — currency formatting ignores the UI language | DONE (not yet verified locally by the owner — see below) | **Root cause:** storefront code called `new Intl.NumberFormat(undefined, { style: "currency", … })`. `undefined` means "use the OS/runtime locale", so on a machine whose OS locale is Arabic an **English** UI rendered `‏١٬٤٩٩ US$` instead of `$1,499`. It surfaced as two failing `ProductConfigurator` tests on an Arabic-locale Windows machine (they were correct; the app was wrong). **Fix:** new shared formatter `src/lib/format.ts` — `formatCurrency(amount, currency, options?)`, `formatNumber(value, options?)` and `getFormatLocale()` — which formats with the current i18next language (`i18n.resolvedLanguage \|\| i18n.language`, canonicalised, falling back to `"en"` if missing/malformed) instead of the OS locale. Twelve call sites switched to it (same Intl options as before, so output in a matching locale is unchanged): `ProductCard`, `QuickViewModal`, `ProductDetailPage` (3 sites), `ProductConfigurator`, `AssistantProductCard`, `CartPage`, `ComparePage`, `OrderSummary`, `ReviewStepPage`, `AccountOverviewPage`, `OrdersPage`, `OrderDetailPage`. No test file was modified. The admin pages already passed `i18n.language` explicitly and were left as they were. Bugs A and B (fixed in `99fbbd4`) were not touched |
+| Bug C — verification status | PENDING (owner) | The sandbox that made this change cannot reach the npm registry, so `tsc -b`, lint, tests and build were **not run** there. All that was checked: no `Intl.NumberFormat(undefined` remains in `src/`, and a best-effort `tsc` over `src/` against an incomplete install reported the same error count before and after the change (3392, all missing-dependency noise). The owner runs the four commands locally |
+
 ## PHASE 13 — POLISH — TODO
 
 Recommended next: **Phase 13 (Polish) — NOT started; needs an explicit owner decision first.** Phase 12 is complete. See HANDOFF §7 for the candidates already on record.
@@ -272,6 +278,7 @@ Vitest + Testing Library. 510 tests across 67 files:
   authenticated session, validation failures, bad-credential errors, and the account auth guard
 
 ## Known issues / deliberate deferrals
+- **Dates and a few hardcoded `$` strings still ignore the UI language (found during Bug C, deliberately not changed there).** `toLocaleDateString()` / `toLocaleString()` calls without a locale in `OrderSuccessPage`, `ReviewsSection`, `OrdersPage` and `OrderDetailPage` have the same root cause as Bug C (OS locale wins), now for dates. Two strings concatenate a literal `$` instead of formatting a currency: `DeliveryStepPage` (`` `$${shipping}` ``) and `mockAIProvider` (budget wording). Natural follow-ups: a `formatDate` helper beside `formatCurrency` in `lib/format.ts`, and a `lib/format.ts` unit test (none was added with Bug C because no test file was to be touched).
 - Analytics: per-browser data; one period at a time (no comparison with the previous period); daily buckets for every range; top products capped at 8; product/category sales are line-item sales (before discounts, shipping and tax) so they don't sum to revenue; categories are attributed from the CURRENT catalog; Conversion "Not available".
 - **Not yet checked in a real browser (all of Phases 1–12) across RTL / mobile / dark** — Phase 13 territory. Arabic strings are unreviewed by a native speaker.
 - Coupons: codes can't be changed after creation; no expiry dates, usage limits, minimum spend or per-customer rules; the delete-409 only protects against orders that recorded the code (`Order.couponCode` is new — older orders carry none, so their usage is unknowable); checkout does not re-validate an already-applied coupon at order placement (pre-existing), so a coupon deactivated or deleted after being applied in a cart still goes through; edits are per-browser.

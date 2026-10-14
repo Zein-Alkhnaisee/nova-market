@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { formatCurrency } from "../../lib/format";
 import { useCheckoutGuard } from "../../hooks/useCheckoutGuard";
 import { useAppDispatch, useAppSelector } from "../../app/store/hooks";
 import { selectCartLines, clearCart } from "../../features/cart/cartSlice";
@@ -92,9 +93,7 @@ export function ReviewStepPage() {
                   <p className="text-xs text-muted-foreground">× {line.quantity}</p>
                 </div>
                 <span className="text-sm text-foreground">
-                  {new Intl.NumberFormat(undefined, { style: "currency", currency: line.currency }).format(
-                    line.price * line.quantity
-                  )}
+                  {formatCurrency(line.price * line.quantity, line.currency)}
                 </span>
               </li>
             ))}

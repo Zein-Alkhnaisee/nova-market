@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { formatCurrency } from "../../lib/format";
 import type { ConfiguratorGroup } from "../../types/configurator";
 import { cn } from "../../lib/cn";
 
@@ -13,11 +14,7 @@ export function ProductConfigurator({ groups, selected, onSelect, currency }: Pr
   const { t } = useTranslation("product");
   const formatDelta = (delta: number) => {
     if (delta === 0) return t("configurator.included");
-    const formatted = new Intl.NumberFormat(undefined, {
-      style: "currency",
-      currency,
-      maximumFractionDigits: 0,
-    }).format(Math.abs(delta));
+    const formatted = formatCurrency(Math.abs(delta), currency, { maximumFractionDigits: 0 });
     return delta > 0 ? `+${formatted}` : `-${formatted}`;
   };
 

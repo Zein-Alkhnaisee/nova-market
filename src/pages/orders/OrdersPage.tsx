@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { formatCurrency } from "../../lib/format";
 import { useAuthGuard } from "../../hooks/useAuthGuard";
 import { useAppSelector } from "../../app/store/hooks";
 import { selectUser } from "../../features/auth/authSlice";
@@ -72,10 +73,7 @@ export function OrdersPage() {
                 <p className="text-sm text-muted-foreground">
                   {t("itemsCount", { count: order.items.length })} · {t("total")}:{" "}
                   <span className="font-medium text-foreground">
-                    {new Intl.NumberFormat(undefined, {
-                      style: "currency",
-                      currency: order.currency,
-                    }).format(order.total)}
+                    {formatCurrency(order.total, order.currency)}
                   </span>
                 </p>
                 <Link

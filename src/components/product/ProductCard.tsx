@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { formatCurrency } from "../../lib/format";
 import { Eye, Heart, Scale, Star } from "lucide-react";
 import type { ProductSummary } from "../../types/product";
 import { useAppDispatch, useAppSelector } from "../../app/store/hooks";
@@ -28,18 +29,10 @@ export function ProductCard({ product }: { product: ProductSummary }) {
   const [quickViewOpen, setQuickViewOpen] = useState(false);
   const productComparisonEnabled = useFeatureFlag("productComparison");
 
-  const formattedPrice = new Intl.NumberFormat(undefined, {
-    style: "currency",
-    currency: product.currency,
-    maximumFractionDigits: 0,
-  }).format(product.price);
+  const formattedPrice = formatCurrency(product.price, product.currency, { maximumFractionDigits: 0 });
 
   const formattedPrevious = product.previousPrice
-    ? new Intl.NumberFormat(undefined, {
-        style: "currency",
-        currency: product.currency,
-        maximumFractionDigits: 0,
-      }).format(product.previousPrice)
+    ? formatCurrency(product.previousPrice, product.currency, { maximumFractionDigits: 0 })
     : null;
 
   return (

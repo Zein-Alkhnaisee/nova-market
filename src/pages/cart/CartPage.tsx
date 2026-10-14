@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { formatCurrency } from "../../lib/format";
 import { Minus, Plus, X } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../../app/store/hooks";
 import { removeFromCart, selectCartLines, setQuantity } from "../../features/cart/cartSlice";
@@ -46,9 +47,7 @@ export function CartPage() {
   }
 
   const formatPrice = (amount: number, currency: string) =>
-    new Intl.NumberFormat(undefined, { style: "currency", currency, maximumFractionDigits: 0 }).format(
-      amount
-    );
+    formatCurrency(amount, currency, { maximumFractionDigits: 0 });
 
   const pricing = computePricing(lines, { discountPercent });
 

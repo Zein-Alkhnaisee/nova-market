@@ -1,6 +1,6 @@
 # HANDOFF.md — NOVA Market
 
-**Last updated:** 2026-10-13, after Phase 12 (Admin) was completed and verified — all nine checkpoints done. **Phase 13 (Polish) is NOT started and needs an explicit owner decision before work begins.**
+**Last updated:** 2026-10-14, after Phase 12 (Admin) was completed and verified — all nine checkpoints done — and Bug C (currency formatting ignored the UI language; see §8 #19) was fixed. **Phase 13 (Polish) is NOT started and needs an explicit owner decision before work begins.** *Bug C's fix was made in a sandbox that could not run the checks; run the four commands in §10 before relying on the 510/510 figure below.*
 
 This document is written for a **new AI agent or a different AI tool** picking this project up
 cold. It reflects the actual state of the repository at export time, not a plan or an aspiration.
@@ -107,7 +107,8 @@ src/
                     MyCollectionDetailPage) — deliberately separate.
   hooks/            useDebouncedValue, useCheckoutGuard, useAuthGuard, useFeatureFlag,
                     useAssistantConversation (shared by both assistant UIs)
-  lib/              cn, delay, persist, pricing, validation, id
+  lib/              cn, delay, persist, pricing, validation, id, format (locale-aware
+                    currency/number formatting — see §8 #19)
   types/            product (includes RecommendedProduct, ConfiguratorGroup references),
                     cart, review, collection (editorial), userCollection, order, address,
                     user, configurator, assistant (AssistantMessage, AssistantAction)
@@ -353,6 +354,20 @@ Phase numbers are `MASTER_SPEC.md`'s (§107). See `PROGRESS.md` for full feature
     use `updateOrderStatus`, append a timeline entry, and invalidate the `Order` id and `LIST`
     tags so customer pages refresh.
 
+19. **Prices and numbers are formatted through `src/lib/format.ts`, never with `Intl.NumberFormat(undefined, …)`.**
+    `undefined` as the locale means "the OS/runtime locale", which silently overrides the app's own
+    language: with an Arabic OS locale and the UI in English, prices rendered as `‏١٬٤٩٩ US$` instead of
+    `$1,499` (**Bug C**; it showed up as two failing `ProductConfigurator` tests on an Arabic-locale
+    Windows machine — the tests were right and the app was wrong). The shared helpers —
+    `formatCurrency(amount, currency, options?)`, `formatNumber(value, options?)`, `getFormatLocale()` —
+    read the current i18next language at call time (`resolvedLanguage || language`, canonicalised,
+    `"en"` on a missing or malformed tag so formatting can never crash a page). New code must use them.
+    A component re-renders into the new locale on a language switch because it re-renders on
+    `languageChanged` (anything using `useTranslation`), so call the helpers during render, not at module
+    load. The admin pages predate the helper and pass `i18n.language` to `Intl.NumberFormat` directly —
+    equivalent, left as-is, and fine to migrate when touched. **Still open (same root cause, not part of
+    Bug C):** `toLocaleDateString()`/`toLocaleString()` calls without a locale (see §11).
+
 ---
 
 ## 9. Security and data rules — these are hard requirements
@@ -487,6 +502,12 @@ Test conventions:
   drops its gallery; the admin form has no image upload (URL only), bulk actions, or
   variant/configurator editing.
 - **Admin area is a demo boundary.** The seeded admin's credentials are public in the repo and stored in plain text in the mock store; the role check (`useAuthGuard({ role })`) is a client-side UX guard that anyone can bypass. Real admin provisioning, hashing and role enforcement are backend work. Every admin section (shell, Dashboard, Customers, Products, Categories, Orders, Coupons, Analytics) is built (see §7). Guest orders and orders placed before `Order.customerId` existed can't be attributed to an account (surfaced, not hidden). The Dashboard's Conversion KPI is unavailable by design (no visit/session tracking, so no honest denominator), and the admin only sees orders/accounts stored in the current browser.
+- **Dates and two hardcoded `$` strings still ignore the UI language.** Found while fixing Bug C and
+  deliberately left alone: `toLocaleDateString()` / `toLocaleString()` without a locale in
+  `OrderSuccessPage`, `ReviewsSection`, `OrdersPage`, `OrderDetailPage` (OS locale wins, exactly like
+  Bug C but for dates), plus a literal `$` in `DeliveryStepPage` (`` `$${shipping}` ``) and in
+  `mockAIProvider`'s budget wording. A `formatDate` helper in `lib/format.ts` is the natural fix.
+  `lib/format.ts` has no unit test yet.
 - **Not visually QA'd in a real browser** across RTL/mobile/dark combinations; correctness there
   rests on logical properties, semantic tokens, and responsive classes rather than manual review.
 - **Arabic translations are functional but unreviewed by a native speaker.**

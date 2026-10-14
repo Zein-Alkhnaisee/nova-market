@@ -1,5 +1,6 @@
 import { Link, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { formatCurrency } from "../../lib/format";
 import { ArrowLeft, Check } from "lucide-react";
 import { useAuthGuard } from "../../hooks/useAuthGuard";
 import { useCancelOrderMutation, useGetOrderByIdQuery } from "../../services/api/ordersApi";
@@ -38,8 +39,7 @@ export function OrderDetailPage() {
     return <ErrorState message={t("detail.notFound")} onRetry={refetch} />;
   }
 
-  const format = (amount: number) =>
-    new Intl.NumberFormat(undefined, { style: "currency", currency: order.currency }).format(amount);
+  const format = (amount: number) => formatCurrency(amount, order.currency);
 
   const handleBuyAgain = () => {
     order.items.forEach((item) => {

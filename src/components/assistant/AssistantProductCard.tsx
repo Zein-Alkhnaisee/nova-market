@@ -1,12 +1,9 @@
 import { Link } from "react-router-dom";
+import { formatCurrency } from "../../lib/format";
 import type { ProductSummary } from "../../types/product";
 
 export function AssistantProductCard({ product }: { product: ProductSummary }) {
-  const formattedPrice = new Intl.NumberFormat(undefined, {
-    style: "currency",
-    currency: product.currency,
-    maximumFractionDigits: 0,
-  }).format(product.price);
+  const formattedPrice = formatCurrency(product.price, product.currency, { maximumFractionDigits: 0 });
 
   return (
     <Link

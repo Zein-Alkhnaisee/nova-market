@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { formatCurrency } from "../../lib/format";
 import { X } from "lucide-react";
 import type { ProductSummary } from "../../types/product";
 import { useAppDispatch } from "../../app/store/hooks";
@@ -23,11 +24,7 @@ export function QuickViewModal({ product, onClose }: QuickViewModalProps) {
 
   const images = product.images && product.images.length > 0 ? product.images : [product.image];
 
-  const formattedPrice = new Intl.NumberFormat(undefined, {
-    style: "currency",
-    currency: product.currency,
-    maximumFractionDigits: 0,
-  }).format(product.price);
+  const formattedPrice = formatCurrency(product.price, product.currency, { maximumFractionDigits: 0 });
 
   return (
     <div className="fixed inset-0 z-[var(--z-index-modal)] flex items-center justify-center bg-foreground/40 px-4 backdrop-blur-sm">
