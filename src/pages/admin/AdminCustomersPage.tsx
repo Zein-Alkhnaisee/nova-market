@@ -35,7 +35,7 @@ export function AdminCustomersPage() {
       <AdminPageHeader title={t("nav.customers")} description={t("customers.description")} />
 
       {isLoading ? (
-        <div aria-busy="true" aria-label="Loading" className="flex flex-col gap-3">
+        <div aria-busy="true" aria-label={t("common:loading")} className="flex flex-col gap-3">
           <Skeleton className="h-11 max-w-sm" />
           <Skeleton className="h-64" />
         </div>

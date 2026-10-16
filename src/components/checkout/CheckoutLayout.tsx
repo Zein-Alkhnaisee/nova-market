@@ -42,7 +42,7 @@ export function CheckoutLayout({ children }: { children: ReactNode }) {
                         isCurrent
                           ? "bg-primary text-primary-foreground"
                           : isComplete
-                          ? "bg-success text-white"
+                          ? "bg-success text-success-foreground"
                           : "bg-surface-muted text-muted-foreground"
                       )}
                       aria-current={isCurrent ? "step" : undefined}

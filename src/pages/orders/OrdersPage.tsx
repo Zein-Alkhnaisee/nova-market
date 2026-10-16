@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { formatCurrency } from "../../lib/format";
+import { formatCurrency, formatDate } from "../../lib/format";
 import { useAuthGuard } from "../../hooks/useAuthGuard";
 import { useAppSelector } from "../../app/store/hooks";
 import { selectUser } from "../../features/auth/authSlice";
@@ -49,7 +49,7 @@ export function OrdersPage() {
                     {t("orderNumber")} {order.orderNumber}
                   </p>
                   <p className="mt-0.5 text-xs text-muted-foreground">
-                    {t("placedOn", { date: new Date(order.placedAt).toLocaleDateString() })}
+                    {t("placedOn", { date: formatDate(order.placedAt) })}
                   </p>
                 </div>
                 <OrderStatusBadge status={order.status} />

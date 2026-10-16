@@ -47,3 +47,23 @@ export function formatCurrency(
 export function formatNumber(value: number, options?: Intl.NumberFormatOptions): string {
   return new Intl.NumberFormat(getFormatLocale(), options).format(value);
 }
+
+/**
+ * Format a date in the UI language, e.g. `formatDate(order.placedAt)` →
+ * "10/15/2026" (en). Same OS-locale pitfall as currency: `toLocaleDateString()`
+ * with no locale follows the operating system, not the app. Returns "" for an
+ * invalid date instead of throwing, so a bad timestamp can't crash a page.
+ */
+export function formatDate(value: string | number | Date, options?: Intl.DateTimeFormatOptions): string {
+  const date = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  return new Intl.DateTimeFormat(getFormatLocale(), options).format(date);
+}
+
+/** Date + time in the UI language (what `toLocaleString()` produced before, but locale-pinned). */
+export function formatDateTime(value: string | number | Date, options?: Intl.DateTimeFormatOptions): string {
+  return formatDate(
+    value,
+    options ?? { year: "numeric", month: "numeric", day: "numeric", hour: "numeric", minute: "numeric", second: "numeric" }
+  );
+}

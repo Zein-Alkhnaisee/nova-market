@@ -9,7 +9,8 @@
     "continue": "Continue",
     "retry": "Try again",
     "close": "Close",
-    "search": "Search"
+    "search": "Search",
+    "continueShopping": "Continue shopping"
   },
   "theme": {
     "light": "Light",
@@ -36,5 +37,7 @@
     "switchToArabic": "Switch to Arabic",
     "switchToEnglish": "Switch to English",
     "openAssistant": "Open assistant"
-  }
+  },
+  "loading": "Loading",
+  "skipToContent": "Skip to content"
 }

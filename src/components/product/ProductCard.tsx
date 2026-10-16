@@ -53,7 +53,7 @@ export function ProductCard({ product }: { product: ProductSummary }) {
           </Badge>
         ) : null}
 
-        <div className="absolute end-3 top-3 flex flex-col gap-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100 focus-within:opacity-100">
+        <div className="absolute end-3 top-3 flex flex-col gap-2 opacity-100 transition-opacity duration-200 focus-within:opacity-100 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100">
           <button
             type="button"
             onClick={() => dispatch(toggleWishlist(product.id))}

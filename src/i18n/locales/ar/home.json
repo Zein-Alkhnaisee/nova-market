@@ -21,5 +21,28 @@
     "subtitle": "بريد إلكتروني واحد أسبوعيًا. بدون إزعاج.",
     "placeholder": "you@email.com",
     "cta": "اشترك"
+  },
+  "footer": {
+    "columns": {
+      "shop": "المتجر",
+      "help": "المساعدة",
+      "company": "الشركة"
+    },
+    "links": {
+      "newArrivals": "وصل حديثًا",
+      "trending": "الأكثر رواجًا",
+      "deals": "العروض",
+      "collections": "المجموعات",
+      "shipping": "الشحن",
+      "returns": "الإرجاع",
+      "trackOrder": "تتبّع الطلب",
+      "contact": "تواصل معنا",
+      "about": "من نحن",
+      "careers": "الوظائف",
+      "press": "الصحافة",
+      "sustainability": "الاستدامة"
+    },
+    "rights": "© {{year}} نوفا ماركت. جميع الحقوق محفوظة.",
+    "emailLabel": "البريد الإلكتروني"
   }
 }

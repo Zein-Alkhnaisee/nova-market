@@ -12,8 +12,9 @@ import { useGetDashboardStatsQuery } from "../../services/api/adminApi";
 import type { DashboardStats } from "../../lib/adminStats";
 
 function DashboardSkeleton() {
+  const { t } = useTranslation("common");
   return (
-    <div aria-busy="true" aria-label="Loading">
+    <div aria-busy="true" aria-label={t("loading")}>
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-6">
         {Array.from({ length: 6 }).map((_, i) => (
           <Skeleton key={i} className="h-24" />

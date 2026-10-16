@@ -1,10 +1,13 @@
-import { lazy, Suspense } from "react";
-import { createBrowserRouter, Navigate, RouterProvider } from "react-router-dom";
+import { lazy, Suspense, useEffect } from "react";
+import { createBrowserRouter, Navigate, RouterProvider, useRouteError } from "react-router-dom";
 import { AppShell } from "../../components/layout/AppShell";
 import { CheckoutLayout } from "../../components/checkout/CheckoutLayout";
 import { AccountLayout } from "../../components/account/AccountLayout";
 import { AdminLayout } from "../../components/admin/AdminLayout";
 import { NotFoundPage } from "../../pages/NotFoundPage";
+import { CrashPage } from "../../components/common/CrashPage";
+import { RouteBoundary } from "../../components/common/RouteBoundary";
+import { RouteFallback } from "../../components/common/RouteFallback";
 
 const AdminDashboardPage = lazy(() =>
   import("../../pages/admin/AdminDashboardPage").then((m) => ({ default: m.AdminDashboardPage }))
@@ -114,110 +117,111 @@ const PublicCollectionPage = lazy(() =>
   import("../../pages/collections/PublicCollectionPage").then((m) => ({ default: m.PublicCollectionPage }))
 );
 
-function withShell(node: React.ReactNode) {
+/** One boundary + Suspense per route area. The shell stays up if only the page crashes. */
+function area(node: React.ReactNode) {
   return (
-    <AppShell>
-      <Suspense fallback={<div className="px-4 py-24 text-center text-sm text-muted-foreground">Loading…</div>}>
-        {node}
-      </Suspense>
-    </AppShell>
+    <RouteBoundary>
+      <Suspense fallback={<RouteFallback />}>{node}</Suspense>
+    </RouteBoundary>
   );
+}
+
+function withShell(node: React.ReactNode) {
+  return <AppShell>{area(node)}</AppShell>;
 }
 
 function withCheckoutShell(node: React.ReactNode) {
-  return (
-    <CheckoutLayout>
-      <Suspense fallback={<div className="px-4 py-24 text-center text-sm text-muted-foreground">Loading…</div>}>
-        {node}
-      </Suspense>
-    </CheckoutLayout>
-  );
+  return <CheckoutLayout>{area(node)}</CheckoutLayout>;
 }
 
 function withAuthShell(node: React.ReactNode) {
-  return (
-    <Suspense fallback={<div className="px-4 py-24 text-center text-sm text-muted-foreground">Loading…</div>}>
-      {node}
-    </Suspense>
-  );
+  return area(node);
 }
 
 function withAccountShell(node: React.ReactNode) {
   return (
     <AppShell>
-      <AccountLayout>
-        <Suspense fallback={<div className="py-24 text-center text-sm text-muted-foreground">Loading…</div>}>
-          {node}
-        </Suspense>
-      </AccountLayout>
+      <AccountLayout>{area(node)}</AccountLayout>
     </AppShell>
   );
 }
 
 function withAdminShell(node: React.ReactNode) {
-  return (
-    <AdminLayout>
-      <Suspense fallback={<div className="py-24 text-center text-sm text-muted-foreground">Loading…</div>}>
-        {node}
-      </Suspense>
-    </AdminLayout>
-  );
+  return <AdminLayout>{area(node)}</AdminLayout>;
+}
+
+/**
+ * Last line of defence for the route tree. React Router catches render errors itself
+ * (an ErrorBoundary placed OUTSIDE the RouterProvider never sees them), so the root
+ * route needs an errorElement of its own; it covers a crash in any shell, e.g. the header.
+ */
+function RouteErrorPage() {
+  const error = useRouteError();
+  useEffect(() => {
+    console.error("[Router] a route crashed", error);
+  }, [error]);
+  return <CrashPage fullPage />;
 }
 
 export const router = createBrowserRouter([
-  { path: "/", element: withShell(<HomePage />) },
-  { path: "/shop", element: withShell(<ShopPage />) },
-  { path: "/shop/:category", element: withShell(<ShopPage />) },
-  { path: "/product/:slug", element: withShell(<ProductDetailPage />) },
-  { path: "/search", element: withShell(<SearchPage />) },
-  { path: "/compare", element: withShell(<ComparePage />) },
-  { path: "/collections", element: withShell(<CollectionsPage />) },
-  { path: "/collections/:slug", element: withShell(<CollectionDetailPage />) },
-  { path: "/c/:id", element: withShell(<PublicCollectionPage />) },
-  { path: "/deals", element: withShell(<ShopPage />) },
-  { path: "/new-arrivals", element: withShell(<ShopPage />) },
-  { path: "/trending", element: withShell(<ShopPage />) },
+  {
+    errorElement: <RouteErrorPage />,
+    children: [
+      { path: "/", element: withShell(<HomePage />) },
+      { path: "/shop", element: withShell(<ShopPage />) },
+      { path: "/shop/:category", element: withShell(<ShopPage />) },
+      { path: "/product/:slug", element: withShell(<ProductDetailPage />) },
+      { path: "/search", element: withShell(<SearchPage />) },
+      { path: "/compare", element: withShell(<ComparePage />) },
+      { path: "/collections", element: withShell(<CollectionsPage />) },
+      { path: "/collections/:slug", element: withShell(<CollectionDetailPage />) },
+      { path: "/c/:id", element: withShell(<PublicCollectionPage />) },
+      { path: "/deals", element: withShell(<ShopPage badge="deal" titleKey="deals" />) },
+      { path: "/new-arrivals", element: withShell(<ShopPage badge="new" titleKey="newArrivals" />) },
+      { path: "/trending", element: withShell(<ShopPage badge="trending" titleKey="trending" />) },
 
-  { path: "/auth", element: <Navigate to="/auth/login" replace /> },
-  { path: "/auth/login", element: withAuthShell(<LoginPage />) },
-  { path: "/auth/register", element: withAuthShell(<RegisterPage />) },
-  { path: "/auth/forgot-password", element: withAuthShell(<ForgotPasswordPage />) },
-  { path: "/auth/reset-password", element: withAuthShell(<ResetPasswordPage />) },
+      { path: "/auth", element: <Navigate to="/auth/login" replace /> },
+      { path: "/auth/login", element: withAuthShell(<LoginPage />) },
+      { path: "/auth/register", element: withAuthShell(<RegisterPage />) },
+      { path: "/auth/forgot-password", element: withAuthShell(<ForgotPasswordPage />) },
+      { path: "/auth/reset-password", element: withAuthShell(<ResetPasswordPage />) },
 
-  { path: "/account", element: withAccountShell(<AccountOverviewPage />) },
-  { path: "/account/profile", element: withAccountShell(<ProfilePage />) },
-  { path: "/account/addresses", element: withAccountShell(<AddressesPage />) },
-  { path: "/account/payment-methods", element: withAccountShell(<PaymentMethodsPage />) },
-  { path: "/account/orders", element: withAccountShell(<OrdersPage />) },
-  { path: "/account/orders/:id", element: withAccountShell(<OrderDetailPage />) },
-  { path: "/account/wishlist", element: withAccountShell(<WishlistPage />) },
-  { path: "/account/collections", element: withAccountShell(<MyCollectionsPage />) },
-  { path: "/account/collections/:id", element: withAccountShell(<MyCollectionDetailPage />) },
-  { path: "/account/settings", element: withAccountShell(<SettingsPage />) },
+      { path: "/account", element: withAccountShell(<AccountOverviewPage />) },
+      { path: "/account/profile", element: withAccountShell(<ProfilePage />) },
+      { path: "/account/addresses", element: withAccountShell(<AddressesPage />) },
+      { path: "/account/payment-methods", element: withAccountShell(<PaymentMethodsPage />) },
+      { path: "/account/orders", element: withAccountShell(<OrdersPage />) },
+      { path: "/account/orders/:id", element: withAccountShell(<OrderDetailPage />) },
+      { path: "/account/wishlist", element: withAccountShell(<WishlistPage />) },
+      { path: "/account/collections", element: withAccountShell(<MyCollectionsPage />) },
+      { path: "/account/collections/:id", element: withAccountShell(<MyCollectionDetailPage />) },
+      { path: "/account/settings", element: withAccountShell(<SettingsPage />) },
 
-  { path: "/cart", element: withShell(<CartPage />) },
-  { path: "/checkout", element: <Navigate to="/checkout/shipping" replace /> },
-  { path: "/checkout/shipping", element: withCheckoutShell(<ShippingStepPage />) },
-  { path: "/checkout/delivery", element: withCheckoutShell(<DeliveryStepPage />) },
-  { path: "/checkout/payment", element: withCheckoutShell(<PaymentStepPage />) },
-  { path: "/checkout/review", element: withCheckoutShell(<ReviewStepPage />) },
-  { path: "/order-success/:id", element: withCheckoutShell(<OrderSuccessPage />) },
+      { path: "/cart", element: withShell(<CartPage />) },
+      { path: "/checkout", element: <Navigate to="/checkout/shipping" replace /> },
+      { path: "/checkout/shipping", element: withCheckoutShell(<ShippingStepPage />) },
+      { path: "/checkout/delivery", element: withCheckoutShell(<DeliveryStepPage />) },
+      { path: "/checkout/payment", element: withCheckoutShell(<PaymentStepPage />) },
+      { path: "/checkout/review", element: withCheckoutShell(<ReviewStepPage />) },
+      { path: "/order-success/:id", element: withCheckoutShell(<OrderSuccessPage />) },
 
-  { path: "/assistant", element: withShell(<AssistantPage />) },
+      { path: "/assistant", element: withShell(<AssistantPage />) },
 
-  { path: "/admin", element: withAdminShell(<AdminDashboardPage />) },
-  { path: "/admin/products", element: withAdminShell(<AdminProductsPage />) },
-  { path: "/admin/products/new", element: withAdminShell(<AdminProductFormPage />) },
-  { path: "/admin/products/:id", element: withAdminShell(<AdminProductFormPage />) },
-  { path: "/admin/orders", element: withAdminShell(<AdminOrdersPage />) },
-  { path: "/admin/orders/:id", element: withAdminShell(<AdminOrderDetailPage />) },
-  { path: "/admin/customers", element: withAdminShell(<AdminCustomersPage />) },
-  { path: "/admin/customers/:id", element: withAdminShell(<AdminCustomerDetailPage />) },
-  { path: "/admin/categories", element: withAdminShell(<AdminCategoriesPage />) },
-  { path: "/admin/coupons", element: withAdminShell(<AdminCouponsPage />) },
-  { path: "/admin/analytics", element: withAdminShell(<AdminAnalyticsPage />) },
+      { path: "/admin", element: withAdminShell(<AdminDashboardPage />) },
+      { path: "/admin/products", element: withAdminShell(<AdminProductsPage />) },
+      { path: "/admin/products/new", element: withAdminShell(<AdminProductFormPage />) },
+      { path: "/admin/products/:id", element: withAdminShell(<AdminProductFormPage />) },
+      { path: "/admin/orders", element: withAdminShell(<AdminOrdersPage />) },
+      { path: "/admin/orders/:id", element: withAdminShell(<AdminOrderDetailPage />) },
+      { path: "/admin/customers", element: withAdminShell(<AdminCustomersPage />) },
+      { path: "/admin/customers/:id", element: withAdminShell(<AdminCustomerDetailPage />) },
+      { path: "/admin/categories", element: withAdminShell(<AdminCategoriesPage />) },
+      { path: "/admin/coupons", element: withAdminShell(<AdminCouponsPage />) },
+      { path: "/admin/analytics", element: withAdminShell(<AdminAnalyticsPage />) },
 
-  { path: "*", element: <NotFoundPage /> },
+      { path: "*", element: withShell(<NotFoundPage />) },
+    ],
+  },
 ]);
 
 export function AppRouter() {

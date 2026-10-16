@@ -82,7 +82,7 @@ export function RegisterPage() {
         />
         <TextField
           id="email"
-          type="email"
+          type="email" dir="ltr"
           autoComplete="email"
           label={t("register.email")}
           value={form.email}

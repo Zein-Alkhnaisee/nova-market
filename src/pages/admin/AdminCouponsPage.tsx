@@ -179,7 +179,7 @@ export function AdminCouponsPage() {
       {confirming ? <ConfirmDelete coupon={confirming} busy={deleting} onConfirm={confirmDelete} onCancel={() => setConfirming(null)} /> : null}
 
       {isLoading ? (
-        <div aria-busy="true" aria-label="Loading" className="flex flex-col gap-3">
+        <div aria-busy="true" aria-label={t("common:loading")} className="flex flex-col gap-3">
           <Skeleton className="h-48" />
         </div>
       ) : null}

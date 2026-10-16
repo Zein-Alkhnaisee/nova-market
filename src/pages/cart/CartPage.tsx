@@ -18,6 +18,8 @@ import { cn } from "../../lib/cn";
 export function CartPage() {
   const { t: tCart } = useTranslation("cart");
   const { t: tCheckout } = useTranslation("checkout");
+  const { t: tProduct } = useTranslation("product");
+  const { t: tCommon } = useTranslation("common");
   const dispatch = useAppDispatch();
   const lines = useAppSelector(selectCartLines);
   const couponCode = useAppSelector(selectCouponCode);
@@ -38,7 +40,7 @@ export function CartPage() {
           description={tCart("emptyDescription")}
           action={
             <Link to="/shop" className={cn(buttonVariants({ variant: "primary" }))}>
-              Continue shopping
+              {tCommon("actions.continueShopping")}
             </Link>
           }
         />
@@ -98,8 +100,8 @@ export function CartPage() {
                           })
                         )
                       }
-                      aria-label="Decrease quantity"
-                      className="flex h-7 w-7 items-center justify-center text-foreground"
+                      aria-label={tProduct("quantityDecrease")}
+                      className="relative flex h-7 w-7 items-center justify-center text-foreground after:absolute after:-inset-2"
                     >
                       <Minus className="h-3.5 w-3.5" />
                     </button>
@@ -115,8 +117,8 @@ export function CartPage() {
                           })
                         )
                       }
-                      aria-label="Increase quantity"
-                      className="flex h-7 w-7 items-center justify-center text-foreground"
+                      aria-label={tProduct("quantityIncrease")}
+                      className="relative flex h-7 w-7 items-center justify-center text-foreground after:absolute after:-inset-2"
                     >
                       <Plus className="h-3.5 w-3.5" />
                     </button>

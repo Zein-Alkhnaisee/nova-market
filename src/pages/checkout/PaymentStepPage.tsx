@@ -89,6 +89,7 @@ export function PaymentStepPage() {
           </label>
           <input
             id="cardNumber"
+            dir="ltr"
             inputMode="numeric"
             autoComplete="off"
             placeholder="4242 4242 4242 4242"
@@ -112,6 +113,7 @@ export function PaymentStepPage() {
             </label>
             <input
               id="expiry"
+              dir="ltr"
               placeholder="MM/YY"
               autoComplete="off"
               value={form.expiry}
@@ -127,6 +129,7 @@ export function PaymentStepPage() {
             </label>
             <input
               id="cvc"
+              dir="ltr"
               inputMode="numeric"
               autoComplete="off"
               placeholder="123"

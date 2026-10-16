@@ -1,11 +1,13 @@
 import { useMemo, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { SlidersHorizontal, X } from "lucide-react";
+import { SlidersHorizontal } from "lucide-react";
 import { useGetProductsQuery, type SortOption } from "../../services/api/productsApi";
 import { useGetCategoriesQuery } from "../../services/api/categoriesApi";
 import { ProductCard } from "../../components/product/ProductCard";
 import { FilterPanel, type FilterValues } from "../../components/product/FilterPanel";
+import { FilterDrawer } from "../../components/product/FilterDrawer";
+import type { ProductSummary } from "../../types/product";
 import { SortDropdown } from "../../components/product/SortDropdown";
 import { Skeleton } from "../../components/ui/Skeleton";
 import { ErrorState } from "../../components/common/ErrorState";
@@ -22,9 +24,61 @@ function readFiltersFromParams(params: URLSearchParams): FilterValues & { sort: 
   };
 }
 
-export function ShopPage() {
+type ShopTitleKey = "deals" | "newArrivals" | "trending";
+
+interface ShopPageProps {
+  /** Only list products carrying this badge (used by /deals, /new-arrivals, /trending). */
+  badge?: ProductSummary["badge"];
+  /** navigation:links.<key> to use as the page title when no category is selected. */
+  titleKey?: ShopTitleKey;
+}
+
+function CategoryNav({
+  categories,
+  activeSlug,
+  allLabel,
+  onNavigate,
+}: {
+  categories: ReturnType<typeof useGetCategoriesQuery>["data"];
+  activeSlug: string | undefined;
+  allLabel: string;
+  onNavigate?: () => void;
+}) {
+  return (
+    <>
+      <p className="mb-3 text-xs font-medium uppercase tracking-wide text-muted-foreground">{allLabel}</p>
+      <nav aria-label={allLabel} className="mb-8 flex flex-col gap-1">
+        <Link
+          to="/shop"
+          onClick={onNavigate}
+          className={cn(
+            "rounded-[var(--radius-md)] px-3 py-2 text-sm hover:bg-surface-hover",
+            !activeSlug ? "bg-surface-hover font-medium text-foreground" : "text-muted-foreground"
+          )}
+        >
+          {allLabel}
+        </Link>
+        {categories?.map((c) => (
+          <Link
+            key={c.id}
+            to={`/shop/${c.slug}`}
+            onClick={onNavigate}
+            className={cn(
+              "rounded-[var(--radius-md)] px-3 py-2 text-sm hover:bg-surface-hover",
+              activeSlug === c.slug ? "bg-surface-hover font-medium text-foreground" : "text-muted-foreground"
+            )}
+          >
+            {c.name}
+          </Link>
+        ))}
+      </nav>
+    </>
+  );
+}
+
+export function ShopPage({ badge, titleKey }: ShopPageProps = {}) {
   const { category } = useParams<{ category?: string }>();
-  const { t } = useTranslation(["common", "shop"]);
+  const { t } = useTranslation(["common", "shop", "navigation"]);
   const { data: categories } = useGetCategoriesQuery();
   const [searchParams, setSearchParams] = useSearchParams();
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
@@ -36,11 +90,11 @@ export function ShopPage() {
     isFetching,
     isError,
     refetch,
-  } = useGetProductsQuery({ categoryId: category, minPrice, maxPrice, minRating, inStockOnly, sort });
+  } = useGetProductsQuery({ categoryId: category, badge, minPrice, maxPrice, minRating, inStockOnly, sort });
 
   // Facet counts are computed against everything matching category+price+sort
   // but before rating/stock are applied — see FilterPanel's `facetBaseProducts`.
-  const { data: facetBaseProducts } = useGetProductsQuery({ categoryId: category, minPrice, maxPrice });
+  const { data: facetBaseProducts } = useGetProductsQuery({ categoryId: category, badge, minPrice, maxPrice });
 
   const activeCategory = categories?.find((c) => c.slug === category);
 
@@ -88,7 +142,7 @@ export function ShopPage() {
     <div className="mx-auto max-w-[1440px] px-4 py-10 sm:px-6 lg:px-10">
       <div className="mb-8">
         <h1 className="text-3xl font-semibold tracking-tight text-foreground">
-          {activeCategory ? activeCategory.name : "Shop"}
+          {activeCategory ? activeCategory.name : t(`navigation:links.${titleKey ?? "shop"}`)}
         </h1>
         {products ? (
           <p className="mt-1 text-sm text-muted-foreground">
@@ -113,32 +167,7 @@ export function ShopPage() {
 
       <div className="flex gap-8">
         <aside className="hidden w-56 shrink-0 lg:block">
-          <p className="mb-3 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            {t("shop:allCategories")}
-          </p>
-          <nav className="mb-8 flex flex-col gap-1">
-            <Link
-              to="/shop"
-              className={cn(
-                "rounded-[var(--radius-md)] px-3 py-2 text-sm hover:bg-surface-hover",
-                !category ? "bg-surface-hover font-medium text-foreground" : "text-muted-foreground"
-              )}
-            >
-              {t("shop:allCategories")}
-            </Link>
-            {categories?.map((c) => (
-              <Link
-                key={c.id}
-                to={`/shop/${c.slug}`}
-                className={cn(
-                  "rounded-[var(--radius-md)] px-3 py-2 text-sm hover:bg-surface-hover",
-                  category === c.slug ? "bg-surface-hover font-medium text-foreground" : "text-muted-foreground"
-                )}
-              >
-                {c.name}
-              </Link>
-            ))}
-          </nav>
+          <CategoryNav categories={categories} activeSlug={category} allLabel={t("shop:allCategories")} />
           <FilterPanel values={filterValues} onChange={setFilters} onClear={clearFilters} facetBaseProducts={facetBaseProducts} />
         </aside>
 
@@ -180,25 +209,15 @@ export function ShopPage() {
       </div>
 
       {mobileFiltersOpen ? (
-        <div className="fixed inset-0 z-[var(--z-index-modal)] flex lg:hidden">
-          <button
-            type="button"
-            aria-label="Close"
-            onClick={() => setMobileFiltersOpen(false)}
-            className="absolute inset-0 bg-foreground/40"
+        <FilterDrawer title={t("shop:filters")} onClose={() => setMobileFiltersOpen(false)}>
+          <CategoryNav
+            categories={categories}
+            activeSlug={category}
+            allLabel={t("shop:allCategories")}
+            onNavigate={() => setMobileFiltersOpen(false)}
           />
-          <div className="relative ms-auto flex h-full w-80 max-w-[85vw] flex-col overflow-y-auto bg-surface p-5">
-            <button
-              type="button"
-              onClick={() => setMobileFiltersOpen(false)}
-              aria-label="Close"
-              className="mb-4 self-end text-muted-foreground hover:text-foreground"
-            >
-              <X className="h-5 w-5" />
-            </button>
-            <FilterPanel values={filterValues} onChange={setFilters} onClear={clearFilters} facetBaseProducts={facetBaseProducts} />
-          </div>
-        </div>
+          <FilterPanel values={filterValues} onChange={setFilters} onClear={clearFilters} facetBaseProducts={facetBaseProducts} />
+        </FilterDrawer>
       ) : null}
     </div>
   );

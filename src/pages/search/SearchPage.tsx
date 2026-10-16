@@ -1,12 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { SlidersHorizontal, X } from "lucide-react";
+import { SlidersHorizontal } from "lucide-react";
 import { useGetProductsQuery, type SortOption } from "../../services/api/productsApi";
 import { useAppDispatch } from "../../app/store/hooks";
 import { addRecentSearch } from "../../features/search/recentSearchesSlice";
 import { ProductCard } from "../../components/product/ProductCard";
 import { FilterPanel, type FilterValues } from "../../components/product/FilterPanel";
+import { FilterDrawer } from "../../components/product/FilterDrawer";
 import { SortDropdown } from "../../components/product/SortDropdown";
 import { Skeleton } from "../../components/ui/Skeleton";
 import { ErrorState } from "../../components/common/ErrorState";
@@ -163,25 +164,9 @@ export function SearchPage() {
       </div>
 
       {mobileFiltersOpen ? (
-        <div className="fixed inset-0 z-[var(--z-index-modal)] flex lg:hidden">
-          <button
-            type="button"
-            aria-label={t("common:actions.close")}
-            onClick={() => setMobileFiltersOpen(false)}
-            className="absolute inset-0 bg-foreground/40"
-          />
-          <div className="relative ms-auto flex h-full w-80 max-w-[85vw] flex-col overflow-y-auto bg-surface p-5">
-            <button
-              type="button"
-              onClick={() => setMobileFiltersOpen(false)}
-              aria-label={t("common:actions.close")}
-              className="mb-4 self-end text-muted-foreground hover:text-foreground"
-            >
-              <X className="h-5 w-5" />
-            </button>
-            <FilterPanel values={filterValues} onChange={setFilters} onClear={clearFilters} facetBaseProducts={facetBaseProducts} />
-          </div>
-        </div>
+        <FilterDrawer title={t("shop:filters")} onClose={() => setMobileFiltersOpen(false)}>
+          <FilterPanel values={filterValues} onChange={setFilters} onClear={clearFilters} facetBaseProducts={facetBaseProducts} />
+        </FilterDrawer>
       ) : null}
     </div>
   );

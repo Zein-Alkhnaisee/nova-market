@@ -1,6 +1,6 @@
 import { Link, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { formatCurrency } from "../../lib/format";
+import { formatCurrency, formatDate, formatDateTime } from "../../lib/format";
 import { ArrowLeft, Check } from "lucide-react";
 import { useAuthGuard } from "../../hooks/useAuthGuard";
 import { useCancelOrderMutation, useGetOrderByIdQuery } from "../../services/api/ordersApi";
@@ -70,7 +70,7 @@ export function OrderDetailPage() {
             {t("orderNumber")} {order.orderNumber}
           </h2>
           <p className="mt-0.5 text-sm text-muted-foreground">
-            {t("placedOn", { date: new Date(order.placedAt).toLocaleDateString() })}
+            {t("placedOn", { date: formatDate(order.placedAt) })}
           </p>
         </div>
         <OrderStatusBadge status={order.status} />
@@ -111,7 +111,7 @@ export function OrderDetailPage() {
                 </span>
                 <span className="text-sm text-foreground">{t(`status.${entry.status}`)}</span>
                 <time className="ms-auto text-xs text-muted-foreground" dateTime={entry.timestamp}>
-                  {new Date(entry.timestamp).toLocaleString()}
+                  {formatDateTime(entry.timestamp)}
                 </time>
               </li>
             ))}
@@ -120,10 +120,7 @@ export function OrderDetailPage() {
             <p className="mt-3 text-sm text-muted-foreground">
               {t("detail.estimatedDelivery")}:{" "}
               <span className="text-foreground">
-                {new Date(order.estimatedDelivery).toLocaleDateString(undefined, {
-                  month: "long",
-                  day: "numeric",
-                })}
+                {formatDate(order.estimatedDelivery, { month: "long", day: "numeric" })}
               </span>
             </p>
           ) : null}

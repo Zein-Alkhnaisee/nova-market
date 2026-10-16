@@ -19,7 +19,7 @@ export function SectionHeader({ title, subtitle, viewAllHref }: SectionHeaderPro
       {viewAllHref ? (
         <Link
           to={viewAllHref}
-          className="flex shrink-0 items-center gap-1 text-sm font-medium text-foreground hover:text-accent rtl:flex-row-reverse"
+          className="flex shrink-0 items-center gap-1 text-sm font-medium text-foreground hover:text-accent"
         >
           {t("actions.viewAll")}
           <ArrowRight className="h-4 w-4 rtl:rotate-180" />

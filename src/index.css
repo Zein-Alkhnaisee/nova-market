@@ -53,6 +53,7 @@
   --color-accent: var(--nova-accent);
   --color-accent-foreground: var(--nova-accent-foreground);
   --color-success: var(--nova-success);
+  --color-success-foreground: var(--nova-success-foreground);
   --color-warning: var(--nova-warning);
   --color-danger: var(--nova-danger);
   --color-info: var(--nova-info);
@@ -75,13 +76,16 @@
   --nova-secondary: #eceae4;
   --nova-secondary-foreground: #16181d;
 
-  --nova-accent: #2f5dff;
+  /* Accent and status colours are tuned to >= 4.5:1 as TEXT on background, surface,
+     surface-muted and on their own 10-15% tints (badges, active nav). Phase 13 contrast pass. */
+  --nova-accent: #2850db;
   --nova-accent-foreground: #ffffff;
 
-  --nova-success: #1a8a5f;
-  --nova-warning: #b3760a;
-  --nova-danger: #d1403a;
-  --nova-info: #2f5dff;
+  --nova-success: #15724e;
+  --nova-success-foreground: #ffffff;
+  --nova-warning: #895a08;
+  --nova-danger: #b33732;
+  --nova-info: #2850db;
 }
 
 /* ---------- Dark theme (independently designed, not an inversion) ---------- */
@@ -105,6 +109,7 @@
   --nova-accent-foreground: #0b0c0e;
 
   --nova-success: #35c98a;
+  --nova-success-foreground: #0b0c0e;
   --nova-warning: #e0a733;
   --nova-danger: #f0665f;
   --nova-info: #6d8bff;
@@ -144,5 +149,15 @@
       transition-duration: 0.01ms !important;
       scroll-behavior: auto !important;
     }
+  }
+}
+
+/* Mobile: iOS Safari zooms the page when a focused field's font-size is under 16px.
+   Unlayered on purpose so it beats Tailwind's text-sm utility inside @layer utilities. */
+@media (max-width: 639px) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+  select,
+  textarea {
+    font-size: 16px;
   }
 }

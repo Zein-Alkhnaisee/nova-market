@@ -8,6 +8,7 @@ import { useAppDispatch } from "../../app/store/hooks";
 import { addToCart } from "../../features/cart/cartSlice";
 import { VariantSelector } from "./VariantSelector";
 import { QuantityStepper } from "./QuantityStepper";
+import { useDialogBehavior } from "../../hooks/useDialogBehavior";
 
 interface QuickViewModalProps {
   product: ProductSummary;
@@ -17,6 +18,7 @@ interface QuickViewModalProps {
 export function QuickViewModal({ product, onClose }: QuickViewModalProps) {
   const { t } = useTranslation(["product", "common"]);
   const dispatch = useAppDispatch();
+  const dialogRef = useDialogBehavior<HTMLDivElement>(onClose);
   const [quantity, setQuantity] = useState(1);
   const [selectedVariants, setSelectedVariants] = useState<Record<string, string>>(() =>
     Object.fromEntries((product.variants ?? []).map((group) => [group.type, group.options[0]]))
@@ -35,16 +37,18 @@ export function QuickViewModal({ product, onClose }: QuickViewModalProps) {
         className="absolute inset-0 cursor-default"
       />
       <div
+        ref={dialogRef}
+        tabIndex={-1}
         role="dialog"
         aria-modal="true"
         aria-label={t("quickView")}
-        className="relative grid max-h-[85vh] w-full max-w-3xl grid-cols-1 gap-6 overflow-y-auto rounded-[var(--radius-xl)] border border-border bg-surface p-6 shadow-[var(--shadow-elevation-xl)] sm:grid-cols-2"
+        className="relative grid max-h-[85vh] focus:outline-none w-full max-w-3xl grid-cols-1 gap-6 overflow-y-auto rounded-[var(--radius-xl)] border border-border bg-surface p-6 shadow-[var(--shadow-elevation-xl)] sm:grid-cols-2"
       >
         <button
           type="button"
           onClick={onClose}
           aria-label={t("common:actions.close")}
-          className="absolute end-4 top-4 flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:bg-surface-hover hover:text-foreground"
+          className="absolute end-4 top-4 flex h-8 w-8 items-center justify-center after:absolute after:-inset-1.5 rounded-full text-muted-foreground hover:bg-surface-hover hover:text-foreground"
         >
           <X className="h-4 w-4" />
         </button>

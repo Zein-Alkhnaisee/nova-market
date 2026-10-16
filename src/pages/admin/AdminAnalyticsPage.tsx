@@ -12,8 +12,9 @@ import { DEFAULT_RANGE, RANGE_OPTIONS, parseRange, type AnalyticsStats } from ".
 import { useGetAnalyticsQuery } from "../../services/api/adminApi";
 
 function AnalyticsSkeleton() {
+  const { t } = useTranslation("common");
   return (
-    <div aria-busy="true" aria-label="Loading">
+    <div aria-busy="true" aria-label={t("loading")}>
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         {Array.from({ length: 4 }).map((_, i) => (
           <Skeleton key={i} className="h-24" />

@@ -7,6 +7,7 @@ import { ErrorState } from "../../components/common/ErrorState";
 import { OrderSummary } from "../../components/checkout/OrderSummary";
 import { buttonVariants } from "../../components/ui/Button";
 import { cn } from "../../lib/cn";
+import { formatDate } from "../../lib/format";
 
 export function OrderSuccessPage() {
   const { id = "" } = useParams<{ id: string }>();
@@ -44,10 +45,7 @@ export function OrderSuccessPage() {
         <div>
           <p className="text-xs uppercase tracking-wide text-muted-foreground">{t("success.estimatedDelivery")}</p>
           <p className="mt-1 text-sm font-medium text-foreground">
-            {new Date(order.estimatedDelivery).toLocaleDateString(undefined, {
-              month: "long",
-              day: "numeric",
-            })}
+            {formatDate(order.estimatedDelivery, { month: "long", day: "numeric" })}
           </p>
         </div>
       </div>

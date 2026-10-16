@@ -49,7 +49,7 @@ export function AdminOrderDetailPage() {
 
   if (isLoading) {
     return (
-      <div aria-busy="true" aria-label="Loading" className="flex flex-col gap-4">
+      <div aria-busy="true" aria-label={t("common:loading")} className="flex flex-col gap-4">
         <Skeleton className="h-10 max-w-xs" />
         <Skeleton className="h-24" />
         <Skeleton className="h-64" />
@@ -130,7 +130,7 @@ export function AdminOrderDetailPage() {
       </Card>
 
       <div className="grid gap-4 lg:grid-cols-3">
-        <Card className="p-4 lg:col-span-2">
+        <Card className="overflow-x-auto p-4 lg:col-span-2">
           <h2 className="mb-3 text-sm font-semibold text-foreground">{t("admin:orders.items")}</h2>
           <table className="w-full text-sm">
             <caption className="sr-only">{t("admin:orders.items")}</caption>

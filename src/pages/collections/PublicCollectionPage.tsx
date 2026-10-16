@@ -62,7 +62,7 @@ export function PublicCollectionPage() {
           title={t("yours.emptyItems")}
           action={
             <Link to="/shop" className={cn(buttonVariants({ variant: "primary" }))}>
-              Continue shopping
+              {t("common:actions.continueShopping")}
             </Link>
           }
         />

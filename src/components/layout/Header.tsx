@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Heart, Menu, Search, ShoppingBag, Sparkles, User } from "lucide-react";
+import { Heart, Languages, Menu, Moon, Search, ShoppingBag, Sparkles, Sun, User } from "lucide-react";
 import { useAppSelector } from "../../app/store/hooks";
 import { selectCartCount } from "../../features/cart/cartSlice";
 import { selectWishlistIds } from "../../features/wishlist/wishlistSlice";
@@ -50,6 +50,16 @@ export function Header() {
   const toggleTheme = () => {
     setTheme(resolvedTheme === "dark" ? "light" : "dark");
   };
+
+  const closeMenu = () => setMobileMenuOpen(false);
+  const isArabic = i18n.language === "ar";
+  const languageActionLabel = isArabic
+    ? t("common:commandPalette.switchToEnglish")
+    : t("common:commandPalette.switchToArabic");
+  const themeActionLabel =
+    resolvedTheme === "dark" ? t("common:commandPalette.switchToLight") : t("common:commandPalette.switchToDark");
+  const mobileItemClass =
+    "flex w-full items-center gap-3 rounded-[var(--radius-md)] px-3 py-2 text-start text-sm font-medium text-foreground hover:bg-surface-hover";
 
   return (
     <header className="sticky top-0 z-[var(--z-index-sticky)] border-b border-border bg-background/95 backdrop-blur">
@@ -102,17 +112,21 @@ export function Header() {
             type="button"
             onClick={toggleLanguage}
             className="hidden h-10 items-center rounded-[var(--radius-md)] px-2 text-sm font-medium text-muted-foreground hover:bg-surface-hover sm:flex"
-            aria-label={t("common:language.english")}
+            aria-label={languageActionLabel}
           >
-            {i18n.language === "ar" ? "EN" : "عربي"}
+            {isArabic ? "EN" : "عربي"}
           </button>
           <button
             type="button"
             onClick={toggleTheme}
             className="hidden h-10 w-10 items-center justify-center rounded-[var(--radius-md)] text-muted-foreground hover:bg-surface-hover sm:flex"
-            aria-label={t("common:theme.dark")}
+            aria-label={themeActionLabel}
           >
-            {resolvedTheme === "dark" ? "☀" : "🌙"}
+            {resolvedTheme === "dark" ? (
+              <Sun className="h-5 w-5" aria-hidden="true" />
+            ) : (
+              <Moon className="h-5 w-5" aria-hidden="true" />
+            )}
           </button>
           <Link
             to="/account/wishlist"
@@ -158,17 +172,45 @@ export function Header() {
       </div>
 
       {mobileMenuOpen ? (
-        <nav className="flex flex-col gap-1 border-t border-border px-4 py-3 lg:hidden">
+        <nav aria-label={t("menu")} className="flex flex-col gap-1 border-t border-border px-4 py-3 lg:hidden">
           {CATEGORY_LINKS.filter((link) => link.key !== "compare" || productComparisonEnabled).map((link) => (
             <Link
               key={link.key}
               to={link.href}
-              onClick={() => setMobileMenuOpen(false)}
+              onClick={closeMenu}
               className="rounded-[var(--radius-md)] px-3 py-2 text-sm font-medium text-foreground hover:bg-surface-hover"
             >
               {t(`links.${link.key}`)}
             </Link>
           ))}
+          {/* Below sm the header bar hides these controls, so they live here (nothing is unreachable on a phone). */}
+          <div className="mt-2 flex flex-col gap-1 border-t border-border pt-2 sm:hidden">
+            <Link to="/assistant" onClick={closeMenu} className={mobileItemClass}>
+              <Sparkles className="h-4 w-4 text-accent" aria-hidden="true" />
+              {t("assistant")}
+            </Link>
+            <Link to="/account/wishlist" onClick={closeMenu} className={mobileItemClass}>
+              <Heart className="h-4 w-4" aria-hidden="true" />
+              {t("wishlist")}
+              {wishlistCount > 0 ? <span className="ms-auto text-xs text-muted-foreground">{wishlistCount}</span> : null}
+            </Link>
+            <Link to={isAuthenticated ? "/account" : "/auth/login"} onClick={closeMenu} className={mobileItemClass}>
+              <User className="h-4 w-4" aria-hidden="true" />
+              {t("account")}
+            </Link>
+            <button type="button" onClick={toggleLanguage} className={mobileItemClass}>
+              <Languages className="h-4 w-4" aria-hidden="true" />
+              {isArabic ? t("common:language.english") : t("common:language.arabic")}
+            </button>
+            <button type="button" onClick={toggleTheme} className={mobileItemClass}>
+              {resolvedTheme === "dark" ? (
+                <Sun className="h-4 w-4" aria-hidden="true" />
+              ) : (
+                <Moon className="h-4 w-4" aria-hidden="true" />
+              )}
+              {themeActionLabel}
+            </button>
+          </div>
         </nav>
       ) : null}
 

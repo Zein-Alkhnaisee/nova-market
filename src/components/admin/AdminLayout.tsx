@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { Moon, Sun } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../../app/store/hooks";
 import { useTheme } from "../../app/providers/ThemeProvider";
 import { clearSession, selectUser } from "../../features/auth/authSlice";
@@ -76,10 +77,14 @@ export function AdminLayout({ children }: { children: ReactNode }) {
             <button
               type="button"
               onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
-              className="h-9 w-9 rounded-[var(--radius-md)] text-muted-foreground hover:bg-surface-hover"
+              className="flex h-9 w-9 items-center justify-center rounded-[var(--radius-md)] text-muted-foreground hover:bg-surface-hover"
               aria-label={resolvedTheme === "dark" ? t("shell.switchToLight") : t("shell.switchToDark")}
             >
-              {resolvedTheme === "dark" ? "☀" : "🌙"}
+              {resolvedTheme === "dark" ? (
+                <Sun className="h-4 w-4" aria-hidden="true" />
+              ) : (
+                <Moon className="h-4 w-4" aria-hidden="true" />
+              )}
             </button>
             <span className="ms-2 hidden max-w-[10rem] truncate text-muted-foreground md:block">
               {user.fullName}

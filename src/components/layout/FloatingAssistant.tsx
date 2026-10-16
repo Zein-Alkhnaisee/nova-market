@@ -25,7 +25,7 @@ export function FloatingAssistant() {
           role="dialog"
           aria-modal="false"
           aria-label={t("title")}
-          className="fixed bottom-20 end-4 z-[var(--z-index-drawer)] flex h-[32rem] w-[22rem] max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-[var(--radius-xl)] border border-border bg-surface shadow-[var(--shadow-elevation-xl)]"
+          className="fixed bottom-20 end-4 z-[var(--z-index-drawer)] flex h-[min(32rem,calc(100dvh-6rem))] w-[22rem] max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-[var(--radius-xl)] border border-border bg-surface shadow-[var(--shadow-elevation-xl)]"
         >
           <div className="flex items-center justify-between border-b border-border px-4 py-3">
             <div className="flex items-center gap-2">
@@ -44,7 +44,7 @@ export function FloatingAssistant() {
                 type="button"
                 onClick={() => setOpen(false)}
                 aria-label={t("close")}
-                className="flex h-7 w-7 items-center justify-center rounded-[var(--radius-sm)] text-muted-foreground hover:bg-surface-hover hover:text-foreground"
+                className="relative flex h-7 w-7 items-center justify-center after:absolute after:-inset-2 rounded-[var(--radius-sm)] text-muted-foreground hover:bg-surface-hover hover:text-foreground"
               >
                 <X className="h-4 w-4" />
               </button>

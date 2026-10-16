@@ -49,7 +49,7 @@ export function WishlistPage() {
           description={t("common:empty.description")}
           action={
             <Link to="/shop" className={cn(buttonVariants({ variant: "primary" }))}>
-              Continue shopping
+              {t("common:actions.continueShopping")}
             </Link>
           }
         />

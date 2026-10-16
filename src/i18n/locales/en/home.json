@@ -21,5 +21,28 @@
     "subtitle": "One email a week. No noise.",
     "placeholder": "you@email.com",
     "cta": "Subscribe"
+  },
+  "footer": {
+    "columns": {
+      "shop": "Shop",
+      "help": "Help",
+      "company": "Company"
+    },
+    "links": {
+      "newArrivals": "New arrivals",
+      "trending": "Trending",
+      "deals": "Deals",
+      "collections": "Collections",
+      "shipping": "Shipping",
+      "returns": "Returns",
+      "trackOrder": "Track order",
+      "contact": "Contact",
+      "about": "About",
+      "careers": "Careers",
+      "press": "Press",
+      "sustainability": "Sustainability"
+    },
+    "rights": "© {{year}} NOVA Market. All rights reserved.",
+    "emailLabel": "Email address"
   }
 }

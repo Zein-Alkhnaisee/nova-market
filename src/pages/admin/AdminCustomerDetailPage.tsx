@@ -26,7 +26,7 @@ export function AdminCustomerDetailPage() {
 
   if (isLoading) {
     return (
-      <div aria-busy="true" aria-label="Loading" className="flex flex-col gap-4">
+      <div aria-busy="true" aria-label={t("common:loading")} className="flex flex-col gap-4">
         <Skeleton className="h-10 max-w-xs" />
         <Skeleton className="h-24" />
         <Skeleton className="h-56" />

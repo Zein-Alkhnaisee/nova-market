@@ -146,6 +146,7 @@ export function AddressForm({ initialValue, onSubmit, submitLabel }: AddressForm
           </label>
           <input
             id="postalCode"
+            dir="ltr"
             value={form.postalCode}
             onChange={(e) => setField("postalCode")(e.target.value)}
             aria-invalid={Boolean(errors.postalCode)}
@@ -174,7 +175,7 @@ export function AddressForm({ initialValue, onSubmit, submitLabel }: AddressForm
         </label>
         <input
           id="phone"
-          type="tel"
+          type="tel" dir="ltr"
           value={form.phone}
           onChange={(e) => setField("phone")(e.target.value)}
           aria-invalid={Boolean(errors.phone)}

@@ -50,7 +50,7 @@ export function ComparePage() {
           description={t("emptyDescription")}
           action={
             <Link to="/shop" className={cn(buttonVariants({ variant: "primary" }))}>
-              Continue shopping
+              {t("common:actions.continueShopping")}
             </Link>
           }
         />
@@ -109,7 +109,7 @@ export function ComparePage() {
                       type="button"
                       onClick={() => dispatch(toggleCompare(product.id))}
                       aria-label={t("remove")}
-                      className="absolute -end-1 -top-1 flex h-7 w-7 items-center justify-center rounded-full bg-surface-elevated text-muted-foreground shadow-[var(--shadow-elevation-sm)] hover:text-foreground"
+                      className="absolute -end-1 -top-1 flex h-7 w-7 items-center justify-center after:absolute after:-inset-2 rounded-full bg-surface-elevated text-muted-foreground shadow-[var(--shadow-elevation-sm)] hover:text-foreground"
                     >
                       <X className="h-3.5 w-3.5" />
                     </button>

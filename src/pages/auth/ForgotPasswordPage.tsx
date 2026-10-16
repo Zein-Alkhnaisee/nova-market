@@ -49,7 +49,7 @@ export function ForgotPasswordPage() {
         <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
           <TextField
             id="email"
-            type="email"
+            type="email" dir="ltr"
             autoComplete="email"
             label={t("forgotPassword.email")}
             value={email}

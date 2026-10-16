@@ -3,15 +3,18 @@ import { store } from "./app/store";
 import { ThemeProvider } from "./app/providers/ThemeProvider";
 import { LanguageProvider } from "./app/providers/LanguageProvider";
 import { AppRouter } from "./app/router";
+import { ErrorBoundary } from "./components/common/ErrorBoundary";
 
 export default function App() {
   return (
-    <Provider store={store}>
-      <ThemeProvider>
-        <LanguageProvider>
-          <AppRouter />
-        </LanguageProvider>
-      </ThemeProvider>
-    </Provider>
+    <ErrorBoundary fullPage>
+      <Provider store={store}>
+        <ThemeProvider>
+          <LanguageProvider>
+            <AppRouter />
+          </LanguageProvider>
+        </ThemeProvider>
+      </Provider>
+    </ErrorBoundary>
   );
 }

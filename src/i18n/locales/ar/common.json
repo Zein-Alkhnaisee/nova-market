@@ -9,7 +9,8 @@
     "continue": "متابعة",
     "retry": "أعد المحاولة",
     "close": "إغلاق",
-    "search": "بحث"
+    "search": "بحث",
+    "continueShopping": "متابعة التسوق"
   },
   "theme": {
     "light": "فاتح",
@@ -36,5 +37,7 @@
     "switchToArabic": "التبديل إلى العربية",
     "switchToEnglish": "التبديل إلى الإنجليزية",
     "openAssistant": "فتح المساعد"
-  }
+  },
+  "loading": "جارٍ التحميل",
+  "skipToContent": "انتقل إلى المحتوى"
 }

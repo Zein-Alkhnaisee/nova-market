@@ -6,6 +6,7 @@ import { Skeleton } from "../ui/Skeleton";
 import { ErrorState } from "../common/ErrorState";
 import { EmptyState } from "../common/EmptyState";
 import { cn } from "../../lib/cn";
+import { formatDate } from "../../lib/format";
 
 function StarRow({ rating, size = "sm" }: { rating: number; size?: "sm" | "md" }) {
   const dimension = size === "sm" ? "h-3.5 w-3.5" : "h-5 w-5";
@@ -215,7 +216,7 @@ export function ReviewsSection({ productId }: { productId: string }) {
                     ) : null}
                   </div>
                   <time className="text-xs text-muted-foreground" dateTime={review.date}>
-                    {new Date(review.date).toLocaleDateString()}
+                    {formatDate(review.date)}
                   </time>
                 </div>
                 <p className="text-sm font-medium text-foreground">{review.title}</p>

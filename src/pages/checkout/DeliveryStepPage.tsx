@@ -12,6 +12,7 @@ import {
 import { deliveryOptions } from "../../mocks/data/deliveryOptions";
 import { computePricing } from "../../lib/pricing";
 import { cn } from "../../lib/cn";
+import { formatCurrency } from "../../lib/format";
 
 export function DeliveryStepPage() {
   useCheckoutGuard("delivery");
@@ -65,7 +66,9 @@ export function DeliveryStepPage() {
                 </div>
               </div>
               <span className="text-sm font-medium text-foreground">
-                {qualifiesForFreeShipping ? t("summary.free") : `$${shipping}`}
+                {qualifiesForFreeShipping
+                  ? t("summary.free")
+                  : formatCurrency(shipping, lines[0]?.currency ?? "USD", { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
               </span>
             </label>
           );

@@ -47,7 +47,7 @@ export function ProfilePage() {
         />
         <TextField
           id="email"
-          type="email"
+          type="email" dir="ltr"
           label={t("profile.email")}
           autoComplete="email"
           value={email}

@@ -185,7 +185,7 @@ export function SearchOverlay({ open, onClose }: SearchOverlayProps) {
                           type="button"
                           onClick={() => dispatch(removeRecentSearch(term))}
                           aria-label={t("search:removeRecent")}
-                          className="opacity-0 text-muted-foreground hover:text-foreground group-hover:opacity-100"
+                          className="relative p-1 text-muted-foreground hover:text-foreground focus-visible:opacity-100 after:absolute after:-inset-2 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100"
                         >
                           <X className="h-3.5 w-3.5" />
                         </button>

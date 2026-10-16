@@ -81,6 +81,7 @@ export function PaymentMethodsPage() {
             label={t("checkout:paymentForm.cardNumber")}
             inputMode="numeric"
             autoComplete="off"
+            dir="ltr"
             placeholder="4242 4242 4242 4242"
             value={cardNumber}
             onChange={(e) => setCardNumber(e.target.value)}
@@ -90,6 +91,7 @@ export function PaymentMethodsPage() {
             id="pm-expiry"
             label={t("checkout:paymentForm.expiry")}
             autoComplete="off"
+            dir="ltr"
             placeholder="MM/YY"
             value={expiry}
             onChange={(e) => setExpiry(e.target.value)}

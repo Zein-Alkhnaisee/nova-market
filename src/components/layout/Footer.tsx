@@ -1,9 +1,25 @@
+import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { formatNumber } from "../../lib/format";
 
-const FOOTER_COLUMNS = [
-  { titleKey: "shop", links: ["New arrivals", "Trending", "Deals", "Collections"] },
-  { titleKey: "help", links: ["Shipping", "Returns", "Track order", "Contact"] },
-  { titleKey: "company", links: ["About", "Careers", "Press", "Sustainability"] },
+interface FooterLink {
+  key: string;
+  /** Only set for destinations that exist. The rest render as plain text until their pages are built. */
+  href?: string;
+}
+
+const FOOTER_COLUMNS: { key: string; links: FooterLink[] }[] = [
+  {
+    key: "shop",
+    links: [
+      { key: "newArrivals", href: "/new-arrivals" },
+      { key: "trending", href: "/trending" },
+      { key: "deals", href: "/deals" },
+      { key: "collections", href: "/collections" },
+    ],
+  },
+  { key: "help", links: [{ key: "shipping" }, { key: "returns" }, { key: "trackOrder" }, { key: "contact" }] },
+  { key: "company", links: [{ key: "about" }, { key: "careers" }, { key: "press" }, { key: "sustainability" }] },
 ];
 
 export function Footer() {
@@ -20,24 +36,31 @@ export function Footer() {
             <form className="mt-4 flex max-w-sm gap-2" onSubmit={(e) => e.preventDefault()}>
               <input
                 type="email"
+                aria-label={t("footer.emailLabel")}
                 placeholder={t("newsletter.placeholder")}
-                className="h-11 flex-1 rounded-[var(--radius-md)] border border-border bg-background px-3 text-sm text-foreground placeholder:text-muted-foreground"
+                className="h-11 min-w-0 flex-1 rounded-[var(--radius-md)] border border-border bg-background px-3 text-sm text-foreground placeholder:text-muted-foreground"
               />
               <button
                 type="submit"
-                className="h-11 rounded-[var(--radius-md)] bg-primary px-4 text-sm font-medium text-primary-foreground"
+                className="h-11 shrink-0 rounded-[var(--radius-md)] bg-primary px-4 text-sm font-medium text-primary-foreground"
               >
                 {t("newsletter.cta")}
               </button>
             </form>
           </div>
           {FOOTER_COLUMNS.map((col) => (
-            <div key={col.titleKey}>
-              <p className="text-sm font-medium text-foreground capitalize">{col.titleKey}</p>
+            <div key={col.key}>
+              <p className="text-sm font-medium text-foreground">{t(`footer.columns.${col.key}`)}</p>
               <ul className="mt-4 flex flex-col gap-2.5">
                 {col.links.map((link) => (
-                  <li key={link}>
-                    <span className="text-sm text-muted-foreground">{link}</span>
+                  <li key={link.key}>
+                    {link.href ? (
+                      <Link to={link.href} className="text-sm text-muted-foreground hover:text-foreground">
+                        {t(`footer.links.${link.key}`)}
+                      </Link>
+                    ) : (
+                      <span className="text-sm text-muted-foreground">{t(`footer.links.${link.key}`)}</span>
+                    )}
                   </li>
                 ))}
               </ul>
@@ -45,7 +68,7 @@ export function Footer() {
           ))}
         </div>
         <p className="pt-6 text-xs text-muted-foreground">
-          © {new Date().getFullYear()} NOVA Market. All rights reserved.
+          {t("footer.rights", { year: formatNumber(new Date().getFullYear(), { useGrouping: false }) })}
         </p>
       </div>
     </footer>
