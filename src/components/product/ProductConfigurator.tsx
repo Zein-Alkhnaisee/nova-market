@@ -14,8 +14,9 @@ export function ProductConfigurator({ groups, selected, onSelect, currency }: Pr
   const { t } = useTranslation("product");
   const formatDelta = (delta: number) => {
     if (delta === 0) return t("configurator.included");
-    const formatted = formatCurrency(Math.abs(delta), currency, { maximumFractionDigits: 0 });
-    return delta > 0 ? `+${formatted}` : `-${formatted}`;
+    // signDisplay lets Intl place the sign for the locale; gluing "+"/"-" onto an already
+    // formatted string can land on the wrong side of the number in right-to-left text.
+    return formatCurrency(delta, currency, { maximumFractionDigits: 0, signDisplay: "exceptZero" });
   };
 
   return (

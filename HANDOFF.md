@@ -1,6 +1,6 @@
 # HANDOFF.md — NOVA Market
 
-**Last updated:** 2026-10-14, after Phase 12 (Admin) was completed and verified — all nine checkpoints done — and Bug C (currency formatting ignored the UI language; see §8 #19) was fixed. **Phase 13 (Polish) is NOT started and needs an explicit owner decision before work begins.** *Bug C's fix was made in a sandbox that could not run the checks; run the four commands in §10 before relying on the 510/510 figure below.*
+**Last updated:** 2026-10-16, after Phase 13 (Polish) was completed **as scoped by the owner** — error boundaries, date formatting, the badge routes, a static RTL/dark/mobile audit with fixes, and the deferrals in §11. Phases 1–12 and Bug C (§8 #19) were verified by the owner (510/510). **Phase 13 was written in a sandbox that could not install dependencies, so none of it has been type-checked, linted, tested or built, and none of it has been seen in a real browser. Run the four commands in §10 first; expected 547 tests across 73 files.**
 
 This document is written for a **new AI agent or a different AI tool** picking this project up
 cold. It reflects the actual state of the repository at export time, not a plan or an aspiration.
@@ -95,8 +95,9 @@ src/
                     mockAIProvider.ts (the mock AI service implementation). This is a
                     sibling of services/api/, not nested inside it, since it's not an
                     RTK Query module itself — assistantApi.ts wraps it.
-  components/       ui/ (primitives), common/, layout/ (includes FloatingAssistant),
-                    product/ (includes ProductConfigurator, FilterPanel with smart facet
+  components/       ui/ (primitives), common/ (includes ErrorBoundary, CrashPage, RouteBoundary,
+                    RouteFallback), layout/ (includes FloatingAssistant),
+                    product/ (includes ProductConfigurator, FilterDrawer, FilterPanel with smart facet
                     counts), checkout/, account/, auth/, navigation/ (includes
                     CommandPalette), assistant/ (ConversationView — shared by the floating
                     panel and the dedicated page — AssistantMessageBubble,
@@ -106,9 +107,9 @@ src/
                     user-created collections live in pages/account/ (MyCollectionsPage,
                     MyCollectionDetailPage) — deliberately separate.
   hooks/            useDebouncedValue, useCheckoutGuard, useAuthGuard, useFeatureFlag,
-                    useAssistantConversation (shared by both assistant UIs)
+                    useAssistantConversation (shared by both assistant UIs), useDialogBehavior
   lib/              cn, delay, persist, pricing, validation, id, format (locale-aware
-                    currency/number formatting — see §8 #19)
+                    currency/number/date formatting — see §8 #19)
   types/            product (includes RecommendedProduct, ConfiguratorGroup references),
                     cart, review, collection (editorial), userCollection, order, address,
                     user, configurator, assistant (AssistantMessage, AssistantAction)
@@ -206,7 +207,7 @@ Phase numbers are `MASTER_SPEC.md`'s (§107). See `PROGRESS.md` for full feature
 
 ## 7. Current phase and what remains
 
-**Current phase: Phase 12 (Admin) is COMPLETE** (verified: `tsc -b` clean, lint 0 errors / 4 warnings, 510/510 tests across 67 files, build OK). **Phase 13 (Polish) has not been started and must not be started without an explicit owner decision.** The working tree is in a clean, fully passing state.
+**Current phase: Phase 13 (Polish) is done as scoped, pending the owner's verification.** Phase 12 (Admin) was verified earlier (`tsc -b` clean, lint 0 errors / 4 warnings, 510/510 tests across 67 files, build OK) and so was Bug C. Everything added after that — Phase 13 — is unverified until the four commands in §10 are run.
 
 **Phase 12 checkpoint order (revised by the owner):** auth → shell → dashboard → customers → products → categories → orders → coupons → analytics. **All nine done.**
 
@@ -232,9 +233,9 @@ Phase numbers are `MASTER_SPEC.md`'s (§107). See `PROGRESS.md` for full feature
 
 **Phase 12's footprint on Phases 1–11 code** (everything outside the admin area that Phase 12 changed, 16 source files + the shared test setup; all additive or a data-source swap, each owner-approved and recorded in `IMPLEMENTATION_LOG.md`): *Phase 7/8 enablers* — `types/order.ts` + `ordersApi.ts` (optional `customerId`, optional `couponCode`, `updateOrderStatus`, the `listAllOrders` accessor), `ReviewStepPage.tsx` (two added lines passing them), `authApi.ts` + `types/user.ts` + `hooks/useAuthGuard.ts` (role, seeded mock admin, `listMockCustomers`, role-aware guard), `CouponInput.tsx` (reads coupons through `couponStore`). *Catalog read-through* — `productsApi`, `recommendationsApi`, `searchApi`, `categoriesApi`, `mockAIProvider` (read products/categories through the stores). *Foundation* — `router/index.tsx` (admin routes), `i18n/config.ts` (`admin` namespace), `baseApi.ts` (`Coupon` tag), `types/product.ts` (optional `inventory`). The only modified test file is `test/setup.ts` (resets the three stores after each test); no pre-existing test was modified. `checkoutSlice` was never touched.
 
-**Phase 13 — Polish (NOT started; owner decision required first).** MASTER_SPEC §107 lists: responsive testing, RTL testing, accessibility, dark mode, loading states, error states, empty states, animations, performance, SEO metadata, tests, type checking, linting, production build. Candidates already on record in §11 and `PROGRESS.md` "Known issues": **nothing in the project (Phases 1–12) has ever been checked in a real browser across RTL / mobile / dark** — it has rested on logical properties, semantic tokens and responsive classes; no React error boundary (a Phase 1 gap); Playwright and MSW from the spec are not installed; Arabic strings are unreviewed by a native speaker; derived counts that can exceed visible items after an archive (§11); carts and applied coupons are not re-validated at checkout; and the `ProductConfigurator` timing-flake policy in §10. This list is a starting point for the conversation, not a plan.
+**Phase 13 — Polish (done as scoped; see `PROGRESS.md` for the row-by-row status).** Delivered: a React error boundary per route area plus an app-level one and a router `errorElement` (§8 #20); `formatDate`/`formatDateTime` so dates follow the UI language (§8 #19); `/deals`, `/new-arrivals`, `/trending` filtering by badge; a shared accessible `FilterDrawer` and `useDialogBehavior` (§8 #21); a contrast pass on the accent/status tokens, computed against WCAG 4.5:1; RTL and mobile fixes found by a static audit; removal of hardcoded English (footer, skip link, aria-labels, 404). **Not delivered, by design of the owner's scope:** a real-browser pass (this is still the biggest open risk — a manual checklist is at the end of the Phase 13 entry in `IMPLEMENTATION_LOG.md`), per-page SEO titles, animations, a performance pass. **Provenance:** most Phase 13 code was found uncommitted in the working tree and adopted after a full review; it is a separate commit so it can be dropped on its own (`IMPLEMENTATION_LOG.md`).
 
-**Remaining after Phase 12:** Phase 13 (Polish) — see above; not started.
+**Remaining after Phase 13:** the owner's verification run; a real-browser review across RTL / mobile / dark; and the deferrals in §11. The project is feature-complete against MASTER_SPEC §107 apart from those.
 
 ---
 
@@ -366,7 +367,27 @@ Phase numbers are `MASTER_SPEC.md`'s (§107). See `PROGRESS.md` for full feature
     `languageChanged` (anything using `useTranslation`), so call the helpers during render, not at module
     load. The admin pages predate the helper and pass `i18n.language` to `Intl.NumberFormat` directly —
     equivalent, left as-is, and fine to migrate when touched. **Still open (same root cause, not part of
-    Bug C):** `toLocaleDateString()`/`toLocaleString()` calls without a locale (see §11).
+    Bug C):** none — dates follow the same rule through `formatDate` / `formatDateTime`, which return `""` for an invalid date instead of throwing, and signed price differences use `signDisplay` rather than prepending `+`/`-` to a formatted string (RTL-safe). Never call `toLocaleDateString()` / `toLocaleString()` / `Intl.*Format(undefined, …)` directly.
+
+20. **Render errors are caught per route area, inside the shell, and at the router root.**
+    `RouteBoundary` (an `ErrorBoundary` keyed by pathname) wraps each area's page content inside its
+    shell, so a crashing page leaves the header/footer/sidebar usable and recovers when the person
+    navigates. An app-level `ErrorBoundary` wraps the providers, and the router has a root
+    `errorElement` — **both are needed**: React Router catches render errors itself, so a boundary
+    outside `RouterProvider` never sees a route crash. `CrashPage` is deliberately free of router,
+    Redux and anything else that could be the thing that broke ("Go home" is a plain `<a href="/">`,
+    "Reload" is `location.reload()`) and never shows the raw error (MASTER_SPEC §46). Boundaries do not
+    catch event-handler or async errors; those stay handled where they happen (RTK Query states, form
+    validation). Wrap any new route area with `area(...)` in `app/router/index.tsx`.
+
+21. **Hand-built dialogs use `useDialogBehavior`; small touch targets are extended, not enlarged.**
+    The hook moves focus into the dialog, closes on Escape, and returns focus to the opener, reading
+    `onClose` through a ref so a parent re-render never steals focus from a field mid-typing (a test pins
+    that). `QuickViewModal` and `FilterDrawer` use it; a new overlay should too. Icon buttons that are
+    visually small get an `after:absolute after:-inset-*` pseudo-element for a 44px-ish hit area (the
+    button needs `relative`, or already be positioned). Hover-only reveals are gated behind
+    `[@media(hover:hover)]` so touch screens always see them. Values that must read left-to-right inside
+    RTL text (phone, postal code, card number, email, the 404 code) are `dir="ltr"` islands or `<bdi>`.
 
 ---
 
@@ -402,7 +423,7 @@ npm test          # must be all-passing
 npm run build     # must succeed
 ```
 
-Current state: **510 tests across 67 files, all passing.** (The full suite takes ~100 s normally but can exceed a 300 s limit on a single-core machine; running it in chunks — `src/test/unit`, then the component files in two halves — is a valid way to verify. One pre-existing test, `ProductConfigurator` "adds the configured price…", failed once under load and passed on every rerun; it is believed to be a timing flake from RTL's 1000 ms `waitFor` default.) `tsc -b` clean. `oxlint` 0 errors **Flake policy (owner directive): if `ProductConfigurator` "adds the configured price…" fails again in any checkpoint, treat it as a real flake and bump its `waitFor` timeout deliberately (it uses the 1000 ms default) rather than letting it flake indefinitely.** It has not failed in the last four chunked runs.
+Current state: **510 tests across 67 files, all passing, as last verified by the owner (after Bug C). Phase 13 added 37 tests in 6 files (expected total 547 across 73 files) that have not been run.** (The full suite takes ~100 s normally but can exceed a 300 s limit on a single-core machine; running it in chunks — `src/test/unit`, then the component files in two halves — is a valid way to verify. One pre-existing test, `ProductConfigurator` "adds the configured price…", failed once under load and passed on every rerun; it is believed to be a timing flake from RTL's 1000 ms `waitFor` default.) `tsc -b` clean. `oxlint` 0 errors **Flake policy (owner directive): if `ProductConfigurator` "adds the configured price…" fails again in any checkpoint, treat it as a real flake and bump its `waitFor` timeout deliberately (it uses the 1000 ms default) rather than letting it flake indefinitely.** It has not failed in the last four chunked runs.
 with 4 advisory `only-export-components` / `set-state-in-effect` warnings that are the
 long-standing accepted baseline — **do not let this number grow**; if a change adds a warning,
 fix the cause rather than suppressing it.
@@ -436,9 +457,6 @@ Test conventions:
 - **Search has no fuzzy/typo tolerance and no natural-language parsing** (e.g. "waterproof
   jacket under $100"). Matching is substring-based on name/brand/category. The spec lists NL
   search as a distinct sub-item.
-- **`/deals`, `/new-arrivals`, `/trending`** reuse `ShopPage` without route-level badge filtering.
-- **No React error boundary component** — a Phase 1 gap carried forward; RTK Query error states
-  cover realistic failure paths today.
 - **Some i18n namespaces are registered but empty** (e.g. `validation`, `admin`) — fill them as
   their phases are built.
 - **Archived products inside lists that hold product ids (decision: silently dropped).**
@@ -502,15 +520,29 @@ Test conventions:
   drops its gallery; the admin form has no image upload (URL only), bulk actions, or
   variant/configurator editing.
 - **Admin area is a demo boundary.** The seeded admin's credentials are public in the repo and stored in plain text in the mock store; the role check (`useAuthGuard({ role })`) is a client-side UX guard that anyone can bypass. Real admin provisioning, hashing and role enforcement are backend work. Every admin section (shell, Dashboard, Customers, Products, Categories, Orders, Coupons, Analytics) is built (see §7). Guest orders and orders placed before `Order.customerId` existed can't be attributed to an account (surfaced, not hidden). The Dashboard's Conversion KPI is unavailable by design (no visit/session tracking, so no honest denominator), and the admin only sees orders/accounts stored in the current browser.
-- **Dates and two hardcoded `$` strings still ignore the UI language.** Found while fixing Bug C and
-  deliberately left alone: `toLocaleDateString()` / `toLocaleString()` without a locale in
-  `OrderSuccessPage`, `ReviewsSection`, `OrdersPage`, `OrderDetailPage` (OS locale wins, exactly like
-  Bug C but for dates), plus a literal `$` in `DeliveryStepPage` (`` `$${shipping}` ``) and in
-  `mockAIProvider`'s budget wording. A `formatDate` helper in `lib/format.ts` is the natural fix.
-  `lib/format.ts` has no unit test yet.
-- **Not visually QA'd in a real browser** across RTL/mobile/dark combinations; correctness there
-  rests on logical properties, semantic tokens, and responsive classes rather than manual review.
-- **Arabic translations are functional but unreviewed by a native speaker.**
+- **Never checked in a real browser** across RTL / mobile / dark. Phase 13 did a static audit
+  (physical-direction CSS, hardcoded colours, directional icons, fixed widths, table overflow,
+  contrast computed from the tokens) and fixed what it found; correctness otherwise rests on logical
+  properties, semantic tokens and responsive classes. This is the largest open risk. Checklist:
+  `IMPLEMENTATION_LOG.md`, end of the Phase 13 entry.
+- **Arabic translations are functional but unreviewed by a native speaker.** They live in
+  `src/i18n/locales/ar/` (one file per namespace, kept in key-parity with `en/` apart from Arabic's
+  extra plural forms). Have a native speaker review them before any real launch; wording, register and
+  plural phrasing are the likeliest places for mistakes.
+- **Playwright and MSW (MASTER_SPEC §105) are intentionally not installed.** MSW: `queryFn` reads the
+  in-repo mock layer directly, which behaves identically for the UI (loading, error, caching, tags,
+  invalidation) and keeps the swap-to-a-real-backend surface in `services/api/*` (§8 #1); the only
+  loss is that requests don't show in the Network tab. Playwright: behaviour is covered by Vitest +
+  Testing Library driving real routing; a browser suite is worth adding together with the first
+  real-browser review, since that is the gap it would close — it needs a browser binary and a dev
+  server that the build sandboxes used so far did not have.
+- **The mock AI's replies are English-only** (`mockAIProvider`, including a literal `$` in its budget
+  wording). Everything around them is translated and locale-formatted. A real provider behind
+  `AIProvider` would reply in the user's language.
+- **Phase 13 left out:** per-page SEO titles and product metadata (only static `index.html` meta
+  exists); Framer Motion animations; a performance pass; a mobile bottom navigation bar (§67, a new
+  feature); a mobile layout for the admin area (its tables scroll horizontally on a phone — usable,
+  not designed for it).
 - **Smart filter facet counts cover rating and in-stock only**, not price range — the numeric
   min/max inputs don't map cleanly onto discrete per-option counts the way rating buckets do.
 - **Only 2 of 9 mock products have configurator groups** (the Kite laptop, the Nova Forge
