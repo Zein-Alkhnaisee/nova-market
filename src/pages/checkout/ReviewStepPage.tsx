@@ -43,7 +43,9 @@ export function ReviewStepPage() {
   const paymentSummary = (location.state as { paymentSummary?: PaymentSummary } | null)?.paymentSummary;
 
   useEffect(() => {
-    if (!paymentSummary) {
+    // A guest is left alone here: useCheckoutGuard is already sending them to login with this page as the
+    // redirect. Navigating to /checkout/payment as well would win that race and change where login returns to.
+    if (!paymentSummary && user) {
       navigate("/checkout/payment", { replace: true });
     }
     // Only needs to run once on mount to validate the navigation state we arrived with.

@@ -464,3 +464,14 @@ Docs only. No source, test, MASTER_SPEC or DESIGN_SYSTEM changes. Written agains
 **Existing tests changed, deliberately** (this is the "guest checkout" decision, not a fix): `ReviewCustomerLink.test.tsx` — the test "records no customerId for a guest, and checkout still succeeds" is **removed** and replaced by a comment, since a guest can no longer place an order. `CheckoutFlow.test.tsx`, `CouponCheckout.test.tsx` and the prerequisite tests in `useCheckoutGuard.test.tsx` now sign in first, because every one of them reaches a checkout step; their assertions are unchanged.
 
 **Verification: NOT RUN.** The sandbox cannot install dependencies (npm registry blocked), so `tsc -b`, lint, tests and build were not run, and this change has had no compile check. The last lesson applies: static review is not a substitute for compilation (see the 2026-10-17 entry above on `ShopPage.tsx`). Last verified count: 547 across 73 files. Expected after this change: 559 across 74 files (547 + 10 + 3 − 1). Places most likely to need attention if something fails: the new test file (selectors/labels such as "Continue to checkout", "Order confirmed", "View order"); the `it.each` guest tests; types in `renderApp`'s `initialEntries`.
+
+### 2026-10-17 addendum — login redirect for `/checkout/review` (found by the owner's test run)
+
+The owner applied the commit above and ran everything: 558/559 passing. The failing test was `LoginRequiredCheckout.test.tsx`, "a guest cannot reach /checkout/review directly": login came back with `redirect=%2Fcheckout%2Fpayment` instead of `%2Fcheckout%2Freview`. The test was right.
+
+**Root cause (not the one first suspected).** `useCheckoutGuard` already built the login redirect from `location.pathname` and already checked authentication first, so it was correct. The wrong redirect came from `ReviewStepPage`'s own mount effect: a page opened directly has no `paymentSummary` in router state, so it navigates to `/checkout/payment`. Both effects run in the same commit, the page's navigation ran last and won, and the payment step's guard then sent the guest to login with `redirect=/checkout/payment`. Only `/checkout/review` has such a second redirect, which is why the other three steps passed.
+
+**Fix.** `ReviewStepPage`'s mount effect now only redirects to payment when someone is signed in (`!paymentSummary && user`). For a guest the guard is the single redirect, and it uses `location.pathname`. No change to `useCheckoutGuard`, the tests or the payment boundary.
+
+**Verification: NOT RUN here** (npm registry still blocked). After the fix the owner should see 559/559 across 74 files.
+
