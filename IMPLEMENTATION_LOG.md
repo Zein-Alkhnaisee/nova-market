@@ -446,3 +446,21 @@ Docs only. No source, test, MASTER_SPEC or DESIGN_SYSTEM changes. Written agains
 **Adoption note for the inherited Phase 13 code (`eb810d9`).** Phase 13 code arrived from an unattributed source and was adopted after static review + local test verification. Static review missed one tsc error (see ShopPage.tsx correction above); the local compile caught it. Static review is not a substitute for compilation.
 
 **Docs updated in this pass:** PROGRESS.md (Phase 13 and Bug C verified, 547 / 73 files, all phases DONE); HANDOFF.md (last-updated line, §0, §6, §7 now says "Phase 13 is DONE and verified. All phases complete.", §10 count, §11 adoption note and ShopPage type-fix note; the Arabic-review and Playwright/MSW deferrals remain listed); this log.
+
+## 2026-10-17 — Checkout requires sign-in (UX decision change; written, not run)
+
+**Why**: Guest checkout let someone place an order without an account, but the success page's "View order" button goes to `/account/orders/:id`, which requires login. The guest was sent to a login page for an order they could never open: a dead end. Requiring sign-in *before* checkout means every order belongs to an account and "View order" always works. The decision is the owner's ("Option A": gate at Checkout, not at Place order).
+
+**Base**: GitHub `3f157e6` (the owner's Vercel config commit on top of the docs commit `9b832a8`).
+
+**What changed**
+- `useCheckoutGuard`: first check is authentication; a guest goes to `/auth/login?redirect=<step path>&reason=checkout`. It runs before the empty-cart check. A signed-in customer with an empty cart still goes to `/cart` (unchanged). The existing "check once per landing" behaviour is unchanged, so placing an order (which clears the cart) cannot trigger a redirect race.
+- `CartPage`: the checkout link goes to the login URL for guests and to `/checkout` otherwise. Guests can still add to cart and browse.
+- `LoginPage` / `RegisterPage`: a `reason=checkout` notice (en/ar `auth.json`), `RegisterPage` now returns to `?redirect=` instead of always `/account`, and each page's link to the other carries `redirect`/`reason`. New helper `lib/authRedirect.ts` (`buildLoginUrl`, `carryAuthParams`).
+- Not changed: the payment boundary, the `Order` type (`customerId?` stays optional), `ReviewStepPage` (it already stamped `user?.id`), `OrderSuccessPage`, the router.
+
+**Tests**: new `LoginRequiredCheckout.test.tsx` (10 tests: guest Checkout → login with notice; signed-in button goes to `/checkout`; login → shipping with the cart intact; register → shipping; each of the four steps blocked for a guest; signed-in empty cart → `/cart`; signed-in order has `customerId` and View order opens it). `useCheckoutGuard.test.tsx` gained 3 guest tests.
+
+**Existing tests changed, deliberately** (this is the "guest checkout" decision, not a fix): `ReviewCustomerLink.test.tsx` — the test "records no customerId for a guest, and checkout still succeeds" is **removed** and replaced by a comment, since a guest can no longer place an order. `CheckoutFlow.test.tsx`, `CouponCheckout.test.tsx` and the prerequisite tests in `useCheckoutGuard.test.tsx` now sign in first, because every one of them reaches a checkout step; their assertions are unchanged.
+
+**Verification: NOT RUN.** The sandbox cannot install dependencies (npm registry blocked), so `tsc -b`, lint, tests and build were not run, and this change has had no compile check. The last lesson applies: static review is not a substitute for compilation (see the 2026-10-17 entry above on `ShopPage.tsx`). Last verified count: 547 across 73 files. Expected after this change: 559 across 74 files (547 + 10 + 3 − 1). Places most likely to need attention if something fails: the new test file (selectors/labels such as "Continue to checkout", "Order confirmed", "View order"); the `it.each` guest tests; types in `renderApp`'s `initialEntries`.

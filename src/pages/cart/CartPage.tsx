@@ -3,6 +3,8 @@ import { useTranslation } from "react-i18next";
 import { formatCurrency } from "../../lib/format";
 import { Minus, Plus, X } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../../app/store/hooks";
+import { selectIsAuthenticated } from "../../features/auth/authSlice";
+import { buildLoginUrl } from "../../lib/authRedirect";
 import { removeFromCart, selectCartLines, setQuantity } from "../../features/cart/cartSlice";
 import { selectCouponCode, selectDiscountPercent, setCoupon } from "../../features/checkout/checkoutSlice";
 import { useGetCartSuggestionsQuery } from "../../services/api/recommendationsApi";
@@ -22,6 +24,7 @@ export function CartPage() {
   const { t: tCommon } = useTranslation("common");
   const dispatch = useAppDispatch();
   const lines = useAppSelector(selectCartLines);
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
   const couponCode = useAppSelector(selectCouponCode);
   const discountPercent = useAppSelector(selectDiscountPercent);
   const smartRecommendationsEnabled = useFeatureFlag("smartRecommendations");
@@ -145,7 +148,10 @@ export function CartPage() {
             couponCode={couponCode}
             shippingNote={tCheckout("summary.calculatedAtCheckout")}
           />
-          <Link to="/checkout" className={cn(buttonVariants({ variant: "primary", size: "lg" }), "w-full")}>
+          <Link
+            to={isAuthenticated ? "/checkout" : buildLoginUrl("/checkout/shipping", "checkout")}
+            className={cn(buttonVariants({ variant: "primary", size: "lg" }), "w-full")}
+          >
             {tCart("checkout")}
           </Link>
         </div>

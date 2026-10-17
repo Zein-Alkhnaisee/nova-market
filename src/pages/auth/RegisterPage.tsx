@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { AuthLayout } from "../../components/auth/AuthLayout";
 import { TextField } from "../../components/ui/TextField";
@@ -7,6 +7,7 @@ import { useRegisterMutation } from "../../services/api/authApi";
 import { useAppDispatch } from "../../app/store/hooks";
 import { setSession } from "../../features/auth/authSlice";
 import { isBlank } from "../../lib/validation";
+import { carryAuthParams } from "../../lib/authRedirect";
 
 interface FormState {
   fullName: string;
@@ -19,6 +20,9 @@ export function RegisterPage() {
   const { t } = useTranslation("auth");
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const [searchParams] = useSearchParams();
+  const redirectTo = searchParams.get("redirect") ?? "/account";
+  const reason = searchParams.get("reason");
   const [form, setForm] = useState<FormState>({
     fullName: "",
     email: "",
@@ -52,7 +56,7 @@ export function RegisterPage() {
     });
     if ("data" in result && result.data) {
       dispatch(setSession(result.data));
-      navigate("/account", { replace: true });
+      navigate(redirectTo, { replace: true });
     } else {
       setErrors({ form: t("register.errors.emailTaken") });
     }
@@ -65,13 +69,18 @@ export function RegisterPage() {
       footer={
         <>
           {t("register.haveAccount")}{" "}
-          <Link to="/auth/login" className="font-medium text-accent hover:underline">
+          <Link to={`/auth/login${carryAuthParams(searchParams)}`} className="font-medium text-accent hover:underline">
             {t("register.logIn")}
           </Link>
         </>
       }
     >
       <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
+        {reason === "checkout" ? (
+          <p role="status" className="rounded-[var(--radius-sm)] bg-accent/10 px-3 py-2 text-sm text-foreground">
+            {t("register.checkoutNotice")}
+          </p>
+        ) : null}
         <TextField
           id="fullName"
           autoComplete="name"

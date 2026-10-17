@@ -1,7 +1,9 @@
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useAppSelector } from "../app/store/hooks";
+import { selectIsAuthenticated } from "../features/auth/authSlice";
 import { selectCartLines } from "../features/cart/cartSlice";
+import { buildLoginUrl } from "../lib/authRedirect";
 import { selectDeliveryOption, selectShippingAddress } from "../features/checkout/checkoutSlice";
 
 export type CheckoutStep = "shipping" | "delivery" | "payment" | "review";
@@ -12,14 +14,26 @@ export type CheckoutStep = "shipping" | "delivery" | "payment" | "review";
  * shipping address saved) — matches the spec's "do not show unnecessary
  * navigation" rule by making it impossible to be on a step that doesn't
  * have what it needs, rather than showing an error state for it.
+ *
+ * Checkout also requires a signed-in customer, so every order is linked to an
+ * account (and "View order" after purchase always works). A visitor who isn't
+ * signed in is sent to login first and returned to this step afterwards; this
+ * check runs before the cart check, so the cart is untouched by the detour and
+ * an empty cart is only reported once they are signed in.
  */
 export function useCheckoutGuard(step: CheckoutStep) {
   const navigate = useNavigate();
+  const location = useLocation();
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
   const lines = useAppSelector(selectCartLines);
   const shippingAddress = useAppSelector(selectShippingAddress);
   const deliveryOption = useAppSelector(selectDeliveryOption);
 
   useEffect(() => {
+    if (!isAuthenticated) {
+      navigate(buildLoginUrl(location.pathname, "checkout"), { replace: true });
+      return;
+    }
     if (lines.length === 0) {
       navigate("/cart", { replace: true });
       return;

@@ -8,6 +8,7 @@ import i18n from "../../i18n/config";
 import { CouponInput } from "../../components/checkout/CouponInput";
 import { ReviewStepPage } from "../../pages/checkout/ReviewStepPage";
 import { createTestStore, renderWithProviders } from "../renderWithProviders";
+import { setSession } from "../../features/auth/authSlice";
 import { addToCart } from "../../features/cart/cartSlice";
 import { setDeliveryOption, setShippingAddress } from "../../features/checkout/checkoutSlice";
 import { createCoupon, deleteCoupon, listCoupons, updateCoupon } from "../../services/catalog/couponStore";
@@ -84,6 +85,7 @@ const product: ProductSummary = {
 
 async function placeFromReview(couponToType: string | null) {
   const store = createTestStore();
+  store.dispatch(setSession({ id: "user-test", fullName: "Jordan Lee", email: "jordan@example.com", role: "customer" }));
   store.dispatch(addToCart({ product, quantity: 1 }));
   store.dispatch(setShippingAddress({ fullName: "Sam", line1: "1 A St", city: "SF", region: "CA", postalCode: "94105", country: "US", phone: "+14155550100" }));
   store.dispatch(setDeliveryOption({ id: "standard", label: "Standard", etaDays: "5 business days", price: 0 }));

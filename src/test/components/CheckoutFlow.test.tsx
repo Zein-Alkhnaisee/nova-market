@@ -7,6 +7,7 @@ import { createMemoryRouter, RouterProvider } from "react-router-dom";
 import i18n from "../../i18n/config";
 import { createTestStore } from "../renderWithProviders";
 import { addToCart, selectCartLines } from "../../features/cart/cartSlice";
+import { setSession } from "../../features/auth/authSlice";
 import { selectShippingAddress, selectDeliveryOption } from "../../features/checkout/checkoutSlice";
 import { ShippingStepPage } from "../../pages/checkout/ShippingStepPage";
 import { DeliveryStepPage } from "../../pages/checkout/DeliveryStepPage";
@@ -55,6 +56,7 @@ describe("Checkout flow", () => {
   it("completes shipping → delivery → payment → review → order success, clearing the cart and never persisting raw card data", async () => {
     const user = userEvent.setup();
     const store = createTestStore();
+    store.dispatch(setSession({ id: "user-test", fullName: "Jordan Lee", email: "jordan@example.com", role: "customer" }));
     store.dispatch(addToCart({ product, quantity: 1 }));
 
     renderCheckout(store);
@@ -106,8 +108,9 @@ describe("Checkout flow", () => {
     expect(window.localStorage.getItem("nova:orders") ?? "").not.toMatch(/4242424242424242/);
   }, 10000);
 
-  it("redirects to /cart if checkout is reached with an empty cart", async () => {
+  it("redirects to /cart if a signed-in customer reaches checkout with an empty cart", async () => {
     const store = createTestStore();
+    store.dispatch(setSession({ id: "user-test", fullName: "Jordan Lee", email: "jordan@example.com", role: "customer" }));
     renderCheckout(store);
     await waitFor(() => expect(screen.getByText("Cart page")).toBeInTheDocument());
   });

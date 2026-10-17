@@ -18,12 +18,12 @@ const product: ProductSummary = {
   price: 50, currency: "USD", rating: 4, reviewCount: 1, image: "https://example.com/i.jpg", inStock: true,
 };
 
-async function placeFromReview(signedInId: string | null) {
+async function placeFromReview(signedInId: string) {
   const store = createTestStore();
   store.dispatch(addToCart({ product, quantity: 1 }));
   store.dispatch(setShippingAddress({ fullName: "Sam", line1: "1 A St", city: "SF", region: "CA", postalCode: "94105", country: "US", phone: "+14155550100" }));
   store.dispatch(setDeliveryOption({ id: "standard", label: "Standard", etaDays: "5 business days", price: 0 }));
-  if (signedInId) store.dispatch(setSession({ id: signedInId, fullName: "Sam", email: "sam@example.com", role: "customer" }));
+  store.dispatch(setSession({ id: signedInId, fullName: "Sam", email: "sam@example.com", role: "customer" }));
 
   const router = createMemoryRouter(
     [
@@ -54,8 +54,7 @@ describe("Checkout stamps the signed-in customer on the order", () => {
     expect(order.customerId).toBe("user-signed-in");
   }, 10000);
 
-  it("records no customerId for a guest, and checkout still succeeds", async () => {
-    const order = await placeFromReview(null);
-    expect(order).not.toHaveProperty("customerId");
-  }, 10000);
+  // DELIBERATE CHANGE: this used to assert "records no customerId for a guest, and checkout still
+  // succeeds". Guest checkout was removed (checkout now requires sign-in), so a guest can no longer
+  // place an order at all; see LoginRequiredCheckout.test.tsx and IMPLEMENTATION_LOG 2026-10-17.
 });

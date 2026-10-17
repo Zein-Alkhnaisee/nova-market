@@ -7,6 +7,7 @@ import { useLoginMutation } from "../../services/api/authApi";
 import { useAppDispatch } from "../../app/store/hooks";
 import { setSession } from "../../features/auth/authSlice";
 import { isBlank } from "../../lib/validation";
+import { carryAuthParams } from "../../lib/authRedirect";
 
 export function LoginPage() {
   const { t } = useTranslation("auth");
@@ -14,6 +15,7 @@ export function LoginPage() {
   const dispatch = useAppDispatch();
   const [searchParams] = useSearchParams();
   const redirectTo = searchParams.get("redirect") ?? "/account";
+  const reason = searchParams.get("reason");
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -44,13 +46,18 @@ export function LoginPage() {
       footer={
         <>
           {t("login.noAccount")}{" "}
-          <Link to="/auth/register" className="font-medium text-accent hover:underline">
+          <Link to={`/auth/register${carryAuthParams(searchParams)}`} className="font-medium text-accent hover:underline">
             {t("login.createAccount")}
           </Link>
         </>
       }
     >
       <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
+        {reason === "checkout" ? (
+          <p role="status" className="rounded-[var(--radius-sm)] bg-accent/10 px-3 py-2 text-sm text-foreground">
+            {t("login.checkoutNotice")}
+          </p>
+        ) : null}
         <TextField
           id="email"
           type="email" dir="ltr"
