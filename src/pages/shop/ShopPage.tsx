@@ -7,7 +7,7 @@ import { useGetCategoriesQuery } from "../../services/api/categoriesApi";
 import { ProductCard } from "../../components/product/ProductCard";
 import { FilterPanel, type FilterValues } from "../../components/product/FilterPanel";
 import { FilterDrawer } from "../../components/product/FilterDrawer";
-import type { ProductSummary } from "../../types/product";
+import type { Category, ProductSummary } from "../../types/product";
 import { SortDropdown } from "../../components/product/SortDropdown";
 import { Skeleton } from "../../components/ui/Skeleton";
 import { ErrorState } from "../../components/common/ErrorState";
@@ -39,7 +39,7 @@ function CategoryNav({
   allLabel,
   onNavigate,
 }: {
-  categories: ReturnType<typeof useGetCategoriesQuery>["data"];
+  categories: Category[] | undefined;
   activeSlug: string | undefined;
   allLabel: string;
   onNavigate?: () => void;
