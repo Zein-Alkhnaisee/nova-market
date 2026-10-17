@@ -1,6 +1,6 @@
 # HANDOFF.md — NOVA Market
 
-**Last updated:** 2026-10-16, after Phase 13 (Polish) was completed **as scoped by the owner** — error boundaries, date formatting, the badge routes, a static RTL/dark/mobile audit with fixes, and the deferrals in §11. Phases 1–12 and Bug C (§8 #19) were verified by the owner (510/510). **Phase 13 was written in a sandbox that could not install dependencies, so none of it has been type-checked, linted, tested or built, and none of it has been seen in a real browser. Run the four commands in §10 first; expected 547 tests across 73 files.**
+**Last updated:** 2026-10-17, after Phase 13 (Polish) was completed as scoped by the owner and **verified by the owner**: `tsc -b` clean, lint 0 errors / 4 warnings, **547 tests across 73 files passing**, build succeeds. **All thirteen phases are complete.** Verification means those four automated checks; **no real-browser review across RTL / mobile / dark has been done** — a documented deferral (§11).
 
 This document is written for a **new AI agent or a different AI tool** picking this project up
 cold. It reflects the actual state of the repository at export time, not a plan or an aspiration.
@@ -9,8 +9,8 @@ cold. It reflects the actual state of the repository at export time, not a plan 
 
 ## 0. READ THIS FIRST — do not restart or recreate work
 
-This is a large, multi-session project. Twelve of the spec's thirteen phases are already
-implemented, tested, and verified (only Phase 13, Polish, remains). **Do not**:
+This is a large, multi-session project. All thirteen of the spec's phases are implemented,
+tested, and verified (what was deliberately deferred is listed in §11). **Do not**:
 
 - re-scaffold the project, re-run `npm create vite`, or recreate the folder structure
 - rewrite the design-token system, theming, i18n, routing, or the Redux/RTK Query architecture
@@ -33,7 +33,7 @@ implemented, tested, and verified (only Phase 13, Polish, remains). **Do not**:
 
 **Do**: read `MASTER_SPEC.md` and `DESIGN_SYSTEM.md` as the source of truth, read `PROGRESS.md`
 for phase-by-phase status, read `IMPLEMENTATION_LOG.md` for *why* things are built the way they
-are, inspect the repository, then continue from the next unimplemented phase.
+are, inspect the repository, then continue from the deferrals in §11 (there is no unimplemented phase).
 
 ---
 
@@ -201,13 +201,13 @@ Phase numbers are `MASTER_SPEC.md`'s (§107). See `PROGRESS.md` for full feature
   the required AI-provider abstraction, with `assistantApi` (`POST /assistant/messages`) the
   only thing that knows which implementation is currently wired in.
 
-- **Phase 12 — Admin**: DONE (most recent). All seven items from MASTER_SPEC §107 Phase 12, in nine checkpoints: admin auth + shell, Dashboard, Customers, Products, Categories, Orders, Coupons, Analytics. Role-guarded `/admin/*` (UX only — see §9/§11), a shared design system (same tokens and primitives as the storefront, denser layout), three admin-managed catalog stores behind `lib/versionedStore.ts` (products, categories, coupons — §8 #16/#17), and an admin-only API module (`services/api/adminApi.ts`). Details per checkpoint: `PROGRESS.md` and `IMPLEMENTATION_LOG.md`.
+- **Phase 12 — Admin**: DONE. All seven items from MASTER_SPEC §107 Phase 12, in nine checkpoints: admin auth + shell, Dashboard, Customers, Products, Categories, Orders, Coupons, Analytics. Role-guarded `/admin/*` (UX only — see §9/§11), a shared design system (same tokens and primitives as the storefront, denser layout), three admin-managed catalog stores behind `lib/versionedStore.ts` (products, categories, coupons — §8 #16/#17), and an admin-only API module (`services/api/adminApi.ts`). Details per checkpoint: `PROGRESS.md` and `IMPLEMENTATION_LOG.md`.
 
 ---
 
 ## 7. Current phase and what remains
 
-**Current phase: Phase 13 (Polish) is done as scoped, pending the owner's verification.** Phase 12 (Admin) was verified earlier (`tsc -b` clean, lint 0 errors / 4 warnings, 510/510 tests across 67 files, build OK) and so was Bug C. Everything added after that — Phase 13 — is unverified until the four commands in §10 are run.
+**Phase 13 is DONE and verified. All phases complete.** Verified by the owner on 2026-10-17: `tsc -b` clean, lint 0 errors / 4 warnings (baseline), 547/547 tests across 73 files, build OK (510 tests across 67 files before Phase 13, plus 37 in 6 new files). Verification here means those four automated checks; it does **not** include a real-browser review (§11). Phase 12 (Admin) and Bug C were verified earlier.
 
 **Phase 12 checkpoint order (revised by the owner):** auth → shell → dashboard → customers → products → categories → orders → coupons → analytics. **All nine done.**
 
@@ -233,9 +233,9 @@ Phase numbers are `MASTER_SPEC.md`'s (§107). See `PROGRESS.md` for full feature
 
 **Phase 12's footprint on Phases 1–11 code** (everything outside the admin area that Phase 12 changed, 16 source files + the shared test setup; all additive or a data-source swap, each owner-approved and recorded in `IMPLEMENTATION_LOG.md`): *Phase 7/8 enablers* — `types/order.ts` + `ordersApi.ts` (optional `customerId`, optional `couponCode`, `updateOrderStatus`, the `listAllOrders` accessor), `ReviewStepPage.tsx` (two added lines passing them), `authApi.ts` + `types/user.ts` + `hooks/useAuthGuard.ts` (role, seeded mock admin, `listMockCustomers`, role-aware guard), `CouponInput.tsx` (reads coupons through `couponStore`). *Catalog read-through* — `productsApi`, `recommendationsApi`, `searchApi`, `categoriesApi`, `mockAIProvider` (read products/categories through the stores). *Foundation* — `router/index.tsx` (admin routes), `i18n/config.ts` (`admin` namespace), `baseApi.ts` (`Coupon` tag), `types/product.ts` (optional `inventory`). The only modified test file is `test/setup.ts` (resets the three stores after each test); no pre-existing test was modified. `checkoutSlice` was never touched.
 
-**Phase 13 — Polish (done as scoped; see `PROGRESS.md` for the row-by-row status).** Delivered: a React error boundary per route area plus an app-level one and a router `errorElement` (§8 #20); `formatDate`/`formatDateTime` so dates follow the UI language (§8 #19); `/deals`, `/new-arrivals`, `/trending` filtering by badge; a shared accessible `FilterDrawer` and `useDialogBehavior` (§8 #21); a contrast pass on the accent/status tokens, computed against WCAG 4.5:1; RTL and mobile fixes found by a static audit; removal of hardcoded English (footer, skip link, aria-labels, 404). **Not delivered, by design of the owner's scope:** a real-browser pass (this is still the biggest open risk — a manual checklist is at the end of the Phase 13 entry in `IMPLEMENTATION_LOG.md`), per-page SEO titles, animations, a performance pass. **Provenance:** most Phase 13 code was found uncommitted in the working tree and adopted after a full review; it is a separate commit so it can be dropped on its own (`IMPLEMENTATION_LOG.md`).
+**Phase 13 — Polish (done as scoped; see `PROGRESS.md` for the row-by-row status).** Delivered: a React error boundary per route area plus an app-level one and a router `errorElement` (§8 #20); `formatDate`/`formatDateTime` so dates follow the UI language (§8 #19); `/deals`, `/new-arrivals`, `/trending` filtering by badge; a shared accessible `FilterDrawer` and `useDialogBehavior` (§8 #21); a contrast pass on the accent/status tokens, computed against WCAG 4.5:1; RTL and mobile fixes found by a static audit; removal of hardcoded English (footer, skip link, aria-labels, 404). **Not delivered, by design of the owner's scope:** a real-browser pass (this is still the biggest open risk — a manual checklist is at the end of the Phase 13 entry in `IMPLEMENTATION_LOG.md`), per-page SEO titles, animations, a performance pass. **Provenance:** most Phase 13 code was found uncommitted in the working tree and adopted; it is a separate commit (`eb810d9`) (see §11 and `IMPLEMENTATION_LOG.md`).
 
-**Remaining after Phase 13:** the owner's verification run; a real-browser review across RTL / mobile / dark; and the deferrals in §11. The project is feature-complete against MASTER_SPEC §107 apart from those.
+**Remaining after Phase 13:** nothing is outstanding against MASTER_SPEC §107 as scoped by the owner. What was deferred on purpose, with reasons, is in §11: a real-browser review across RTL / mobile / dark (the largest open risk), native-speaker review of the Arabic strings, per-page SEO titles, animations, a performance pass, a mobile layout for the admin area, a mobile bottom navigation bar, translated mock AI replies, and Playwright/MSW (intentionally not installed).
 
 ---
 
@@ -423,7 +423,7 @@ npm test          # must be all-passing
 npm run build     # must succeed
 ```
 
-Current state: **510 tests across 67 files, all passing, as last verified by the owner (after Bug C). Phase 13 added 37 tests in 6 files (expected total 547 across 73 files) that have not been run.** (The full suite takes ~100 s normally but can exceed a 300 s limit on a single-core machine; running it in chunks — `src/test/unit`, then the component files in two halves — is a valid way to verify. One pre-existing test, `ProductConfigurator` "adds the configured price…", failed once under load and passed on every rerun; it is believed to be a timing flake from RTL's 1000 ms `waitFor` default.) `tsc -b` clean. `oxlint` 0 errors **Flake policy (owner directive): if `ProductConfigurator` "adds the configured price…" fails again in any checkpoint, treat it as a real flake and bump its `waitFor` timeout deliberately (it uses the 1000 ms default) rather than letting it flake indefinitely.** It has not failed in the last four chunked runs.
+Current state: **547 tests across 73 files, all passing** (verified by the owner after Phase 13; 510 across 67 files before it, plus 37 in 6 new files). (The full suite takes ~100 s normally but can exceed a 300 s limit on a single-core machine; running it in chunks — `src/test/unit`, then the component files in two halves — is a valid way to verify. One pre-existing test, `ProductConfigurator` "adds the configured price…", failed once under load and passed on every rerun; it is believed to be a timing flake from RTL's 1000 ms `waitFor` default.) `tsc -b` clean. `oxlint` 0 errors **Flake policy (owner directive): if `ProductConfigurator` "adds the configured price…" fails again in any checkpoint, treat it as a real flake and bump its `waitFor` timeout deliberately (it uses the 1000 ms default) rather than letting it flake indefinitely.** It has not failed in the last four chunked runs.
 with 4 advisory `only-export-components` / `set-state-in-effect` warnings that are the
 long-standing accepted baseline — **do not let this number grow**; if a change adds a warning,
 fix the cause rather than suppressing it.
@@ -525,6 +525,8 @@ Test conventions:
   contrast computed from the tokens) and fixed what it found; correctness otherwise rests on logical
   properties, semantic tokens and responsive classes. This is the largest open risk. Checklist:
   `IMPLEMENTATION_LOG.md`, end of the Phase 13 entry.
+- **Phase 13 code arrived from an unattributed source (commit `eb810d9`).** Phase 13 code arrived from an unattributed source and was adopted after static review + local test verification. Static review missed one `tsc` error (see the `ShopPage.tsx` correction); the local compile caught it. Static review is not a substitute for compilation.
+- **`ShopPage.tsx` type fix (found by `tsc -b`, not by review).** `src/pages/shop/ShopPage.tsx`, `CategoryNav`: the `categories` prop is typed explicitly as `Category[] | undefined` (`Category` imported from `types/product`). It was originally `ReturnType<typeof useGetCategoriesQuery>["data"]`, which TypeScript could not resolve to a usable element type (`Parameter 'c' implicitly has an 'any' type` where the list is mapped). Keep the explicit type if this file is touched again. A derived `ReturnType<…>["data"]` is fine for a local variable, not for a prop a child maps over. The fix is committed in `089b749` (parent `8c99400`; `8c99400` alone does not pass `tsc -b`). A fresh clone of `089b749` compiles cleanly. If you find the old `ReturnType<…>` type in the file, the fix has been lost and `tsc -b` will fail.
 - **Arabic translations are functional but unreviewed by a native speaker.** They live in
   `src/i18n/locales/ar/` (one file per namespace, kept in key-parity with `en/` apart from Arabic's
   extra plural forms). Have a native speaker review them before any real launch; wording, register and

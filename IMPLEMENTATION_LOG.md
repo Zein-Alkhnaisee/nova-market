@@ -388,6 +388,8 @@
 
 ## 2026-10-16 — Phase 13: Polish (as scoped by the owner)
 
+> **Status note (added 2026-10-17):** this entry is the record as written *before* verification, and its wording ("never compiled or tested", "verification pending", "what the owner needs to run", "expected 547") is kept as history. It is superseded by the **2026-10-17** entry at the end of this file: the owner ran all four commands and they passed, after one type fix.
+
 **Scope (owner's)**: (1) a structured real-browser pass across dark, RTL and ~375px mobile; (2) a React error boundary; (3) two or three cheap §11 items; (4) explicit deferrals in HANDOFF §11. No new features, no Playwright/MSW, no re-touching Bugs A/B/C. One consolidated checkpoint.
 
 **Two limits that shape everything below.** (a) The authoring sandbox cannot reach the npm registry (HTTP 403 from the egress policy), so no dependency could be installed: `tsc -b`, lint, tests, build and a real browser were **not run**. (b) Priority 1 asked for a real-browser pass; that was therefore **not done**. A static audit was done in its place, and it is labelled as such everywhere. It finds mistakes in code, not in how a page looks.
@@ -408,7 +410,7 @@ No defect was found. That is a review, not a run: the inherited code has still n
 
 **Decisions worth recording**: (1) Phase 13 is marked "DONE AS SCOPED, verification pending", not "DONE": the real-browser pass, SEO per page, animations and performance were not done and saying otherwise would be false. (2) The inherited work was kept rather than rewritten because it matches the owner's scope, passed review, and rewriting it blind would add risk without information. (3) The mock AI's English-only replies, the missing mobile admin layout and the missing mobile bottom navigation were recorded rather than "fixed": each is a feature or a design decision, outside a polish pass.
 
-**What the owner needs to run**: `npx tsc -b`, `npm run lint`, `npm test`, `npm run build`. Expected: clean, 0 errors / 4 warnings, **547 tests across 73 files** (510 + 37), success. Things most likely to need attention if something fails, in order: the six new test files (never run); `tsc` on `ShopPage`'s `badge`/`titleKey` props and template-literal translation keys; the `only-export-components` warning count (a new unexported component in `router/index.tsx` should not raise it).
+**What the owner needs to run (superseded: the owner has since run these; see the 2026-10-17 entry)**: `npx tsc -b`, `npm run lint`, `npm test`, `npm run build`. Expected: clean, 0 errors / 4 warnings, **547 tests across 73 files** (510 + 37), success. Things most likely to need attention if something fails, in order: the six new test files (never run); `tsc` on `ShopPage`'s `badge`/`titleKey` props and template-literal translation keys; the `only-export-components` warning count (a new unexported component in `router/index.tsx` should not raise it).
 
 **Manual browser checklist (this replaces the pass that could not be run)**. Do each in light and dark, in English and Arabic, at ~375px and at desktop width.
 1. Header: at 375px the bar shows logo, search, cart and menu; the menu lists assistant, wishlist, account, language and theme and each works. In Arabic the layout mirrors; the menu button and the drawer sit on the correct edge.
@@ -421,3 +423,26 @@ No defect was found. That is a review, not a run: the inherited code has still n
 8. Overlaps at 375px: the compare bar (centred, fixed to the bottom) against the floating assistant button; the floating assistant panel height with the keyboard open.
 9. Throw an error deliberately in a page component: the shell stays up and the crash page offers Reload and Go home; throw one in `Header`: the full-page crash page appears; navigating away from a crashed page recovers it.
 10. `/deals`, `/new-arrivals`, `/trending` list only their badged products and show their own heading; footer links go to the right pages; the 404 page's Back button works from a pasted link.
+
+## 2026-10-17 — Final consistency pass: Phase 13 verified, all phases DONE
+
+Docs only. No source, test, MASTER_SPEC or DESIGN_SYSTEM changes. Written against GitHub `089b749` (parent `8c99400`).
+
+**Verification, run by the owner on their machine (first on `8c99400` with the `ShopPage.tsx` fix applied locally, then again on `089b749`, which contains that fix; all four passed both times):**
+
+| Command | Result |
+|---|---|
+| `npx tsc -b` | clean, 0 errors |
+| `npm run lint` | 0 errors, 4 warnings. These are the accepted baseline: 3× `only-export-components` (router, ThemeProvider, Button) and 1× `set-state-in-effect` (SearchOverlay). No new warnings |
+| `npm test` | **547/547 passing across 73 files** (510 across 67 before Phase 13, plus 37 in 6 new files) |
+| `npm run build` | succeeds (Vite 8.2.2, main bundle 341.56 kB / 101.15 kB gzip) |
+
+"Verified" means these four automated checks. A real-browser review across RTL / mobile / dark was **not** done and stays a documented deferral (HANDOFF §11).
+
+**Correction: `ShopPage.tsx` type error, found by the owner's `tsc -b`.** The 2026-10-16 review of the inherited Phase 13 code concluded "no defect was found". That was wrong in one place. The `CategoryNav` prop in `src/pages/shop/ShopPage.tsx` was typed `categories: ReturnType<typeof useGetCategoriesQuery>["data"]`. TypeScript could not resolve that to a usable element type, so mapping over it failed with `Parameter 'c' implicitly has an 'any' type`. The owner fixed it locally by typing the prop explicitly as `Category[] | undefined`, with `Category` imported from `types/product`. Keep the explicit type if this file is touched again: a derived `ReturnType<…>["data"]` is fine for a local variable but not for a prop a child maps over.
+
+**Where the fix lives.** The `ShopPage.tsx` type fix is committed in `089b749` (parent `8c99400`); `8c99400` itself still has the old `ReturnType<…>["data"]` type and does not pass `tsc -b`. A fresh clone of `089b749` compiles cleanly. (This entry was first drafted against `8c99400` and re-applied on top of `089b749`; the docs content is unchanged.)
+
+**Adoption note for the inherited Phase 13 code (`eb810d9`).** Phase 13 code arrived from an unattributed source and was adopted after static review + local test verification. Static review missed one tsc error (see ShopPage.tsx correction above); the local compile caught it. Static review is not a substitute for compilation.
+
+**Docs updated in this pass:** PROGRESS.md (Phase 13 and Bug C verified, 547 / 73 files, all phases DONE); HANDOFF.md (last-updated line, §0, §6, §7 now says "Phase 13 is DONE and verified. All phases complete.", §10 count, §11 adoption note and ShopPage type-fix note; the Arabic-review and Playwright/MSW deferrals remain listed); this log.
