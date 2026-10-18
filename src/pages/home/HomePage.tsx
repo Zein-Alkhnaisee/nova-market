@@ -13,6 +13,7 @@ import { SectionHeader } from "../../components/common/SectionHeader";
 import { ErrorState } from "../../components/common/ErrorState";
 import { buttonVariants } from "../../components/ui/Button";
 import { cn } from "../../lib/cn";
+import heroLocalImage from "../../assets/remote-images/photo-1441986300917-64674bd600d8.jpg";
 
 function BadgeRail({
   title,
@@ -119,7 +120,7 @@ export function HomePage() {
           </div>
           <div className="relative hidden overflow-hidden rounded-[var(--radius-2xl)] bg-surface-muted lg:block">
             <img
-              src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1200"
+              src={heroLocalImage}
               alt=""
               className="h-full w-full object-cover"
             />

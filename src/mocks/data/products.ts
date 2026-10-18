@@ -1,3 +1,28 @@
+import local_photo_1505740420928_5e560c06d30e from "../../assets/remote-images/photo-1505740420928-5e560c06d30e.jpg";
+import local_photo_1583394838336_acd977736f90 from "../../assets/remote-images/photo-1583394838336-acd977736f90.jpg";
+import local_photo_1546435770_a3e426bf472b from "../../assets/remote-images/photo-1546435770-a3e426bf472b.jpg";
+import local_photo_1484704849700_f032a568e944 from "../../assets/remote-images/photo-1484704849700-f032a568e944.jpg";
+import local_photo_1496181133206_80ce9b88a853 from "../../assets/remote-images/photo-1496181133206-80ce9b88a853.jpg";
+import local_photo_1517336714731_489689fd1ca8 from "../../assets/remote-images/photo-1517336714731-489689fd1ca8.jpg";
+import local_photo_1618384887929_16ec33fab9ef from "../../assets/remote-images/photo-1618384887929-16ec33fab9ef.jpg";
+import local_photo_1587829741301_dc798b83add3 from "../../assets/remote-images/photo-1587829741301-dc798b83add3.jpg";
+import local_photo_1523275335684_37898b6baf30 from "../../assets/remote-images/photo-1523275335684-37898b6baf30.jpg";
+import local_photo_1434493789847_2f02dc6ca35d from "../../assets/remote-images/photo-1434493789847-2f02dc6ca35d.jpg";
+import local_photo_1508685096489_7aacd43bd3b1 from "../../assets/remote-images/photo-1508685096489-7aacd43bd3b1.jpg";
+import local_photo_1620799140408_edc6dcb6d633 from "../../assets/remote-images/photo-1620799140408-edc6dcb6d633.jpg";
+import local_photo_1596755094514_f87e34085b2c from "../../assets/remote-images/photo-1596755094514-f87e34085b2c.jpg";
+import local_photo_1602810318383_e386cc2a3ccf from "../../assets/remote-images/photo-1602810318383-e386cc2a3ccf.jpg";
+import local_photo_1517256064527_09c73fc73e38 from "../../assets/remote-images/photo-1517256064527-09c73fc73e38.jpg";
+import local_photo_1495474472287_4d71bcdd2085 from "../../assets/remote-images/photo-1495474472287-4d71bcdd2085.jpg";
+import local_photo_1442512595331_e89e73853f31 from "../../assets/remote-images/photo-1442512595331-e89e73853f31.jpg";
+import local_photo_1485965120184_e220f721d03e from "../../assets/remote-images/photo-1485965120184-e220f721d03e.jpg";
+import local_photo_1502744688674_c619d1586c9e from "../../assets/remote-images/photo-1502744688674-c619d1586c9e.jpg";
+import local_photo_1576435728678_68d0fbf94e91 from "../../assets/remote-images/photo-1576435728678-68d0fbf94e91.jpg";
+import local_photo_1592840496694_26d035b52b48 from "../../assets/remote-images/photo-1592840496694-26d035b52b48.jpg";
+import local_photo_1552820728_8b83bb6b773f from "../../assets/remote-images/photo-1552820728-8b83bb6b773f.jpg";
+import local_photo_1587202372634_32705e3bf49c from "../../assets/remote-images/photo-1587202372634-32705e3bf49c.jpg";
+import local_photo_1587831990711_23ca6441447b from "../../assets/remote-images/photo-1587831990711-23ca6441447b.jpg";
+import local_photo_1591405351990_4726e331f141 from "../../assets/remote-images/photo-1591405351990-4726e331f141.jpg";
 import type { ProductSummary } from "../../types/product";
 
 export const products: ProductSummary[] = [
@@ -12,12 +37,12 @@ export const products: ProductSummary[] = [
     currency: "USD",
     rating: 4.7,
     reviewCount: 1284,
-    image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800",
+    image: local_photo_1505740420928_5e560c06d30e,
     images: [
-      "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=1200",
-      "https://images.unsplash.com/photo-1583394838336-acd977736f90?w=1200",
-      "https://images.unsplash.com/photo-1546435770-a3e426bf472b?w=1200",
-      "https://images.unsplash.com/photo-1484704849700-f032a568e944?w=1200",
+      local_photo_1505740420928_5e560c06d30e,
+      local_photo_1583394838336_acd977736f90,
+      local_photo_1546435770_a3e426bf472b,
+      local_photo_1484704849700_f032a568e944,
     ],
     description:
       "Adaptive noise cancellation that actually adapts — Aether reads the room and adjusts in real time, from a quiet office to a boarding gate. 40 hours of playback, plush memory-foam ear cups, and a fold-flat hinge for the bag.",
@@ -42,11 +67,11 @@ export const products: ProductSummary[] = [
     currency: "USD",
     rating: 4.6,
     reviewCount: 512,
-    image: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=800",
+    image: local_photo_1496181133206_80ce9b88a853,
     images: [
-      "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=1200",
-      "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=1200",
-      "https://images.unsplash.com/photo-1517336714731-489689fd1ca4?w=1200",
+      local_photo_1496181133206_80ce9b88a853,
+      local_photo_1517336714731_489689fd1ca8,
+      local_photo_1517336714731_489689fd1ca8,
     ],
     description:
       "1.1kg, magnesium unibody, and a 13-inch display that's actually color-accurate out of the box. Built for people who carry their laptop more than they carry their charger.",
@@ -100,11 +125,11 @@ export const products: ProductSummary[] = [
     currency: "USD",
     rating: 4.5,
     reviewCount: 843,
-    image: "https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=800",
+    image: local_photo_1618384887929_16ec33fab9ef,
     images: [
-      "https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=1200",
-      "https://images.unsplash.com/photo-1595225476474-64bf8c1ba7f4?w=1200",
-      "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=1200",
+      local_photo_1618384887929_16ec33fab9ef,
+      local_photo_1587829741301_dc798b83add3,
+      local_photo_1587829741301_dc798b83add3,
     ],
     description:
       "Hot-swappable switches, a machined aluminum plate, and per-key RGB you can actually turn off. Tuned for a satisfying thock without waking up the rest of the house.",
@@ -127,11 +152,11 @@ export const products: ProductSummary[] = [
     currency: "USD",
     rating: 4.4,
     reviewCount: 967,
-    image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800",
+    image: local_photo_1523275335684_37898b6baf30,
     images: [
-      "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=1200",
-      "https://images.unsplash.com/photo-1434493789847-2f02dc6ca35d?w=1200",
-      "https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?w=1200",
+      local_photo_1523275335684_37898b6baf30,
+      local_photo_1434493789847_2f02dc6ca35d,
+      local_photo_1508685096489_7aacd43bd3b1,
     ],
     description:
       "A watch that tracks your training without turning your wrist into a dashboard. Always-on display, 6-day battery, and a case that actually looks good with a suit.",
@@ -158,11 +183,11 @@ export const products: ProductSummary[] = [
     currency: "USD",
     rating: 4.3,
     reviewCount: 231,
-    image: "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=800",
+    image: local_photo_1620799140408_edc6dcb6d633,
     images: [
-      "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=1200",
-      "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=1200",
-      "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=1200",
+      local_photo_1620799140408_edc6dcb6d633,
+      local_photo_1596755094514_f87e34085b2c,
+      local_photo_1602810318383_e386cc2a3ccf,
     ],
     description:
       "European flax linen, stone-washed for softness on day one. Cut generously, so it drapes instead of clings.",
@@ -188,11 +213,11 @@ export const products: ProductSummary[] = [
     currency: "USD",
     rating: 4.8,
     reviewCount: 402,
-    image: "https://images.unsplash.com/photo-1517256064527-09c73fc73e38?w=800",
+    image: local_photo_1517256064527_09c73fc73e38,
     images: [
-      "https://images.unsplash.com/photo-1517256064527-09c73fc73e38?w=1200",
-      "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=1200",
-      "https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=1200",
+      local_photo_1517256064527_09c73fc73e38,
+      local_photo_1495474472287_4d71bcdd2085,
+      local_photo_1442512595331_e89e73853f31,
     ],
     description:
       "Dual boiler, PID temperature control, and a steam wand that actually microfoams. The machine that makes the case for skipping the coffee shop.",
@@ -215,11 +240,11 @@ export const products: ProductSummary[] = [
     currency: "USD",
     rating: 4.6,
     reviewCount: 118,
-    image: "https://images.unsplash.com/photo-1485965120184-e220f721d03e?w=800",
+    image: local_photo_1485965120184_e220f721d03e,
     images: [
-      "https://images.unsplash.com/photo-1485965120184-e220f721d03e?w=1200",
-      "https://images.unsplash.com/photo-1502744688674-c619d1586c9e?w=1200",
-      "https://images.unsplash.com/photo-1576435728678-68d0fbf94e91?w=1200",
+      local_photo_1485965120184_e220f721d03e,
+      local_photo_1502744688674_c619d1586c9e,
+      local_photo_1576435728678_68d0fbf94e91,
     ],
     description:
       "Full carbon frame, hydraulic disc brakes, and a geometry tuned for long days on fire roads. Built by people who ride it on weekends too.",
@@ -243,11 +268,11 @@ export const products: ProductSummary[] = [
     currency: "USD",
     rating: 4.5,
     reviewCount: 1502,
-    image: "https://images.unsplash.com/photo-1592840496694-26d035b52b48?w=800",
+    image: local_photo_1592840496694_26d035b52b48,
     images: [
-      "https://images.unsplash.com/photo-1592840496694-26d035b52b48?w=1200",
-      "https://images.unsplash.com/photo-1600861195091-690c92f1d2cb?w=1200",
-      "https://images.unsplash.com/photo-1552820728-8b83bb6b773f?w=1200",
+      local_photo_1592840496694_26d035b52b48,
+      local_photo_1552820728_8b83bb6b773f,
+      local_photo_1552820728_8b83bb6b773f,
     ],
     description:
       "Hall-effect sticks that won't drift, back paddles you'll actually reach for, and a battery that survives a weekend tournament.",
@@ -270,11 +295,11 @@ export const products: ProductSummary[] = [
     currency: "USD",
     rating: 4.7,
     reviewCount: 86,
-    image: "https://images.unsplash.com/photo-1587202372634-32705e3bf49c?w=800",
+    image: local_photo_1587202372634_32705e3bf49c,
     images: [
-      "https://images.unsplash.com/photo-1587202372634-32705e3bf49c?w=1200",
-      "https://images.unsplash.com/photo-1587831990711-23ca6441447b?w=1200",
-      "https://images.unsplash.com/photo-1591405351990-4726e331f141?w=1200",
+      local_photo_1587202372634_32705e3bf49c,
+      local_photo_1587831990711_23ca6441447b,
+      local_photo_1591405351990_4726e331f141,
     ],
     description:
       "Build it your way. Start from a balanced baseline and upgrade exactly the parts that matter for what you actually play or render.",
