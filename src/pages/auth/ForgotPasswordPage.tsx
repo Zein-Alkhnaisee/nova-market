@@ -16,7 +16,7 @@ export function ForgotPasswordPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const result = await forgotPassword({ email });
-    if ("data" in result) setDemoToken(result.data.demoToken);
+    if (result.data) setDemoToken(result.data.demoToken);
     setSent(true);
   };
 
