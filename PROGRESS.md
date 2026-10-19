@@ -104,7 +104,7 @@ bought Y" at checkout time). Worth adding alongside Phase 7 (Checkout).
 | Login | DONE | `/auth/login`, validation, error alert, `?redirect=` support so a guarded page returns you where you were going |
 | Register | DONE | `/auth/register`, name/email/password/confirm validation, duplicate-email error from the API |
 | Forgot password | DONE | `/auth/forgot-password`, deliberately succeeds regardless of whether the account exists (no account enumeration), with an explicit demo note + link onward since no email is actually sent |
-| Reset password | DONE | `/auth/reset-password?token=`, password + confirm validation, success state |
+| Reset password | DONE | `/auth/reset-password?token=`, password + confirm validation, success state. Since 2026-10-19 it really changes the password and shows an error for a bad token (see "Bug fix — password reset") |
 | Logout | DONE | From Settings → Danger zone; clears the persisted session |
 | Auth guard | DONE | `useAuthGuard` redirects unauthenticated visitors to login with a redirect param; applied to every `/account/*` page |
 | Account shell | DONE | `AccountLayout` — sidebar nav on desktop, horizontal scroll nav on mobile, `NavLink` active states, wrapped in the normal `AppShell` |
@@ -199,6 +199,20 @@ Checkpoint order (revised: Customers moved ahead of Products): admin auth → sh
 | Analytics — metric semantics | DONE | Revenue = order totals excluding cancelled/refunded; top-products and category sales are **line-item sales before discounts, shipping and tax** (stated on the page; they don't sum to revenue); average order excludes cancelled/refunded and is "Not available" when nothing counts; **Conversion is "Not available"** with the reason (no visit data), never fabricated; category attribution uses the current catalog (archived products still resolve; a missing product/category goes to an "Unknown category" row) |
 
 **Not yet verified in a real browser** for the admin shell across RTL/mobile/dark (same standing caveat as the rest of the project).
+
+## BUG FIX — PASSWORD RESET DID NOT CHANGE THE PASSWORD (2026-10-19; written, awaiting the owner's verification)
+
+| Item | Status | Notes |
+|---|---|---|
+| Root cause | FOUND | `resetPassword` in `authApi.ts` returned success without doing anything ("demo accepts any token"), and `forgotPassword` never issued a token, so there was nothing linking a token to an account. The Forgot page also hard-coded `?token=demo`. Result: the old password kept working after a "successful" reset. |
+| `forgotPassword` issues a token | DONE (unverified) | Random token (`crypto.randomUUID`, falling back to `generateId`) stored in memory with the account's email and a 1-hour expiry. Always succeeds with the same response shape, whether or not the email has an account (no account enumeration): for an unknown email nothing is stored, so its token fails at reset |
+| `resetPassword` changes the password | DONE (unverified) | Looks up the token, finds the account, replaces its password, persists the mock users, and deletes the token (one use). Unknown, used or expired token → 400 "This reset link is invalid or has expired." |
+| Pages | DONE (unverified) | Forgot passes the issued token to the reset link (the demo has no inbox, so the API returns it as `demoToken`; a real backend emails it and never returns it). Reset shows the error and a "Request a new link" link instead of always saying success. en + ar strings |
+| Persistence | By design | The new password is persisted (mock users already persist to `nova:mockUsers`). Tokens are in memory only: a page refresh forgets a pending reset, which is acceptable for a demo |
+| Tests | WRITTEN, NOT RUN | `passwordReset.test.ts` (8: new password logs in, old fails, one-time token, invalid token, expired token, forgot same shape for unknown email, persisted, case-insensitive email) and `PasswordResetPages.test.tsx` (2). Expected total 569 across 76 files if the checkout fix verified at 559/74 (559 + 10; +2 files) — **not run** |
+| `tsc -b`, lint, tests, build | **PENDING (owner)** | Run the four commands (HANDOFF §10) |
+
+Not changed: login, register, the payment boundary. No new features (no email, no password-strength rules, no "reset link expired" page).
 
 ## BUG FIXES BETWEEN PHASES 12 AND 13
 | Bug | Status | Notes |

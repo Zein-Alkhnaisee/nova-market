@@ -475,3 +475,26 @@ The owner applied the commit above and ran everything: 558/559 passing. The fail
 
 **Verification: NOT RUN here** (npm registry still blocked). After the fix the owner should see 559/559 across 74 files.
 
+## 2026-10-19 — Bug fix: password reset did not change the password (written, not run)
+
+**Reported by the owner**: register with `oldpass123`, run forgot and reset with `newpass456`: `newpass456` fails to log in, `oldpass123` still works.
+
+**Base**: GitHub `6ceb981` (includes the checkout sign-in change and its redirect fix).
+
+**Root cause**: `resetPassword` in `authApi.ts` returned success without doing anything ("demo accepts any token"), and `forgotPassword` never issued a token, so there was nothing linking a token to an account. The Forgot page also hard-coded `?token=demo`. Result: the old password kept working after a "successful" reset. This matches what the owner suspected.
+
+**Fix (`services/api/authApi.ts`, the pages, `auth.json` en/ar)**
+- A module-level in-memory `Map` of reset tokens `{ email, expiresAt }`, TTL `RESET_TOKEN_TTL_MS` (1 hour, exported for the test).
+- `forgotPassword({ email })`: makes a random token (`crypto.randomUUID`, with the project's `generateId` as fallback for non-secure contexts), stores it only if the email belongs to an account, and always returns `{ ok: true, demoToken }`. The response shape is identical for known and unknown emails, so there is no enumeration; an unknown email's token fails later at reset. Case-insensitive email match, like login.
+- `resetPassword({ token, newPassword })`: reads and deletes the token in one step (so any attempt burns it, and a token is single-use), checks expiry, finds the account, replaces its password, and calls `persistUsers()`. A missing, used or expired token returns a 400 with one message, "This reset link is invalid or has expired.", for all three.
+- `ForgotPasswordPage`: the onward link carries the issued `demoToken` instead of the hard-coded `?token=demo`. This is the one deliberate demo concession: with no inbox, the browser has to be handed the token. A real backend emails it.
+- `ResetPasswordPage`: it ignored the mutation result and always showed success. It now shows the error (with a "Request a new link" link) when the call fails, and success only when it works.
+
+**Not changed**: login, register, the payment boundary, the mock store's plain-text passwords, anything else. No password-strength rules, no email, no rate limiting.
+
+**Persistence**: the mock users were already persisted (`nova:mockUsers`), so the new password survives a refresh. Tokens are not persisted; a refresh forgets a pending reset (existing demo limitation, now documented in HANDOFF §11).
+
+**Tests (written, not run)**: `src/test/unit/passwordReset.test.ts` (8) and `src/test/components/PasswordResetPages.test.tsx` (2): register -> forgot -> reset -> new password logs in; old password fails; token cannot be reused (and the second attempt changes nothing); invalid token returns the error and changes nothing; expired token rejected; forgot has the same shape for an unknown email and its token is useless; the new password is written to storage and the token is not; case-insensitive email; the pages end to end (including the error state for a bad token). No existing test changed (none covered reset).
+
+**Verification: NOT RUN.** The sandbox cannot install dependencies (npm registry blocked), so `tsc -b`, lint, tests and build were not run. The last count I was told of is 558/559 on the checkout change; the redirect fix (2026-10-17 addendum) should have made it 559/559 across 74 files. This change adds 10 tests in 2 new files: expected **569 across 76 files** — unconfirmed. Static review is not a substitute for compilation. Likeliest trouble spots if something fails: the `"data" in result` narrowing in `ForgotPasswordPage`, the `Date.now` spy in the expiry test, and the button/link names the page test looks up ("Send reset link", "Continue to reset password (demo)", "Reset password").
+

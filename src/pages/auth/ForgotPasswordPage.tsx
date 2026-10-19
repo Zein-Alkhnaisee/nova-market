@@ -10,11 +10,13 @@ export function ForgotPasswordPage() {
   const { t } = useTranslation("auth");
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
+  const [demoToken, setDemoToken] = useState("");
   const [forgotPassword, { isLoading }] = useForgotPasswordMutation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await forgotPassword({ email });
+    const result = await forgotPassword({ email });
+    if ("data" in result) setDemoToken(result.data.demoToken);
     setSent(true);
   };
 
@@ -39,7 +41,7 @@ export function ForgotPasswordPage() {
             <p>{t("forgotPassword.demoNote")}</p>
           </div>
           <Link
-            to="/auth/reset-password?token=demo"
+            to={`/auth/reset-password?token=${encodeURIComponent(demoToken)}`}
             className="flex h-12 items-center justify-center rounded-[var(--radius-md)] border border-border text-sm font-medium text-foreground hover:bg-surface-hover"
           >
             {t("forgotPassword.demoContinue")}

@@ -14,6 +14,7 @@ export function ResetPasswordPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errors, setErrors] = useState<{ password?: string; confirmPassword?: string }>({});
   const [done, setDone] = useState(false);
+  const [failed, setFailed] = useState(false);
   const [resetPassword, { isLoading }] = useResetPasswordMutation();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -24,7 +25,12 @@ export function ResetPasswordPage() {
     setErrors(next);
     if (Object.keys(next).length > 0) return;
 
-    await resetPassword({ token, newPassword: password });
+    setFailed(false);
+    const result = await resetPassword({ token, newPassword: password });
+    if ("error" in result) {
+      setFailed(true);
+      return;
+    }
     setDone(true);
   };
 
@@ -45,6 +51,14 @@ export function ResetPasswordPage() {
         </div>
       ) : (
         <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
+          {failed ? (
+            <p role="alert" className="rounded-[var(--radius-sm)] bg-danger/10 px-3 py-2 text-sm text-danger">
+              {t("resetPassword.errors.invalidToken")}{" "}
+              <Link to="/auth/forgot-password" className="font-medium underline">
+                {t("resetPassword.requestNew")}
+              </Link>
+            </p>
+          ) : null}
           <TextField
             id="password"
             type="password"

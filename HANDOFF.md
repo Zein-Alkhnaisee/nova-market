@@ -237,6 +237,8 @@ Phase numbers are `MASTER_SPEC.md`'s (§107). See `PROGRESS.md` for full feature
 
 **Post-Phase-13 change (2026-10-17): checkout requires sign-in. Written, NOT yet verified by the owner.** Guest checkout let someone place an order without an account, but the success page's "View order" button goes to `/account/orders/:id`, which requires login. The guest was sent to a login page for an order they could never open: a dead end. Requiring sign-in *before* checkout means every order belongs to an account and "View order" always works. The decision is the owner's ("Option A": gate at Checkout, not at Place order). `useCheckoutGuard` redirects a guest to `/auth/login?redirect=<step>&reason=checkout` before anything else (so it applies to all four `/checkout/*` steps); the cart's checkout button links guests straight there; Login and Register show a one-line notice and Register now honours `?redirect=`. Payment handling is untouched and `Order.customerId` stays optional. Last verified state is still 547 tests across 73 files; with this change the expected total is 559 across 74 files — run the four commands in §10 to confirm. Not built, deliberately: guest-order linking, account creation from the success page, email recovery.
 
+**Bug fix (2026-10-19): password reset now changes the password. Written, NOT yet verified by the owner.** `resetPassword` in `authApi.ts` returned success without doing anything ("demo accepts any token"), and `forgotPassword` never issued a token, so there was nothing linking a token to an account. The Forgot page also hard-coded `?token=demo`. Result: the old password kept working after a "successful" reset. Now `forgotPassword` stores a one-time, 1-hour token tied to the account's email and `resetPassword` consumes it, updates the user in the persisted mock store and rejects an unknown, used or expired token with a clear error. `forgotPassword` still succeeds identically for every email. Details: `PROGRESS.md` and `IMPLEMENTATION_LOG.md`.
+
 **Remaining after Phase 13:** nothing is outstanding against MASTER_SPEC §107 as scoped by the owner. What was deferred on purpose, with reasons, is in §11: a real-browser review across RTL / mobile / dark (the largest open risk), native-speaker review of the Arabic strings, per-page SEO titles, animations, a performance pass, a mobile layout for the admin area, a mobile bottom navigation bar, translated mock AI replies, and Playwright/MSW (intentionally not installed).
 
 ---
@@ -406,8 +408,10 @@ Phase numbers are `MASTER_SPEC.md`'s (§107). See `PROGRESS.md` for full feature
   authentication in a way that suggests it's real. `services/api/authApi.ts` stores mock
   passwords in plain text and says so loudly in a header comment; that file is the boundary to
   replace. Don't quietly make it look more secure than it is, and don't make it worse.
-- **No account enumeration.** `forgotPassword` succeeds identically whether or not the email
-  exists. Preserve this.
+- **No account enumeration.** `forgotPassword` succeeds identically (same response shape) whether or
+  not the email exists. Preserve this. For an unknown email no token is stored, so its token simply
+  fails at `resetPassword`. The token is returned to the browser as `demoToken` only because the demo
+  has no inbox; a real backend emails it and must never return it.
 - **Backend-enforced constraints belong in the API layer, not just the UI.** Example:
   `cancelOrder` rejects orders past `processing` with a 409 even though the UI already hides
   the button. Follow this pattern rather than trusting the UI alone.
@@ -530,6 +534,7 @@ Test conventions:
 - **Phase 13 code arrived from an unattributed source (commit `eb810d9`).** Phase 13 code arrived from an unattributed source and was adopted after static review + local test verification. Static review missed one `tsc` error (see the `ShopPage.tsx` correction); the local compile caught it. Static review is not a substitute for compilation.
 - **`ShopPage.tsx` type fix (found by `tsc -b`, not by review).** `src/pages/shop/ShopPage.tsx`, `CategoryNav`: the `categories` prop is typed explicitly as `Category[] | undefined` (`Category` imported from `types/product`). It was originally `ReturnType<typeof useGetCategoriesQuery>["data"]`, which TypeScript could not resolve to a usable element type (`Parameter 'c' implicitly has an 'any' type` where the list is mapped). Keep the explicit type if this file is touched again. A derived `ReturnType<…>["data"]` is fine for a local variable, not for a prop a child maps over. The fix is committed in `089b749` (parent `8c99400`; `8c99400` alone does not pass `tsc -b`). A fresh clone of `089b749` compiles cleanly. If you find the old `ReturnType<…>` type in the file, the fix has been lost and `tsc -b` will fail.
 - **Guest checkout was removed on purpose (2026-10-17).** The rule lives in `useCheckoutGuard` (auth check first). Do not re-add guest orders without also solving "View order" for a guest. A test that used to assert a guest order has no `customerId` was replaced, not fixed (IMPLEMENTATION_LOG 2026-10-17). `/order-success/:id` is outside `/checkout/*` and was left as is.
+- **Password reset tokens are in memory only (2026-10-19).** A page refresh forgets a pending reset; the *new password* is persisted with the other mock users. Tokens live 1 hour and work once. This is demo-grade by design; it does not make the mock auth secure (passwords are still plain text in the mock store, as the file header says).
 - **Arabic translations are functional but unreviewed by a native speaker.** They live in
   `src/i18n/locales/ar/` (one file per namespace, kept in key-parity with `en/` apart from Arabic's
   extra plural forms). Have a native speaker review them before any real launch; wording, register and

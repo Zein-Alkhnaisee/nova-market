@@ -57,6 +57,27 @@ function persistUsers() {
   savePersisted("mockUsers", userStore);
 }
 
+/**
+ * PASSWORD-RESET TOKENS — MOCK ONLY.
+ *
+ * `forgotPassword` issues a one-time token for the email and remembers which email it belongs to, so
+ * `resetPassword` can find the account to change. Tokens live in memory only (a page refresh forgets
+ * them, like any pending reset in a demo); the new *password* is persisted with the rest of the mock
+ * users, so it survives a refresh. A real backend emails the token and never hands it to the browser.
+ */
+export const RESET_TOKEN_TTL_MS = 60 * 60 * 1000;
+
+interface ResetTokenRecord {
+  email: string;
+  expiresAt: number;
+}
+
+const resetTokens = new Map<string, ResetTokenRecord>();
+
+function newResetToken(): string {
+  return globalThis.crypto?.randomUUID?.() ?? generateId("reset");
+}
+
 function toPublicUser(record: MockUserRecord): User {
   const { password: _password, ...user } = record;
   return user;
@@ -107,14 +128,36 @@ export const authApi = baseApi.injectEndpoints({
         return { data: await delay(toPublicUser(record), 400) };
       },
     }),
-    // Always "succeeds" regardless of whether the email exists — this is
-    // correct behavior for a real backend too (don't leak account existence).
-    forgotPassword: builder.mutation<{ ok: true }, { email: string }>({
-      queryFn: async () => ({ data: await delay({ ok: true as const }, 500) }),
+    // Always "succeeds" with the same response shape regardless of whether the email exists — correct
+    // for a real backend too (don't leak account existence). A token is remembered only when the email
+    // belongs to an account; for an unknown email the returned token simply fails at `resetPassword`.
+    // `demoToken` is returned only because this demo has no inbox; a real backend emails it instead.
+    forgotPassword: builder.mutation<{ ok: true; demoToken: string }, { email: string }>({
+      queryFn: async ({ email }) => {
+        const token = newResetToken();
+        const record = userStore.find((u) => u.email.toLowerCase() === email.trim().toLowerCase());
+        if (record) {
+          resetTokens.set(token, { email: record.email, expiresAt: Date.now() + RESET_TOKEN_TTL_MS });
+        }
+        return { data: await delay({ ok: true as const, demoToken: token }, 500) };
+      },
     }),
-    // Demo accepts any token — a real backend validates a signed, expiring token.
+    // Looks the token up, changes that account's password, persists it, and burns the token (one use).
+    // An unknown, already-used or expired token is a 400 with one message for all three cases.
     resetPassword: builder.mutation<{ ok: true }, { token: string; newPassword: string }>({
-      queryFn: async () => ({ data: await delay({ ok: true as const }, 500) }),
+      queryFn: async ({ token, newPassword }) => {
+        const entry = resetTokens.get(token);
+        resetTokens.delete(token);
+        const record = entry && entry.expiresAt > Date.now()
+          ? userStore.find((u) => u.email.toLowerCase() === entry.email.toLowerCase())
+          : undefined;
+        if (!record) {
+          return { error: { status: 400, message: "This reset link is invalid or has expired." } };
+        }
+        userStore = userStore.map((u) => (u.id === record.id ? { ...u, password: newPassword } : u));
+        persistUsers();
+        return { data: await delay({ ok: true as const }, 500) };
+      },
     }),
   }),
 });
