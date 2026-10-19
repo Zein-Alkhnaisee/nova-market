@@ -158,7 +158,7 @@ function validate(
 
   const image = input.image?.trim() ?? "";
   if (!image) fields.image = "required";
-  else if (!/^https?:\/\/\S+$/i.test(image)) fields.image = "invalidFormat";
+  else if (!isValidImageRef(image)) fields.image = "invalidFormat";
 
   if (input.inventory != null) {
     if (!Number.isFinite(input.inventory) || !Number.isInteger(input.inventory) || input.inventory < 0) {
@@ -179,6 +179,16 @@ function validate(
   }
 
   return { fields, slug };
+}
+
+/**
+ * A product image may be an external http(s) URL or a "/"-rooted path to a bundled asset (the seed
+ * products use the latter since the images moved into `src/assets`). Everything else is rejected:
+ * empty, `javascript:`, `data:`, other schemes, bare relative paths, and `//host` / `/\host`
+ * (which a browser treats as an external URL, not a local path).
+ */
+function isValidImageRef(value: string): boolean {
+  return /^https?:\/\/\S+$/i.test(value) || /^\/(?![\/\\])\S+$/.test(value);
 }
 
 function failure(fields: Partial<Record<string, ProductFieldError>>): ProductWriteResult {

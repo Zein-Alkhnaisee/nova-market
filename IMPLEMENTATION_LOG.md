@@ -498,3 +498,19 @@ The owner applied the commit above and ran everything: 558/559 passing. The fail
 
 **Verification: NOT RUN.** The sandbox cannot install dependencies (npm registry blocked), so `tsc -b`, lint, tests and build were not run. The last count I was told of is 558/559 on the checkout change; the redirect fix (2026-10-17 addendum) should have made it 559/559 across 74 files. This change adds 10 tests in 2 new files: expected **569 across 76 files** — unconfirmed. Static review is not a substitute for compilation. Likeliest trouble spots if something fails: the `"data" in result` narrowing in `ForgotPasswordPage`, the `Date.now` spy in the expiry test, and the button/link names the page test looks up ("Send reset link", "Continue to reset password (demo)", "Reset password").
 
+## 2026-10-19 — Bug fix: product image validator rejected the local asset paths (written, not run)
+
+**Found by the owner's local run** after applying the password-reset commit: 569 tests, 8 failing, all through `updateProduct`. The password-reset fix itself passed (its 10 tests, `tsc -b`, lint and build all fine). The owner isolated each failure and traced them to a single cause.
+
+**Base**: the password-reset commit `b51aa90` on top of GitHub `6ceb981`.
+
+**Root cause**: `6ceb981` ("Replace remote Unsplash images with local assets") changed the seed products' `image` values from `https://images.unsplash.com/…` to bundled assets (Vite-imported `src/assets/remote-images/*.jpg`, which resolve to "/"-rooted paths such as `/src/assets/…` in dev and `/assets/…-<hash>.jpg` in a build). `productStore`'s image check only allowed `http(s)://`, so every `updateProduct` that re-sent a seeded product's own image failed with `invalidFormat`: 8 failing tests (productStore ×4, categoryStore ×1, catalogReaders ×1, AdminProductsPages ×2), and, in the real app, saving any seeded product in the admin form. `createProduct` tests were unaffected only because their fixtures use explicit `https://` URLs.
+
+**Fix** (`services/catalog/productStore.ts`, one function and one call site): `isValidImageRef` in `productStore.ts`, used by both `createProduct` and `updateProduct` (they share `validate`): accepts `http(s)://…` or a "/"-rooted path with something after the slash; rejects empty (`required`), `javascript:`, `data:`, other schemes, bare relative paths, a lone `/`, paths with spaces, and `//host` / `/\host` (a browser treats those as external URLs, so they are not local paths). The error codes are unchanged (`required`, `invalidFormat`), so no UI or locale change was needed. The admin product form's image field is `type="url"` but its `<form>` is `noValidate`, so the browser does not block a "/"-rooted value before it reaches this check.
+
+**Not changed**: `6ceb981`'s images, any existing test (they assert the right behaviour), `categoryStore`, the payment boundary, `authApi.ts`.
+
+**Tests (written, not run)**: new `src/test/unit/productImageValidation.test.ts` (32 tests, 1 new file), going through `createProduct` and `updateProduct` only: accepted values (https, http, two "/"-rooted shapes: dev `/src/assets/…` and built `/assets/…-hash.jpg`), trimming, ten rejected shapes, the specific error codes, state unchanged after a rejected update, and a regression loop saving every seeded product with its own image.
+
+**Verification: NOT RUN** (npm registry blocked in this sandbox). The owner's expected count after the fix alone is 569/569 across 76 files; these 32 tests make it **601 across 77 files** — unconfirmed. Static review is not a substitute for compilation (see the `ShopPage.tsx` correction). Likeliest trouble spot if something fails: the regression loop, which re-saves every seeded product (it passes `slug: p.slug` so a slug clash cannot mask the image check).
+

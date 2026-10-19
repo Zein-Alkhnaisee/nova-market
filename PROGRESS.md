@@ -200,6 +200,16 @@ Checkpoint order (revised: Customers moved ahead of Products): admin auth → sh
 
 **Not yet verified in a real browser** for the admin shell across RTL/mobile/dark (same standing caveat as the rest of the project).
 
+## BUG FIX — PRODUCT IMAGE VALIDATOR REJECTED THE LOCAL ASSET PATHS (2026-10-19; written, awaiting the owner's verification)
+
+| Item | Status | Notes |
+|---|---|---|
+| Root cause | FOUND (by the owner's test run) | `6ceb981` ("Replace remote Unsplash images with local assets") changed the seed products' `image` values from `https://images.unsplash.com/…` to bundled assets (Vite-imported `src/assets/remote-images/*.jpg`, which resolve to "/"-rooted paths such as `/src/assets/…` in dev and `/assets/…-<hash>.jpg` in a build). `productStore`'s image check only allowed `http(s)://`, so every `updateProduct` that re-sent a seeded product's own image failed with `invalidFormat`: 8 failing tests (productStore ×4, categoryStore ×1, catalogReaders ×1, AdminProductsPages ×2), and, in the real app, saving any seeded product in the admin form. |
+| Validator relaxed | DONE (unverified) | `isValidImageRef` in `productStore.ts`, used by both `createProduct` and `updateProduct` (they share `validate`): accepts `http(s)://…` or a "/"-rooted path with something after the slash; rejects empty (`required`), `javascript:`, `data:`, other schemes, bare relative paths, a lone `/`, paths with spaces, and `//host` / `/\host` (a browser treats those as external URLs, so they are not local paths). |
+| Left alone | — | `6ceb981`'s images and `mocks/data/products.ts`; `categoryStore`'s own image check (seed categories have no images, so it was never affected); the payment boundary; `authApi.ts` and the password-reset fix; every existing test file |
+| Tests | WRITTEN, NOT RUN | New `productImageValidation.test.ts` (32): create and update both accept https, http and /-rooted paths; both reject empty, whitespace, `javascript:`, `data:`, `ftp:`, bare relative, `//host`, `/\host`, `/`, spaces; the specific errors are kept; every seeded product can be saved with its own image. The owner's expected 569/569 across 76 files is the fix alone; with these tests **601 across 77 files** — **not run** |
+| `tsc -b`, lint, tests, build | **PENDING (owner)** | Run the four commands (HANDOFF §10) |
+
 ## BUG FIX — PASSWORD RESET DID NOT CHANGE THE PASSWORD (2026-10-19; written, awaiting the owner's verification)
 
 | Item | Status | Notes |
